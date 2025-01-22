@@ -1,0 +1,21 @@
+@layer components {
+  .navbar {
+    @apply fixed top-0 left-0 right-0 bg-white border-b border-gray-200;
+  }
+
+  .navbar-container {
+    @apply max-w-7xl mx-auto flex justify-between items-center h-16 px-4;
+  }
+
+  .navbar-brand {
+    @apply text-black hover:text-gray-700 text-lg font-bold;
+  }
+
+  .navbar-links {
+    @apply flex items-center space-x-2 sm:space-x-4 md:space-x-6;
+  }
+
+  .navbar-link {
+    @apply text-black hover:text-gray-700;
+  }
+} 

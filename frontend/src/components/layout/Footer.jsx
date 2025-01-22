@@ -1,7 +1,7 @@
 const Footer = () => {
   return (
-    <footer className="bg-gray-800 text-white p-4 mt-auto">
-      <div className="container mx-auto text-center">
+    <footer className="footer">
+      <div className="footer-container">
         <p>© 2024 Serenity Sphere. All rights reserved.</p>
       </div>
     </footer>

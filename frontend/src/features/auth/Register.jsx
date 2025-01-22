@@ -123,30 +123,24 @@ const Register = () => {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Create your account
-          </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
-            Or{' '}
-            <Link to="/login" className="font-medium text-blue-600 hover:text-blue-500">
-              sign in to your account
-            </Link>
-          </p>
-        </div>
+    <div className="auth-container">
+      <div className="auth-box">
+        <h2 className="auth-title">Create your account</h2>
+        <p className="auth-subtitle">
+          Or{' '}
+          <Link to="/login" className="auth-link">
+            sign in to your account
+          </Link>
+        </p>
 
-        <form onSubmit={handleSubmit} className="mt-8 space-y-6">
+        <form onSubmit={handleSubmit} className="auth-form">
           {error && (
-            <div className="bg-red-50 border border-red-400 text-red-700 px-4 py-3 rounded relative">
-              {error}
-            </div>
+            <div className="auth-error">{error}</div>
           )}
 
-          <div className="rounded-md shadow-sm space-y-4">
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+          <div className="auth-form-group">
+            <div className="auth-input-group">
+              <label htmlFor="email" className="form-label">
                 Email address
               </label>
               <input
@@ -156,17 +150,15 @@ const Register = () => {
                 autoComplete="email"
                 value={formData.email}
                 onChange={handleChange}
-                className={`mt-1 appearance-none relative block w-full px-3 py-2 border ${
-                  fieldErrors.email ? 'border-red-300' : 'border-gray-300'
-                } rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm`}
+                className={`form-input ${fieldErrors.email ? 'form-input-error' : ''}`}
               />
               {fieldErrors.email && (
-                <p className="mt-1 text-sm text-red-600">{fieldErrors.email}</p>
+                <p className="form-error-text">{fieldErrors.email}</p>
               )}
             </div>
 
-            <div>
-              <label htmlFor="username" className="block text-sm font-medium text-gray-700">
+            <div className="auth-input-group">
+              <label htmlFor="username" className="form-label">
                 Username
               </label>
               <input
@@ -176,17 +168,15 @@ const Register = () => {
                 autoComplete="username"
                 value={formData.username}
                 onChange={handleChange}
-                className={`mt-1 appearance-none relative block w-full px-3 py-2 border ${
-                  fieldErrors.username ? 'border-red-300' : 'border-gray-300'
-                } rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm`}
+                className={`form-input ${fieldErrors.username ? 'form-input-error' : ''}`}
               />
               {fieldErrors.username && (
-                <p className="mt-1 text-sm text-red-600">{fieldErrors.username}</p>
+                <p className="form-error-text">{fieldErrors.username}</p>
               )}
             </div>
 
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+            <div className="auth-input-group">
+              <label htmlFor="password" className="form-label">
                 Password
               </label>
               <input
@@ -196,17 +186,15 @@ const Register = () => {
                 autoComplete="new-password"
                 value={formData.password}
                 onChange={handleChange}
-                className={`mt-1 appearance-none relative block w-full px-3 py-2 border ${
-                  fieldErrors.password ? 'border-red-300' : 'border-gray-300'
-                } rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm`}
+                className={`form-input ${fieldErrors.password ? 'form-input-error' : ''}`}
               />
               {fieldErrors.password && (
-                <p className="mt-1 text-sm text-red-600">{fieldErrors.password}</p>
+                <p className="form-error-text">{fieldErrors.password}</p>
               )}
             </div>
 
-            <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
+            <div className="auth-input-group">
+              <label htmlFor="confirmPassword" className="form-label">
                 Confirm Password
               </label>
               <input
@@ -216,23 +204,17 @@ const Register = () => {
                 autoComplete="new-password"
                 value={formData.confirmPassword}
                 onChange={handleChange}
-                className={`mt-1 appearance-none relative block w-full px-3 py-2 border ${
-                  fieldErrors.confirmPassword ? 'border-red-300' : 'border-gray-300'
-                } rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm`}
+                className={`form-input ${fieldErrors.confirmPassword ? 'form-input-error' : ''}`}
               />
               {fieldErrors.confirmPassword && (
-                <p className="mt-1 text-sm text-red-600">{fieldErrors.confirmPassword}</p>
+                <p className="form-error-text">{fieldErrors.confirmPassword}</p>
               )}
             </div>
-          </div>
 
-          <div>
             <button
               type="submit"
               disabled={isLoading}
-              className={`group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white ${
-                isLoading ? 'bg-blue-400' : 'bg-blue-600 hover:bg-blue-700'
-              } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500`}
+              className="form-button"
             >
               {isLoading ? 'Creating account...' : 'Create account'}
             </button>

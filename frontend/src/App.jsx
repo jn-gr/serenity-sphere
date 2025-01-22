@@ -11,9 +11,9 @@ function App() {
   return (
     <Provider store={store}>
       <Router>
-        <div className="min-h-screen flex flex-col">
+        <div className="app-container">
           <Navbar />
-          <main className="flex-grow container mx-auto px-4 py-8">
+          <main className="main-content">
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/login" element={<Login />} />

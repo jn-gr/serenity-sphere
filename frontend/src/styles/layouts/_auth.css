@@ -1,31 +1,37 @@
 @layer components {
   .auth-container {
-    @apply min-h-screen flex items-center justify-center 
-           bg-gray-50 py-12 px-4 sm:px-6 lg:px-8;
+    @apply min-h-[calc(100vh-8rem)] flex items-center justify-center px-4;
   }
 
   .auth-box {
-    @apply max-w-md w-full space-y-8 
-           bg-white p-6 sm:p-8 
-           rounded-lg shadow-md;
+    @apply max-w-md w-full bg-white p-8 rounded-lg shadow-sm border border-gray-200;
   }
 
   .auth-title {
-    @apply mt-6 text-center text-2xl sm:text-3xl 
-           font-extrabold text-gray-900;
+    @apply text-2xl font-bold text-center text-gray-900 mb-2;
   }
 
   .auth-subtitle {
-    @apply mt-2 text-center text-sm text-gray-600;
+    @apply text-sm text-center text-gray-600 mb-8;
   }
 
   .auth-link {
-    @apply font-medium text-primary hover:text-primary-dark 
-           transition-colors duration-200;
+    @apply text-blue-600 hover:text-blue-700 font-medium;
   }
 
   .auth-error {
-    @apply bg-red-50 border border-red-400 text-red-700 
-           px-4 py-3 rounded relative;
+    @apply bg-red-50 border border-red-400 text-red-700 px-4 py-3 rounded mb-4;
+  }
+
+  .auth-form {
+    @apply space-y-6;
+  }
+
+  .auth-form-group {
+    @apply space-y-4;
+  }
+
+  .auth-input-group {
+    @apply space-y-1;
   }
 } 
