@@ -1,0 +1,36 @@
+@import './base/_reset.css';
+@import './base/_typography.css';
+@import './base/_variables.css';
+@import './components/_forms.css';
+@import './layouts/_auth.css';
+@import './layouts/_home.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Import base styles */
+@import './base/_reset.css';
+@import './base/_typography.css';
+@import './base/_variables.css';
+
+/* Import component styles */
+@import './components/_buttons.css';
+@import './components/_navbar.css';
+
+/* Import layout styles */
+@import './layouts/_container.css';
+@import './layouts/_footer.css';
+
+/* Custom base styles */
+@layer base {
+  :root {
+    --primary: #3B82F6;
+    --primary-dark: #2563EB;
+    --secondary: #6B7280;
+    --success: #10B981;
+    --danger: #EF4444;
+    --warning: #F59E0B;
+    --info: #3B82F6;
+  }
+} 

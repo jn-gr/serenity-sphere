@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { Link, useNavigate } from 'react-router-dom'
 import { setCredentials } from './authSlice'
 import api from '../../services/api'
+import '../../styles/main.css'
 
 const Login = () => {
   // Form state
@@ -105,30 +106,24 @@ const Login = () => {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Sign in to your account
-          </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
-            Or{' '}
-            <Link to="/register" className="font-medium text-blue-600 hover:text-blue-500">
-              create a new account
-            </Link>
-          </p>
-        </div>
+    <div className="auth-container">
+      <div className="auth-box">
+        <h2 className="auth-title">Sign in to your account</h2>
+        <p className="auth-subtitle">
+          Or{' '}
+          <Link to="/register" className="auth-link">
+            create a new account
+          </Link>
+        </p>
 
-        <form onSubmit={handleSubmit} className="mt-8 space-y-6">
+        <form onSubmit={handleSubmit} className="form-container">
           {error && (
-            <div className="bg-red-50 border border-red-400 text-red-700 px-4 py-3 rounded relative">
-              {error}
-            </div>
+            <div className="auth-error">{error}</div>
           )}
 
-          <div className="rounded-md shadow-sm space-y-4">
+          <div className="form-group">
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="email" className="form-label">
                 Email address
               </label>
               <input
@@ -138,17 +133,15 @@ const Login = () => {
                 autoComplete="email"
                 value={formData.email}
                 onChange={handleChange}
-                className={`mt-1 appearance-none relative block w-full px-3 py-2 border ${
-                  fieldErrors.email ? 'border-red-300' : 'border-gray-300'
-                } rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm`}
+                className={`form-input ${fieldErrors.email ? 'form-input-error' : ''}`}
               />
               {fieldErrors.email && (
-                <p className="mt-1 text-sm text-red-600">{fieldErrors.email}</p>
+                <p className="form-error-text">{fieldErrors.email}</p>
               )}
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="password" className="form-label">
                 Password
               </label>
               <input
@@ -158,32 +151,20 @@ const Login = () => {
                 autoComplete="current-password"
                 value={formData.password}
                 onChange={handleChange}
-                className={`mt-1 appearance-none relative block w-full px-3 py-2 border ${
-                  fieldErrors.password ? 'border-red-300' : 'border-gray-300'
-                } rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm`}
+                className={`form-input ${fieldErrors.password ? 'form-input-error' : ''}`}
               />
               {fieldErrors.password && (
-                <p className="mt-1 text-sm text-red-600">{fieldErrors.password}</p>
+                <p className="form-error-text">{fieldErrors.password}</p>
               )}
             </div>
-          </div>
 
-          <div>
             <button
               type="submit"
               disabled={isLoading}
-              className={`group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white ${
-                isLoading ? 'bg-blue-400' : 'bg-blue-600 hover:bg-blue-700'
-              } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500`}
+              className="form-button"
             >
               {isLoading ? 'Signing in...' : 'Sign in'}
             </button>
-          </div>
-
-          <div className="text-sm text-center">
-            <Link to="/forgot-password" className="font-medium text-blue-600 hover:text-blue-500">
-              Forgot your password?
-            </Link>
           </div>
         </form>
       </div>

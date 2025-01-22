@@ -3,6 +3,9 @@ import { Provider } from 'react-redux'
 import { store } from './store/store'
 import Navbar from './components/layout/Navbar'
 import Footer from './components/layout/Footer'
+import Home from './features/home/Home'
+import Login from './features/auth/Login'
+import Register from './features/auth/Register'
 
 function App() {
   return (
