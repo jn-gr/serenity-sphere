@@ -65,8 +65,8 @@ const Register = () => {
     
     if (!formData.password) {
       errors.password = 'Password is required'
-    } else if (formData.password.length < 6) {
-      errors.password = 'Password must be at least 6 characters'
+    } else if (formData.password.length < 8) {
+      errors.password = 'Password must be at least 8 characters'
     }
     
     if (!formData.confirmPassword) {
@@ -93,31 +93,37 @@ const Register = () => {
     setError(null)
     
     try {
-      // Remove confirmPassword before sending to API
-      const { confirmPassword, ...registrationData } = formData
-      const response = await api.post('/auth/register/', registrationData)
+      const registrationData = {
+        email: formData.email.trim(),
+        username: formData.username.trim(),
+        password: formData.password,
+        confirm_password: formData.confirmPassword
+      }
       
-      // Store token in localStorage
+      const response = await api.post('/api/auth/register/', registrationData)
+      
       localStorage.setItem('token', response.data.token)
-      
-      // Update Redux state
       dispatch(setCredentials(response.data))
-      
-      // Redirect to home page
       navigate('/')
       
     } catch (err) {
-      // Handle different types of errors
-      if (err.response?.data?.email) {
-        setFieldErrors(prev => ({ ...prev, email: err.response.data.email }))
-      } else if (err.response?.data?.username) {
-        setFieldErrors(prev => ({ ...prev, username: err.response.data.username }))
-      } else if (err.response?.data?.detail) {
-        setError(err.response.data.detail)
-      } else if (err.response?.data?.errors) {
-        setFieldErrors(err.response.data.errors)
+      if (err.response?.data) {
+        // Handle specific field errors
+        const serverErrors = err.response.data
+        const fieldErrors = {}
+        
+        // Map server errors to fields
+        Object.keys(serverErrors).forEach(key => {
+          if (Array.isArray(serverErrors[key])) {
+            fieldErrors[key] = serverErrors[key][0]
+          } else {
+            fieldErrors[key] = serverErrors[key]
+          }
+        })
+        
+        setFieldErrors(fieldErrors)
       } else {
-        setError('An error occurred. Please try again.')
+        setError('Registration failed. Please try again.')
       }
     } finally {
       setIsLoading(false)

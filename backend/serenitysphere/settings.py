@@ -31,18 +31,16 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    # Django apps
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'django.contrib.sites',
     
     # Local apps
-    'core.apps.CoreConfig',
-    'api.apps.ApiConfig',
+    'core',
+    'api',
     
     # Third party apps
     'rest_framework',
@@ -145,7 +143,7 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-AUTH_USER_MODEL = 'core.User'
+AUTH_USER_MODEL = 'core.CustomUser'
 SITE_ID = 1
 
 CORS_ALLOWED_ORIGINS = [

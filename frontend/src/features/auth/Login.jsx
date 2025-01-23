@@ -79,7 +79,7 @@ const Login = () => {
     setError(null)
     
     try {
-      const response = await api.post('/auth/login/', formData)
+      const response = await api.post('/api/auth/login/', formData)
       
       // Store token in localStorage
       localStorage.setItem('token', response.data.token)
