@@ -3,6 +3,8 @@ import { useDispatch, useSelector } from 'react-redux'
 import { Link, useNavigate } from 'react-router-dom'
 import { setCredentials } from './authSlice'
 import api from '../../services/api'
+import '../../styles/layouts/_auth.css'
+import '../../styles/components/_forms.css'
 
 const Register = () => {
   // Form state

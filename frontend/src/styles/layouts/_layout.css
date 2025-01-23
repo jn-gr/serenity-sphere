@@ -1,9 +1,8 @@
-@layer components {
-  .app-container {
-    @apply flex flex-col min-h-screen;
-  }
+.app-container {
+  @apply flex flex-col min-h-screen bg-white dark:bg-gray-900;
+}
 
-  .main-content {
-    @apply flex-1 w-full pt-16;
-  }
+.main-content {
+  @apply flex-1 w-full pt-16 bg-white dark:bg-gray-900 
+         text-black dark:text-white;
 } 

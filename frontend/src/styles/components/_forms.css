@@ -1,46 +1,47 @@
-@layer components {
-  .form-container {
-    @apply mt-8 space-y-6;
-  }
+.form-container {
+  @apply mt-8 space-y-6;
+}
 
-  .form-group {
-    @apply space-y-4;
-  }
+.form-group {
+  @apply space-y-4;
+}
 
-  .form-input-group {
-    @apply rounded-md shadow-sm space-y-4;
-  }
+.form-input-group {
+  @apply rounded-md shadow-sm space-y-4;
+}
 
-  .form-label {
-    @apply block text-sm font-medium text-black;
-  }
+.form-label {
+  @apply block text-sm font-medium 
+         text-gray-700 dark:text-gray-300 mb-1;
+}
 
-  .form-input {
-    @apply mt-1 appearance-none relative block w-full 
-           px-3 py-2 border border-gray-300 
-           placeholder-gray-400 text-black
-           rounded-md focus:outline-none 
-           focus:ring-blue-500 focus:border-blue-500 
-           sm:text-sm;
-  }
+.form-input {
+  @apply w-full px-3 py-2 
+         bg-white dark:bg-gray-700 
+         border border-gray-300 dark:border-gray-600 
+         text-black dark:text-white 
+         rounded-md 
+         focus:outline-none 
+         focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400;
+}
 
-  .form-input-error {
-    @apply border-red-300 focus:ring-red-500 
-           focus:border-red-500;
-  }
+.form-input-error {
+  @apply border-red-300 focus:ring-red-500 
+         focus:border-red-500;
+}
 
-  .form-error-text {
-    @apply mt-1 text-sm text-red-600;
-  }
+.form-error-text {
+  @apply text-red-600 dark:text-red-400 text-sm mt-1;
+}
 
-  .form-button {
-    @apply w-full flex justify-center py-2 px-4 
-           border border-gray-300 text-sm font-medium 
-           rounded-md text-black bg-white 
-           hover:bg-gray-50 focus:outline-none 
-           focus:ring-2 focus:ring-offset-2 
-           focus:ring-blue-500 transition-colors 
-           duration-200 disabled:bg-gray-100 
-           disabled:cursor-not-allowed;
-  }
-} 
+.form-button {
+  @apply w-full py-2 px-4 
+         bg-white dark:bg-gray-700 
+         text-black dark:text-white 
+         border border-gray-300 dark:border-gray-600 
+         rounded-md 
+         hover:bg-gray-50 dark:hover:bg-gray-600 
+         focus:outline-none 
+         focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 
+         transition-colors duration-200;
+}

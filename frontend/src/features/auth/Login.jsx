@@ -3,7 +3,8 @@ import { useDispatch, useSelector } from 'react-redux'
 import { Link, useNavigate } from 'react-router-dom'
 import { setCredentials } from './authSlice'
 import api from '../../services/api'
-import '../../styles/main.css'
+import '../../styles/layouts/_auth.css'
+import '../../styles/components/_forms.css'
 
 const Login = () => {
   // Form state
@@ -116,13 +117,13 @@ const Login = () => {
           </Link>
         </p>
 
-        <form onSubmit={handleSubmit} className="form-container">
+        <form onSubmit={handleSubmit} className="auth-form">
           {error && (
             <div className="auth-error">{error}</div>
           )}
 
-          <div className="form-group">
-            <div>
+          <div className="auth-form-group">
+            <div className="auth-input-group">
               <label htmlFor="email" className="form-label">
                 Email address
               </label>
@@ -140,7 +141,7 @@ const Login = () => {
               )}
             </div>
 
-            <div>
+            <div className="auth-input-group">
               <label htmlFor="password" className="form-label">
                 Password
               </label>
