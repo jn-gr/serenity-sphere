@@ -22,7 +22,6 @@
   @apply flex items-center justify-center w-8 h-8 transition-colors duration-200;
   background-color: transparent;
   color: var(--text-color);
-  border-color: rgba(204, 204, 204, 0.5);
   
   &:hover {
     background-color: rgba(240, 240, 240, 0.5);
