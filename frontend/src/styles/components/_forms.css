@@ -16,13 +16,10 @@
 }
 
 .form-input {
-  @apply w-full px-3 py-2 
-         bg-white dark:bg-gray-700 
-         border border-gray-300 dark:border-gray-600 
-         text-black dark:text-white 
-         rounded-md 
-         focus:outline-none 
-         focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400;
+  @apply w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2;
+  background-color: var(--background-color);
+  color: var(--text-color);
+  border-color: #ccc; /* Darker border for light mode */
 }
 
 .form-input-error {
@@ -35,13 +32,8 @@
 }
 
 .form-button {
-  @apply w-full py-2 px-4 
-         bg-white dark:bg-gray-700 
-         text-black dark:text-white 
-         border border-gray-300 dark:border-gray-600 
-         rounded-md 
-         hover:bg-gray-50 dark:hover:bg-gray-600 
-         focus:outline-none 
-         focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 
-         transition-colors duration-200;
+  @apply w-full py-2 px-4 border rounded-md transition-colors duration-200;
+  background-color: var(--background-color);
+  color: var(--text-color);
+  border-color: #ccc; /* Darker border for light mode */
 }

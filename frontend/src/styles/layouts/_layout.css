@@ -5,4 +5,10 @@
 .main-content {
   @apply flex-1 w-full pt-16 bg-white dark:bg-gray-900 
          text-black dark:text-white;
+}
+
+.layout {
+  background-color: var(--background-color);
+  color: var(--text-color);
+  /* Other styles... */
 } 

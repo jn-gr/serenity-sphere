@@ -1,11 +1,14 @@
 .auth-container {
   @apply min-h-[calc(100vh-8rem)] flex items-center justify-center px-4;
+  background-color: var(--background-color);
+  color: var(--text-color);
 }
 
 .auth-box {
-  @apply max-w-md w-full bg-white dark:bg-gray-800 
-         p-8 rounded-lg shadow-sm 
-         border border-gray-200 dark:border-gray-700;
+  @apply max-w-md w-full p-8 rounded-lg shadow-sm border;
+  background-color: var(--background-color);
+  color: var(--text-color);
+  border-color: #ccc;
 }
 
 .auth-title {
@@ -38,4 +41,8 @@
          border border-red-400 dark:border-red-800 
          text-red-700 dark:text-red-300 
          px-4 py-3 rounded mb-4;
+}
+
+.auth-title, .auth-subtitle, .auth-link, .auth-error {
+  color: var(--text-color);
 } 

@@ -1,5 +1,14 @@
 .theme-toggle {
-  @apply p-2 rounded-full hover:bg-gray-100
-         text-white
-         transition-colors duration-200 text-xl;
+  @apply w-full py-2 px-4 border rounded-md transition-colors duration-200;
+  background-color: var(--background-color);
+  color: var(--text-color);
+  border-color: #ccc; /* Darker border for light mode */
+  /* Add hover and focus styles if needed */
+  &:hover {
+    background-color: #f0f0f0; /* Example hover color */
+  }
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px #007bff; /* Example focus ring */
+  }
 } 

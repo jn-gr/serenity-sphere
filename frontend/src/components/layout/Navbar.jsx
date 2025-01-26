@@ -4,11 +4,21 @@ import { logout } from '../../features/auth/authSlice'
 import ThemeToggle from './ThemeToggle'
 import '../../styles/components/_navbar.css'
 import api from '../../services/api'
+import homeDark from '../../assets/home_dark.svg'
+import homeWhite from '../../assets/home_white.svg'
+import loginDark from '../../assets/login_dark.svg'
+import loginWhite from '../../assets/login_white.svg'
+import registerDark from '../../assets/register_dark.svg'
+import registerWhite from '../../assets/register_white.svg'
+import signoutDark from '../../assets/signout_dark.svg'
+import signoutWhite from '../../assets/signout_white.svg'
+import { useTheme } from '../../context/ThemeContext'
 
 const Navbar = () => {
   const dispatch = useDispatch()
   const navigate = useNavigate()
   const isAuthenticated = useSelector((state) => state.auth.isAuthenticated)
+  const { isDark } = useTheme()
 
   const handleSignOut = async () => {
     try {
@@ -27,16 +37,21 @@ const Navbar = () => {
           Serenity Sphere
         </Link>
         <div className="navbar-links">
+          <Link to="/" className="navbar-link">
+            <img src={isDark ? homeDark : homeWhite} alt="Home" />
+          </Link>
           {isAuthenticated ? (
-            <>
-              <button onClick={handleSignOut} className="navbar-link">
-                Sign Out
-              </button>
-            </>
+            <button onClick={handleSignOut} className="navbar-link">
+              <img src={isDark ? signoutDark : signoutWhite} alt="Sign Out" />
+            </button>
           ) : (
             <>
-              <Link to="/login" className="navbar-link">Login</Link>
-              <Link to="/register" className="navbar-link">Register</Link>
+              <Link to="/login" className="navbar-link">
+                <img src={isDark ? loginDark : loginWhite} alt="Login" />
+              </Link>
+              <Link to="/register" className="navbar-link">
+                <img src={isDark ? registerDark : registerWhite} alt="Register" />
+              </Link>
             </>
           )}
           <ThemeToggle />

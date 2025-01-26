@@ -14,8 +14,8 @@ html, body, #root {
 }
 
 body {
-  background-color: white;
-  color: black;
+  background-color: var(--background-color);
+  color: var(--text-color);
 }
 
 /* Your other CSS imports below */
@@ -33,6 +33,16 @@ body {
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  /* Light mode styles */
+  --background-color: #ffffff;
+  --text-color: #000000;
+}
+
+.dark {
+  /* Dark mode styles */
+  --background-color: #242424;
+  --text-color: #ffffff;
 }
 
 a {

@@ -1,9 +1,11 @@
 .footer {
-  @apply w-full bg-white dark:bg-gray-900 
-         border-t border-gray-200 dark:border-gray-700;
+  @apply w-full;
+  background-color: var(--background-color);
+  color: var(--text-color);
 }
 
 .footer-container {
   @apply max-w-7xl mx-auto py-6 px-4 text-center 
          text-black dark:text-white font-sans;
+  color: var(--text-color);
 } 
