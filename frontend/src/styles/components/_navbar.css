@@ -1,5 +1,5 @@
 .navbar {
-  @apply fixed top-0 left-0 right-0;
+  @apply w-full;
   background-color: var(--background-color);
   color: var(--text-color);
 }
@@ -12,24 +12,25 @@
   @apply text-black dark:text-white 
          hover:text-gray-700 dark:hover:text-gray-300 
          text-lg font-bold font-sans;
-  color: var(--text-color);
 }
 
 .navbar-links {
-  @apply flex items-center space-x-2 sm:space-x-4 md:space-x-6;
+  @apply flex items-center space-x-2 sm:space-x-4 md:space-x-6 p-2;
 }
 
 .navbar-link {
-  @apply w-full py-2 px-4 border rounded-md transition-colors duration-200;
-  background-color: var(--background-color);
+  @apply flex items-center justify-center w-8 h-8 transition-colors duration-200;
+  background-color: transparent;
   color: var(--text-color);
-  border-color: #ccc; /* Darker border for light mode */
-  /* Add hover and focus styles if needed */
+  border-color: rgba(204, 204, 204, 0.5);
+  
   &:hover {
-    background-color: #f0f0f0; /* Example hover color */
+    background-color: rgba(240, 240, 240, 0.5);
+    color: #007bff;
   }
+  
   &:focus {
     outline: none;
-    box-shadow: 0 0 0 2px #007bff; /* Example focus ring */
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.5);
   }
-} 
+}

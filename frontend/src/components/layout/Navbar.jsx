@@ -38,19 +38,19 @@ const Navbar = () => {
         </Link>
         <div className="navbar-links">
           <Link to="/" className="navbar-link">
-            <img src={isDark ? homeDark : homeWhite} alt="Home" />
+            <img src={isDark ? homeDark : homeWhite} alt="Home" style={{ height: '24px' }} />
           </Link>
           {isAuthenticated ? (
             <button onClick={handleSignOut} className="navbar-link">
-              <img src={isDark ? signoutDark : signoutWhite} alt="Sign Out" />
+              <img src={isDark ? signoutDark : signoutWhite} alt="Sign Out" style={{ height: '24px' }} />
             </button>
           ) : (
             <>
               <Link to="/login" className="navbar-link">
-                <img src={isDark ? loginDark : loginWhite} alt="Login" />
+                <img src={isDark ? loginDark : loginWhite} alt="Login" style={{ height: '24px' }} />
               </Link>
               <Link to="/register" className="navbar-link">
-                <img src={isDark ? registerDark : registerWhite} alt="Register" />
+                <img src={isDark ? registerDark : registerWhite} alt="Register" style={{ height: '24px' }} />
               </Link>
             </>
           )}
