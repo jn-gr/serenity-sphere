@@ -20,7 +20,9 @@ from core import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('api/csrf/', views.get_csrf_token, name='csrf'),
     path('api/auth/register/', views.register_user, name='register'),
     path('api/auth/login/', views.login_user, name='login'),
+    path('api/auth/logout/', views.logout_user, name='logout'),
     path('api/auth/user/', views.get_user, name='user'),
 ]

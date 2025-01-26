@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import { Link, useNavigate } from 'react-router-dom'
 import { setCredentials } from './authSlice'
 import api from '../../services/api'
@@ -21,84 +21,32 @@ const Login = () => {
   const dispatch = useDispatch()
   const navigate = useNavigate()
   
-  // Check if user is already logged in
-  const isAuthenticated = useSelector((state) => state.auth.isAuthenticated)
-  if (isAuthenticated) {
-    navigate('/')
-    return null
-  }
-
   // Handle input changes
   const handleChange = (e) => {
     const { name, value } = e.target
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }))
+    setFormData(prev => ({ ...prev, [name]: value }))
     // Clear field-specific error when user starts typing
     if (fieldErrors[name]) {
-      setFieldErrors(prev => ({
-        ...prev,
-        [name]: ''
-      }))
+      setFieldErrors(prev => ({ ...prev, [name]: '' }))
     }
     setError(null) // Clear general error
-  }
-
-  // Validate form
-  const validateForm = () => {
-    const errors = {}
-    
-    if (!formData.email) {
-      errors.email = 'Email is required'
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      errors.email = 'Please enter a valid email'
-    }
-    
-    if (!formData.password) {
-      errors.password = 'Password is required'
-    } else{
-      errors.password = 'Password is incorrect'
-    }
-    return errors
   }
 
   // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault()
-    
-    // Validate form
-    const errors = validateForm()
-    if (Object.keys(errors).length > 0) {
-      setFieldErrors(errors)
-      return
-    }
-    
     setIsLoading(true)
     setError(null)
     
     try {
       const response = await api.post('/api/auth/login/', formData)
-      
-      // Store token in localStorage
-      localStorage.setItem('token', response.data.token)
-      
-      // Update Redux state
       dispatch(setCredentials(response.data))
-      
-      // Redirect to home page
       navigate('/')
-      
     } catch (err) {
-      // Handle different types of errors
-      if (err.response?.status === 401) {
-        setError('Invalid email or password')
-      } else if (err.response?.data?.detail) {
-        setError(err.response.data.detail)
-      } else if (err.response?.data?.errors) {
-        setFieldErrors(err.response.data.errors)
+      if (err.response?.data) {
+        setFieldErrors(err.response.data)
       } else {
-        setError('An error occurred. Please try again.')
+        setError('Login failed. Please try again.')
       }
     } finally {
       setIsLoading(false)
