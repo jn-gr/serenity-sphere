@@ -1,0 +1,59 @@
+.journal-item {
+    border: 1px solid var(--border-color);
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-radius: 8px;
+    background-color: var(--bg-accent);
+}
+
+.journal-item h3 {
+    margin-top: 0;
+    color: var(--text-primary);
+}
+
+.journal-actions button {
+    margin-right: 0.5rem;
+    padding: 0.5rem 1rem;
+    background-color: var(--button-bg);
+    color: var(--button-text);
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.journal-actions button:hover {
+    background-color: var(--button-hover);
+}
+
+.journal-form textarea {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid var(--input-border);
+    border-radius: 4px;
+    background-color: var(--input-bg);
+    color: var(--input-text);
+    resize: vertical;
+    transition: border-color 0.3s, background-color 0.3s, color 0.3s;
+}
+
+.journal-form button {
+    margin-top: 0.5rem;
+    padding: 0.5rem 1rem;
+    background-color: var(--button-bg);
+    color: var(--button-text);
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    transition: background-color 0.3s;
+}
+
+.journal-form button:hover {
+    background-color: var(--button-hover);
+}
+
+.journal-form button svg {
+    margin-right: 0.5rem;
+} 

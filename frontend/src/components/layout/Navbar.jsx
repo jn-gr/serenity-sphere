@@ -10,23 +10,24 @@ import loginDark from '../../assets/login_dark.svg'
 import loginWhite from '../../assets/login_white.svg'
 import registerDark from '../../assets/register_dark.svg'
 import registerWhite from '../../assets/register_white.svg'
-import signoutDark from '../../assets/signout_dark.svg'
-import signoutWhite from '../../assets/signout_white.svg'
+
 import { useTheme } from '../../context/ThemeContext'
+import { FaSignOutAlt, FaBook, FaSignInAlt, FaUserPlus } from 'react-icons/fa'
 
 const Navbar = () => {
   const dispatch = useDispatch()
   const navigate = useNavigate()
   const isAuthenticated = useSelector((state) => state.auth.isAuthenticated)
+  const user = useSelector((state) => state.auth.user)
   const { isDark } = useTheme()
 
-  const handleSignOut = async () => {
+  const handleLogout = async () => {
     try {
       await api.post('/api/auth/logout/')
       dispatch(logout())
       navigate('/login')
-    } catch (error) {
-      console.error('Logout failed:', error)
+    } catch (err) {
+      console.error('Failed to logout:', err)
     }
   }
 
@@ -41,16 +42,22 @@ const Navbar = () => {
             <img src={isDark ? homeDark : homeWhite} alt="Home" style={{ height: '24px' }} />
           </Link>
           {isAuthenticated ? (
-            <button onClick={handleSignOut} className="navbar-link">
-              <img src={isDark ? signoutDark : signoutWhite} alt="Sign Out" style={{ height: '24px' }} />
-            </button>
+            <>
+              <Link to="/journal" className="navbar-link" title="Journal">
+                <FaBook size={20} />
+              </Link>
+              <span className="navbar-user">Hello, {user.username}</span>
+              <button onClick={handleLogout} className="navbar-icon-button" aria-label="Logout">
+                <FaSignOutAlt size={20} />
+              </button>
+            </>
           ) : (
             <>
-              <Link to="/login" className="navbar-link">
-                <img src={isDark ? loginDark : loginWhite} alt="Login" style={{ height: '24px' }} />
+              <Link to="/login" className="navbar-link" title="Login">
+                <FaSignInAlt size={20} />
               </Link>
-              <Link to="/register" className="navbar-link">
-                <img src={isDark ? registerDark : registerWhite} alt="Register" style={{ height: '24px' }} />
+              <Link to="/register" className="navbar-link" title="Register">
+                <FaUserPlus size={20} />
               </Link>
             </>
           )}

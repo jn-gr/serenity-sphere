@@ -30,3 +30,17 @@ class CustomUser(AbstractUser):
 
     # Add custom fields here
     pass
+
+class JournalEntry(models.Model):
+    user = models.ForeignKey(CustomUser, related_name='journal_entries', on_delete=models.CASCADE)
+    date = models.DateField(auto_now_add=True)
+    content = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        unique_together = ('user', 'date')
+        ordering = ['-date']
+
+    def __str__(self):
+        return f"Journal Entry by {self.user.email} on {self.date}"

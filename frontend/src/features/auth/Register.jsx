@@ -1,10 +1,11 @@
-import { useState } from 'react'
-import { useDispatch } from 'react-redux'
+import React, { useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import { Link, useNavigate } from 'react-router-dom'
 import { setCredentials } from './authSlice'
 import api from '../../services/api'
 import '../../styles/layouts/_auth.css'
 import '../../styles/components/_forms.css'
+import { FaUserPlus } from 'react-icons/fa'
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -75,7 +76,10 @@ const Register = () => {
   return (
     <div className="auth-container">
       <div className="auth-box">
-        <h2 className="auth-title">Create your account</h2>
+        <h2 className="auth-title">
+          <FaUserPlus size={24} style={{ marginRight: '8px' }} />
+          Create your account
+        </h2>
         <p className="auth-subtitle">
           Or <Link to="/login" className="auth-link">sign in to your account</Link>
         </p>

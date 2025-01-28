@@ -86,7 +86,7 @@ def main():
     )
 
     # 8. Train
-    trainer.train()
+    trainer.train(resume_from_checkpoint="./results_multilabel/checkpoint-10000")
 
 
     # 9. Evaluate

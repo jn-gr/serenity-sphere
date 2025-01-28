@@ -1,6 +1,7 @@
-import { useState } from 'react'
-import { useDispatch } from 'react-redux'
+import React, { useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import { Link, useNavigate } from 'react-router-dom'
+import { FaSignInAlt } from 'react-icons/fa'
 import { setCredentials } from './authSlice'
 import api from '../../services/api'
 import '../../styles/layouts/_auth.css'
@@ -56,7 +57,10 @@ const Login = () => {
   return (
     <div className="auth-container">
       <div className="auth-box">
-        <h2 className="auth-title">Sign in to your account</h2>
+        <h2 className="auth-title">
+          <FaSignInAlt size={24} style={{ marginRight: '8px' }} />
+          Sign in to your account
+        </h2>
         <p className="auth-subtitle">
           Or{' '}
           <Link to="/register" className="auth-link">

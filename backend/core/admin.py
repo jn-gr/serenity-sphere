@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.utils.translation import gettext_lazy as _
-from .models import CustomUser
+from .models import CustomUser, JournalEntry
 
 @admin.register(CustomUser)
 class CustomUserAdmin(UserAdmin):
@@ -24,3 +24,10 @@ class CustomUserAdmin(UserAdmin):
             'fields': ('email', 'username', 'password1', 'password2'),
         }),
     )
+
+@admin.register(JournalEntry)
+class JournalEntryAdmin(admin.ModelAdmin):
+    list_display = ('user', 'date', 'created_at')
+    search_fields = ('user__email', 'content')
+    list_filter = ('date',)
+    ordering = ('-date',)

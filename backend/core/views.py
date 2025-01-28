@@ -1,16 +1,16 @@
 from django.contrib.auth import login, logout, authenticate
-from rest_framework import status
+from rest_framework import status, viewsets
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
-from .serializers import RegisterSerializer, LoginSerializer, UserSerializer
+from .serializers import RegisterSerializer, LoginSerializer, UserSerializer, JournalEntrySerializer
+from .models import JournalEntry
 from django.middleware.csrf import get_token
 from django.http import JsonResponse
 import logging
 
 logger = logging.getLogger(__name__)
 
-# Create your views here.
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
@@ -58,3 +58,13 @@ def logout_user(request):
 @permission_classes([IsAuthenticated])
 def get_user(request):
     return Response(UserSerializer(request.user).data)
+
+class JournalEntryViewSet(viewsets.ModelViewSet):
+    serializer_class = JournalEntrySerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return JournalEntry.objects.filter(user=self.request.user)
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
