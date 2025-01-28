@@ -1,2 +1,0 @@
-serenity-sphere/scripts/results_multilabel/* filter=lfs diff=lfs merge=lfs -text
-serenity-sphere/models/roberta_model_multilabel/* filter=lfs diff=lfs merge=lfs -text
