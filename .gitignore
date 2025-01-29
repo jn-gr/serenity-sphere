@@ -6,6 +6,5 @@ node_modules/
 *.pt
 *.pkl
 .env
-scripts/results_multilabel/*
-scripts/logs_multilabel/*
+scripts/
 models/
