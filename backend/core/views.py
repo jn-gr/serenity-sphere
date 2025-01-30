@@ -7,6 +7,7 @@ from .serializers import RegisterSerializer, LoginSerializer, UserSerializer, Jo
 from .models import JournalEntry
 from django.middleware.csrf import get_token
 from django.http import JsonResponse
+from .ai_services import predict_emotions
 import logging
 
 logger = logging.getLogger(__name__)
@@ -68,3 +69,9 @@ class JournalEntryViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
+
+@api_view(["POST"])
+def detect_emotions(request):
+    text = request.data.get("text", "")
+    predictions = predict_emotions(text)
+    return Response({"emotions": predictions})

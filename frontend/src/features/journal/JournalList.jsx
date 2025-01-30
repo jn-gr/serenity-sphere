@@ -3,6 +3,7 @@ import { useSelector, useDispatch } from 'react-redux'
 import { fetchJournalEntries, deleteJournalEntry } from './journalSlice'
 import JournalItem from './JournalItem'
 import { Link } from 'react-router-dom'
+import EmotionDetector from '../emotion/EmotionDetector'
 
 const JournalList = () => {
     const dispatch = useDispatch()
@@ -41,6 +42,7 @@ const JournalList = () => {
             <h2>Your Journal Entries</h2>
             <Link to="/journal/new" className="create-entry-button">Create New Entry</Link>
             {content}
+            <EmotionDetector />
         </div>
     )
 }
