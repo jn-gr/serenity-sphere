@@ -17,7 +17,7 @@ const JournalList = () => {
     }, [status, dispatch])
 
     const handleDelete = (id) => {
-        if (window.confirm('Are you sure you want to delete this entry?')) {
+        if (window.confirm('Are you sure you want to delete this journal entry?')) {
             dispatch(deleteJournalEntry(id))
         }
     }
@@ -28,7 +28,7 @@ const JournalList = () => {
         content = <p>Loading...</p>
     } else if (status === 'succeeded') {
         if (entries.length === 0) {
-            content = <p>No journal entries found. <Link to="/journal/new">Create one now!</Link></p>
+            content = <p>No Journal Entries found. <Link to="/journal/new">Create one now!</Link></p>
         } else {
             content = entries.map(entry => (
                 <JournalItem className="journal-item" key={entry.id} entry={entry} onDelete={handleDelete} />
@@ -40,8 +40,8 @@ const JournalList = () => {
 
     return (
         <div className="journal-container">
-            <h2>Your Daily Mood Log</h2>
-            <Link to="/journal/new" className="create-entry-button">Create New Entry</Link>
+            <h2>Your Daily Journal</h2>
+            <Link to="/journal/new" className="create-entry-button">Enter your daily journal entry (TESTING)</Link>
             {content}
             <br></br>
             <EmotionDetector />

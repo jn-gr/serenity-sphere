@@ -31,6 +31,7 @@ const JournalItem = ({ entry, onDelete }) => {
             <h3>{new Date(entry.date).toLocaleDateString()}</h3>
             {isEditing ? (
                 <textarea
+                    className="journal-textarea"
                     value={content}
                     onChange={(e) => setContent(e.target.value)}
                     rows="4"
@@ -42,10 +43,10 @@ const JournalItem = ({ entry, onDelete }) => {
             <div className="journal-actions">
                 {isEditing ? (
                     <>
-                        <button onClick={handleSave} aria-label="Save">
+                        <button onClick={handleSave} aria-label="Save" className="journal-actions-button">
                             <FaSave size={16} />
                         </button>
-                        <button onClick={handleCancel} aria-label="Cancel">
+                        <button onClick={handleCancel} aria-label="Cancel" className="journal-actions-button">
                             <FaTimes size={16} />
                         </button>
                     </>

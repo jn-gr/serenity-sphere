@@ -43,3 +43,5 @@ class JournalEntry(models.Model):
 
     def __str__(self):
         return f"Journal Entry by {self.user.email} on {self.date}"
+    
+    

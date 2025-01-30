@@ -21,14 +21,14 @@ const JournalForm = () => {
                     navigate('/journal')
                 })
                 .catch((err) => {
-                    console.error('Failed to create journal entry:', err)
+                    console.error('Failed to create Journal Entry:', err)
                 })
         }
     }
 
     return (
         <div className="journal-container">
-            <h2>Create New Journal Entry</h2>
+            <h2>Write your daily journal entry</h2>
             <form onSubmit={handleSubmit}>
                 <textarea
                     className="journal-textarea"
