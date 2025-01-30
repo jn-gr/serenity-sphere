@@ -6,17 +6,14 @@
 
 .auth-box {
   @apply max-w-md w-full p-8 rounded-lg shadow-sm border;
-  background-color: var(--background-color);
-  color: var(--text-color);
-  border-color: #ccc;
 }
 
 .auth-title {
-  @apply text-2xl font-bold text-black dark:text-white mb-2;
+  @apply text-2xl font-bold mb-2;
 }
 
 .auth-subtitle {
-  @apply text-sm text-gray-600 dark:text-gray-400 mb-8;
+  @apply text-sm mb-8;
 }
 
 .auth-form {

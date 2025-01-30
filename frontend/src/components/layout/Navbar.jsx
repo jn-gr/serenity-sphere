@@ -1,31 +1,32 @@
-import { Link, useNavigate } from 'react-router-dom'
-import { useDispatch, useSelector } from 'react-redux'
-import { logout } from '../../features/auth/authSlice'
-import ThemeToggle from './ThemeToggle'
-import '../../styles/components/_navbar.css'
-import api from '../../services/api'
-import { useTheme } from '../../context/ThemeContext'
-import { FaSignOutAlt, FaBook, FaSignInAlt, FaHome, FaUser} from 'react-icons/fa'
+// frontend/src/components/layout/Navbar.jsx
+import { Link, useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { logout } from '../../features/auth/authSlice';
+import ThemeToggle from './ThemeToggle';
+import '../../styles/components/_navbar.css';
+import api from '../../services/api';
+import { useTheme } from '../../context/ThemeContext';
+import { FaSignOutAlt, FaBook, FaSignInAlt, FaHome } from 'react-icons/fa';
 
 const Navbar = () => {
-  const dispatch = useDispatch()
-  const navigate = useNavigate()
-  const isAuthenticated = useSelector((state) => state.auth.isAuthenticated)
-  const user = useSelector((state) => state.auth.user)
-  const { isDark } = useTheme()
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
+  const user = useSelector((state) => state.auth.user);
+  const { isDark } = useTheme();
 
   const handleLogout = async () => {
     try {
-      await api.post('/api/auth/logout/')
-      dispatch(logout())
-      navigate('/login')
+      await api.post('/api/auth/logout/');
+      dispatch(logout());
+      navigate('/login');
     } catch (err) {
-      console.error('Failed to logout:', err)
+      console.error('Failed to logout:', err);
     }
-  }
+  };
 
   return (
-    <nav className="navbar">
+    <nav >
       <div className="navbar-container">
         <Link to="/" className="navbar-brand">
           Serenity Sphere
@@ -54,7 +55,7 @@ const Navbar = () => {
         </div>
       </div>
     </nav>
-  )
-}
+  );
+};
 
-export default Navbar 
+export default Navbar;

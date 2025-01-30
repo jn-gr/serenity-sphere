@@ -11,6 +11,10 @@ export default {
         sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
         serif: ['Georgia', 'serif'],
       },
+      colors: {
+        'theme-color-card': '#b4c7ed',
+        'theme-color-dark-card': '#1c1d22',
+      },
     },
   },
   plugins: [],

@@ -1,6 +1,11 @@
-.home-container{
-  @apply flex flex-col items-center justify-center p-4 max-w-3xl mx-auto;
-    background-color: var(--background-color);
-    color: var(--text-color);
-    
+.home-container {
+  @apply flex flex-col md:flex-row; /* Flexbox layout for responsiveness */
+}
+
+.home-features {
+  @apply flex-1 p-4; /* Take up available space and add padding */
+}
+
+.mental-health-info {
+  @apply flex-1 p-4  rounded-lg; /* Style for the mental health info section */
 }

@@ -1,7 +1,6 @@
 import { useTheme } from '../../context/ThemeContext'
 import '../../styles/components/_theme-toggle.css'
 
-// Import React Icons for Sun and Moon
 import { FaSun, FaMoon } from 'react-icons/fa'
 
 const ThemeToggle = () => {

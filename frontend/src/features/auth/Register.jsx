@@ -5,8 +5,10 @@ import { setCredentials } from './authSlice'
 import api from '../../services/api'
 import '../../styles/layouts/_auth.css'
 import '../../styles/components/_forms.css'
+import { useTheme } from '../../context/ThemeContext'
 
 const Register = () => {
+  const { isDark } = useTheme()
   const [formData, setFormData] = useState({
     email: '',
     username: '',
@@ -74,7 +76,7 @@ const Register = () => {
 
   return (
     <div className="auth-container">
-      <div className="auth-box">
+      <div className={`auth-box ${isDark ? 'bg-theme-color-dark-card' : 'bg-theme-color-card'}`}>
         <h2 className="auth-title">
           Create your account
         </h2>
