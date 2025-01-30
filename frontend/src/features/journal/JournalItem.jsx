@@ -51,10 +51,10 @@ const JournalItem = ({ entry, onDelete }) => {
                     </>
                 ) : (
                     <>
-                        <button onClick={handleEdit} aria-label="Edit">
+                        <button onClick={handleEdit} aria-label="Edit" className="journal-actions-button">
                             <FaEdit size={16} />
                         </button>
-                        <button onClick={() => onDelete(entry.id)} aria-label="Delete">
+                        <button onClick={() => onDelete(entry.id)} aria-label="Delete" className="journal-actions-button">
                             <FaTrash size={16} />
                         </button>
                     </>

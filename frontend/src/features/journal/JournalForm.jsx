@@ -27,10 +27,11 @@ const JournalForm = () => {
     }
 
     return (
-        <div>
+        <div className="journal-container">
             <h2>Create New Journal Entry</h2>
             <form onSubmit={handleSubmit}>
                 <textarea
+                    className="journal-textarea"
                     value={content}
                     onChange={(e) => setContent(e.target.value)}
                     placeholder="Write your journal entry here..."
@@ -39,8 +40,8 @@ const JournalForm = () => {
                     required
                 ></textarea>
                 <br />
-                <button type="submit" aria-label="Save Entry">
-                    <FaSave size={16} /> Save Entry
+                <button type="submit" aria-label="Save Entry" className="journal-actions-button">
+                    <FaSave size={16} />
                 </button>
             </form>
             {error && <p>{error}</p>}

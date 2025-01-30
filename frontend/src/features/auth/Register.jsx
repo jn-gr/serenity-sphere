@@ -5,7 +5,6 @@ import { setCredentials } from './authSlice'
 import api from '../../services/api'
 import '../../styles/layouts/_auth.css'
 import '../../styles/components/_forms.css'
-import { FaUserPlus } from 'react-icons/fa'
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -77,7 +76,6 @@ const Register = () => {
     <div className="auth-container">
       <div className="auth-box">
         <h2 className="auth-title">
-          <FaUserPlus size={24} style={{ marginRight: '8px' }} />
           Create your account
         </h2>
         <p className="auth-subtitle">

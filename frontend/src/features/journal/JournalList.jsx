@@ -3,6 +3,7 @@ import { useSelector, useDispatch } from 'react-redux'
 import { fetchJournalEntries, deleteJournalEntry } from './journalSlice'
 import JournalItem from './JournalItem'
 import { Link } from 'react-router-dom'
+import '../../styles/components/_journal.css'
 import EmotionDetector from '../emotion/EmotionDetector'
 
 const JournalList = () => {
@@ -30,7 +31,7 @@ const JournalList = () => {
             content = <p>No journal entries found. <Link to="/journal/new">Create one now!</Link></p>
         } else {
             content = entries.map(entry => (
-                <JournalItem key={entry.id} entry={entry} onDelete={handleDelete} />
+                <JournalItem className="journal-item" key={entry.id} entry={entry} onDelete={handleDelete} />
             ))
         }
     } else if (status === 'failed') {
@@ -38,10 +39,11 @@ const JournalList = () => {
     }
 
     return (
-        <div>
-            <h2>Your Journal Entries</h2>
+        <div className="journal-container">
+            <h2>Your Daily Mood Log</h2>
             <Link to="/journal/new" className="create-entry-button">Create New Entry</Link>
             {content}
+            <br></br>
             <EmotionDetector />
         </div>
     )

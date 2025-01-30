@@ -34,8 +34,7 @@
   }
 }
 
-/* Theme Toggle Button */
-.theme-toggle-button {
+.theme-toggle-button, .navbar-icon-button{
     background: none;
     border: none;
     cursor: pointer;

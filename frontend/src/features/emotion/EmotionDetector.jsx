@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import api from '../../services/api'; // Adjust the import based on your API service setup
+import api from '../../services/api'; 
+import '../../styles/components/_emotion.css'; // Import the CSS file
 
 const EmotionDetector = () => {
     const [text, setText] = useState('');
@@ -23,10 +24,11 @@ const EmotionDetector = () => {
     };
 
     return (
-        <div>
-            <h2>Emotion Detector</h2>
+        <div className="emotion-detector">
+            <h2>Emotion Detector (TESTING)</h2>
             <form onSubmit={handleSubmit}>
                 <textarea
+                    className="emotion-detector-textarea"
                     value={text}
                     onChange={(e) => setText(e.target.value)}
                     placeholder="Write your thoughts here..."
@@ -35,17 +37,17 @@ const EmotionDetector = () => {
                     required
                 ></textarea>
                 <br />
-                <button type="submit">Detect Emotions</button>
+                <button type="submit" className="emotion-detector-button">Detect Emotions</button>
             </form>
-            {loading && <p>Waiting for answer...</p>}
-            {error && <p>{error}</p>}
+            {loading && <p className="loading">Waiting for answer...</p>}
+            {error && <p className="error">{error}</p>}
             {emotions.length > 0 && (
-                <div>
+                <div className="detected-emotions">
                     <h3>Detected Emotions:</h3>
                     <ul>
                         {emotions.map((emotion) => (
                             <li key={emotion[0]}>
-                                {emotion[0]}: {emotion[1].toFixed(2)}
+                                {emotion[0]}
                             </li>
                         ))}
                     </ul>
