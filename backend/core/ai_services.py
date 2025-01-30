@@ -2,7 +2,7 @@ import torch
 from transformers import RobertaTokenizer, RobertaForSequenceClassification
 import os
 
-# Define the relative path to the model
+# Path to the model
 model_path = '../models/roberta_model_multilabel_selftrained/'
 
 # Verify that the model path exists

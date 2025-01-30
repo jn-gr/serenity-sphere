@@ -28,7 +28,6 @@ class CustomUser(AbstractUser):
     def __str__(self):
         return self.email
 
-    # Add custom fields here
     pass
 
 class JournalEntry(models.Model):

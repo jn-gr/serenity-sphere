@@ -159,10 +159,10 @@ CORS_ALLOWED_ORIGINS = [
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:5173",
 ]
-CSRF_COOKIE_SECURE = False  # Set to True in production with HTTPS
-CSRF_COOKIE_HTTPONLY = False  # Allow JavaScript access to the cookie
+CSRF_COOKIE_SECURE = False
+CSRF_COOKIE_HTTPONLY = False
 CSRF_COOKIE_SAMESITE = 'Lax'
-CSRF_USE_SESSIONS = False  # Store in cookie instead of session
+CSRF_USE_SESSIONS = False
 
 # REST Framework settings
 REST_FRAMEWORK = {
