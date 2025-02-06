@@ -2,7 +2,6 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import api from '../../services/api'
 import axios from 'axios'
 
-// Async thunks for CRUD operations
 export const fetchJournalEntries = createAsyncThunk(
     'journal/fetchJournalEntries',
     async () => {

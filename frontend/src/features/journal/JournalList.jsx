@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import '../../styles/components/_journal.css';
-import JournalForm from './JournalForm'; // Import the JournalForm component for creating new entries
+import JournalForm from './JournalForm';
 import { fetchJournalEntries, deleteJournalEntry } from './journalSlice';
 
 const JournalList = () => {
     const dispatch = useDispatch();
     const { entries, status, error } = useSelector(state => state.journal);
-    const [activeTab, setActiveTab] = useState("history"); // "history" or "create"
+    const [activeTab, setActiveTab] = useState("history");
 
     // When the history tab is active, fetch entries if needed.
     useEffect(() => {
@@ -30,7 +30,6 @@ const JournalList = () => {
         <div className="container mx-auto my-8">
             <h2 className="text-2xl font-bold mb-4">Your Journal</h2>
             <div className="flex gap-4">
-                {/* Sidebar Menu using DaisyUI */}
                 <div className="w-60">
                     <ul className="menu p-2 bg-base-200 rounded-box">
                         <li className={activeTab === 'create' ? 'bg-base-300' : ''} onClick={() => handleTabClick('create')}>

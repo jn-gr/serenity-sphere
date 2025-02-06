@@ -1,7 +1,6 @@
-// frontend/src/components/cards/HomeMoodLogCard.jsx
 import React from 'react';
-import { Link } from 'react-router-dom'; // Import Link from react-router-dom
-import { useTheme } from '../../context/ThemeContext'; // Import the theme context
+import { Link } from 'react-router-dom';
+import { useTheme } from '../../context/ThemeContext';
 
 const HomeMoodLogCard = () => {
   const { isDark } = useTheme(); // Get the current theme state
