@@ -15,7 +15,7 @@ class RegisterSerializer(serializers.ModelSerializer):
     confirm_password = serializers.CharField(write_only=True, required=True)
 
     class Meta:
-        model = User
+        model = CustomUser
         fields = ('username', 'email', 'password', 'confirm_password')
 
     def validate(self, attrs):
@@ -25,7 +25,7 @@ class RegisterSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         validated_data.pop('confirm_password')
-        user = User.objects.create_user(**validated_data)
+        user = CustomUser.objects.create_user(**validated_data)
         return user
 
 class LoginSerializer(serializers.Serializer):
@@ -38,4 +38,18 @@ class JournalEntrySerializer(serializers.ModelSerializer):
     class Meta:
         model = JournalEntry
         fields = ['id', 'user', 'date', 'content', 'created_at', 'updated_at']
-        read_only_fields = ['id', 'user', 'date', 'created_at', 'updated_at'] 
+        read_only_fields = ['id', 'user', 'date', 'created_at', 'updated_at']
+
+# New serializer for updating the user's profile
+class UserUpdateSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(write_only=True, required=False, validators=[validate_password])
+
+    class Meta:
+        model = CustomUser
+        fields = ['username', 'email', 'password']
+
+    def update(self, instance, validated_data):
+        if 'password' in validated_data:
+            password = validated_data.pop('password')
+            instance.set_password(password)
+        return super().update(instance, validated_data) 

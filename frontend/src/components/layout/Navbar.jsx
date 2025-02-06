@@ -6,7 +6,7 @@ import ThemeToggle from './ThemeToggle';
 import '../../styles/components/_navbar.css';
 import api from '../../services/api';
 import { useTheme } from '../../context/ThemeContext';
-import { FaSignOutAlt, FaBook, FaSignInAlt, FaHome } from 'react-icons/fa';
+import { FaSignOutAlt, FaBook, FaSignInAlt, FaHome, FaUser } from 'react-icons/fa';
 
 const Navbar = () => {
   const dispatch = useDispatch();
@@ -14,6 +14,8 @@ const Navbar = () => {
   const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
   const user = useSelector((state) => state.auth.user);
   const { isDark } = useTheme();
+
+  console.log('Is Authenticated:', isAuthenticated);
 
   const handleLogout = async () => {
     try {
@@ -24,6 +26,8 @@ const Navbar = () => {
       console.error('Failed to logout:', err);
     }
   };
+
+  
 
   return (
     <nav >
@@ -39,6 +43,9 @@ const Navbar = () => {
             <>
               <Link to="/journal" className="navbar-link" title="Journal">
                 <FaBook size={20} />
+              </Link>
+              <Link to="/profile" className="navbar-link" title="Profile">
+                <FaUser size={20} />
               </Link>
               <button onClick={handleLogout} className="navbar-icon-button" aria-label="Logout">
                 <FaSignOutAlt size={20} />

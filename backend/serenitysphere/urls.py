@@ -29,6 +29,7 @@ urlpatterns = [
     path('api/auth/login/', views.login_user, name='login'),
     path('api/auth/logout/', views.logout_user, name='logout'),
     path('api/auth/user/', views.get_user, name='user'),
+    path('api/user-profile/', views.user_profile, name='user_profile'),
     path('api/', include(router.urls)),
     path('api/detect-emotions/', views.detect_emotions, name='detect_emotions'),
 ]

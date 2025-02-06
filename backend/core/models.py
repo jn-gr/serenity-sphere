@@ -44,4 +44,5 @@ class JournalEntry(models.Model):
     def __str__(self):
         return f"Journal Entry by {self.user.email} on {self.date}"
     
-    
+class MoodLog(models.Model):
+    user = models.ForeignKey(CustomUser, related_name='Mood_logs',on_delete=models.CASCADE)

@@ -45,9 +45,9 @@ const EmotionDetector = () => {
                 <div className="detected-emotions">
                     <h3>Detected Emotions:</h3>
                     <ul>
-                        {emotions.map((emotion) => (
-                            <li key={emotion[0]}>
-                                {emotion[0]}
+                        {emotions.map((emotion, index) => (
+                            <li key={index}>
+                                {emotion[0]}: {emotion[1].toFixed(2)}
                             </li>
                         ))}
                     </ul>

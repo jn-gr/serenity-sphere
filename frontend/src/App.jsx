@@ -12,6 +12,7 @@ import JournalList from './features/journal/JournalList'
 import JournalForm from './features/journal/JournalForm'
 import { setCredentials } from './features/auth/authSlice'
 import { ThemeProvider } from './context/ThemeContext'
+import Profile from './features/profile/Profile'
 
 const AppContent = () => {
   const dispatch = useDispatch()
@@ -52,6 +53,7 @@ const AppContent = () => {
               <Route path="/register" element={!isAuthenticated ? <Register /> : <Navigate to="/" />} />
               <Route path="/journal" element={isAuthenticated ? <JournalList /> : <Navigate to="/login" />} />
               <Route path="/journal/new" element={isAuthenticated ? <JournalForm /> : <Navigate to="/login" />} />
+              <Route path="/profile" element={isAuthenticated ? <Profile /> : <Navigate to="/login" />} />
               {/* Add more routes as needed */}
             </Routes>
           </main>
