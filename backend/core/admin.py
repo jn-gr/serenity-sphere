@@ -27,7 +27,18 @@ class CustomUserAdmin(UserAdmin):
 
 @admin.register(JournalEntry)
 class JournalEntryAdmin(admin.ModelAdmin):
-    list_display = ('user', 'date', 'created_at')
+    list_display = ('user_email', 'date', 'content_preview', 'emotions', 'created_at')
     search_fields = ('user__email', 'content')
-    list_filter = ('date',)
+    list_filter = ('date', 'user')
     ordering = ('-date',)
+    readonly_fields = ('emotions',)
+
+    def user_email(self, obj):
+        return obj.user.email
+    user_email.short_description = 'User Email'
+
+    def content_preview(self, obj):
+        if len(obj.content) > 75:
+            return obj.content[:75] + '...'
+        return obj.content
+    content_preview.short_description = 'Content Preview'

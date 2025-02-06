@@ -1,6 +1,6 @@
-from django.contrib.auth import login, logout, authenticate
-from rest_framework import status, viewsets
-from rest_framework.decorators import api_view, permission_classes
+from django.contrib.auth import login, logout, authenticate, update_session_auth_hash
+from rest_framework import status, viewsets, permissions
+from rest_framework.decorators import api_view, permission_classes, action
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from .serializers import RegisterSerializer, LoginSerializer, UserSerializer, UserUpdateSerializer, JournalEntrySerializer
@@ -10,6 +10,7 @@ from django.http import JsonResponse
 from .ai_services import predict_emotions
 import logging
 from django.contrib.auth.hashers import check_password
+
 
 logger = logging.getLogger(__name__)
 
@@ -79,6 +80,8 @@ def user_profile(request):
             serializer = UserUpdateSerializer(user, data=request.data, partial=True)
             if serializer.is_valid():
                 serializer.save()
+                if 'password' in request.data:
+                    update_session_auth_hash(request, user)
                 return Response(serializer.data)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     except Exception as e:
@@ -93,10 +96,27 @@ class JournalEntryViewSet(viewsets.ModelViewSet):
         return JournalEntry.objects.filter(user=self.request.user)
 
     def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+        content = serializer.validated_data.get('content', '')
+        emotions = predict_emotions(content)
+        serializer.save(user=self.request.user, emotions=emotions)
+
+    def perform_update(self, serializer):
+        content = serializer.validated_data.get('content', None)
+        if content is not None:
+            emotions = predict_emotions(content)
+            serializer.save(emotions=emotions)
+        else:
+            serializer.save()
 
 @api_view(["POST"])
 def detect_emotions(request):
     text = request.data.get("text", "")
     predictions = predict_emotions(text)
     return Response({"emotions": predictions})
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_journal_entries(request):
+    entries = JournalEntry.objects.filter(user=request.user)
+    serializer = JournalEntrySerializer(entries, many=True)
+    return Response(serializer.data)

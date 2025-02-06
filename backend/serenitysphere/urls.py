@@ -32,4 +32,5 @@ urlpatterns = [
     path('api/user-profile/', views.user_profile, name='user_profile'),
     path('api/', include(router.urls)),
     path('api/detect-emotions/', views.detect_emotions, name='detect_emotions'),
+    path('api/journal-entries/', views.get_journal_entries, name='get_journal_entries'),
 ]

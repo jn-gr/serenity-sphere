@@ -32,13 +32,13 @@ class CustomUser(AbstractUser):
 
 class JournalEntry(models.Model):
     user = models.ForeignKey(CustomUser, related_name='journal_entries', on_delete=models.CASCADE)
-    date = models.DateField(auto_now_add=True)
+    date = models.DateTimeField(auto_now_add=True)
     content = models.TextField()
+    emotions = models.JSONField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
     class Meta:
-        unique_together = ('user', 'date')
         ordering = ['-date']
 
     def __str__(self):

@@ -34,11 +34,12 @@ class LoginSerializer(serializers.Serializer):
 
 class JournalEntrySerializer(serializers.ModelSerializer):
     user = serializers.ReadOnlyField(source='user.email')
+    emotions = serializers.JSONField(read_only=True)
 
     class Meta:
         model = JournalEntry
-        fields = ['id', 'user', 'date', 'content', 'created_at', 'updated_at']
-        read_only_fields = ['id', 'user', 'date', 'created_at', 'updated_at']
+        fields = ['id', 'user', 'date', 'content', 'emotions', 'created_at', 'updated_at']
+        read_only_fields = ['id', 'user', 'date', 'emotions', 'created_at', 'updated_at']
 
 # New serializer for updating the user's profile
 class UserUpdateSerializer(serializers.ModelSerializer):

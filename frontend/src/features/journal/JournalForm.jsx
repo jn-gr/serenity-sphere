@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { createJournalEntry } from './journalSlice'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 
 // Import React Icons for action
 import { FaSave } from 'react-icons/fa'
@@ -45,6 +45,9 @@ const JournalForm = () => {
                 </button>
             </form>
             {error && <p>{error}</p>}
+            <div className="form-navigation">
+                <Link to="/journal" className="back-button">Back to Journal List</Link>
+            </div>
         </div>
     )
 }

@@ -27,39 +27,49 @@ const Navbar = () => {
     }
   };
 
-  
-
   return (
-    <nav >
-      <div className="navbar-container">
-        <Link to="/" className="navbar-brand">
+    <nav className="navbar bg-base-100 shadow-lg">
+      <div className="flex-1">
+        <Link to="/" className="btn btn-ghost normal-case text-xl">
           Serenity Sphere
         </Link>
-        <div className="navbar-links">
-          <Link to="/" className="navbar-link" title='Home'>
-            <FaHome size={20} />
-          </Link>
+      </div>
+      <div className="flex-none">
+        <ul className="menu menu-horizontal p-0">
+          <li>
+            <Link to="/" title="Home">
+              <FaHome size={20} />
+            </Link>
+          </li>
           {isAuthenticated ? (
             <>
-              <Link to="/journal" className="navbar-link" title="Journal">
-                <FaBook size={20} />
-              </Link>
-              <Link to="/profile" className="navbar-link" title="Profile">
-                <FaUser size={20} />
-              </Link>
-              <button onClick={handleLogout} className="navbar-icon-button" aria-label="Logout">
-                <FaSignOutAlt size={20} />
-              </button>
+              <li>
+                <Link to="/journal" title="Journal">
+                  <FaBook size={20} />
+                </Link>
+              </li>
+              <li>
+                <Link to="/profile" title="Profile">
+                  <FaUser size={20} />
+                </Link>
+              </li>
+              <li>
+                <button onClick={handleLogout} aria-label="Logout">
+                  <FaSignOutAlt size={20} />
+                </button>
+              </li>
             </>
           ) : (
-            <>
-              <Link to="/login" className="navbar-link" title="Login">
+            <li>
+              <Link to="/login" title="Login">
                 <FaSignInAlt size={20} />
               </Link>
-            </>
+            </li>
           )}
-          <ThemeToggle />
-        </div>
+          <li>
+            <ThemeToggle />
+          </li>
+        </ul>
       </div>
     </nav>
   );

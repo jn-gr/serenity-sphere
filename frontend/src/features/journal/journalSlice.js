@@ -1,16 +1,13 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import api from '../../services/api'
+import axios from 'axios'
 
 // Async thunks for CRUD operations
 export const fetchJournalEntries = createAsyncThunk(
-    'journal/fetchEntries',
-    async (_, { rejectWithValue }) => {
-        try {
-            const response = await api.get('/api/journal/')
-            return response.data
-        } catch (err) {
-            return rejectWithValue(err.response.data)
-        }
+    'journal/fetchJournalEntries',
+    async () => {
+        const response = await axios.get('/api/journal-entries/')
+        return response.data
     }
 )
 
@@ -70,7 +67,7 @@ const journalSlice = createSlice({
             })
             .addCase(fetchJournalEntries.rejected, (state, action) => {
                 state.status = 'failed'
-                state.error = action.payload.detail || 'Failed to fetch journal entries.'
+                state.error = action.error.message
             })
             // Create Entry
             .addCase(createJournalEntry.fulfilled, (state, action) => {
