@@ -1,34 +1,33 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { useTheme } from '../../context/ThemeContext';
 
 const HomeJournalCard = () => {
-  const { isDark } = useTheme(); // Get the current theme state
+  const { isDark } = useTheme();
 
   return (
-    <div className={`flex flex-col ${isDark ? 'bg-theme-color-dark-card' : 'bg-theme-color-card'} rounded-3xl`}>
-      <div className="px-6 py-8 sm:p-10 sm:pb-6">
-        <div className="grid items-center justify-center w-full grid-cols-1 text-left">
-          <div>
-            <h2 className="text-lg font-medium tracking-tighter" style={{ color: 'var(--text-color)' }}>
-              Start Journaling today
-            </h2>
-            <p className="mt-2 text-sm" style={{ color: 'var(--text-color)' }}>
-              Vent your thoughts and emotions.
-            </p>
-          </div>
-        </div>
+    <motion.div 
+      whileHover={{ scale: 1.02 }}
+      className={`flex flex-col ${
+        isDark ? 'bg-serenity-dark text-white' : 'bg-white'
+      } rounded-3xl p-8 shadow-lg hover:shadow-xl transition-shadow duration-300 h-full`}
+    >
+      <div className="flex-1">
+        <div className="text-primary.DEFAULT text-4xl mb-4">📖</div>
+        <h3 className="text-xl font-semibold mb-3">Digital Journal</h3>
+        <p className="text-calm-400 mb-4">
+          Express your thoughts freely with our AI-powered journal that helps you 
+          understand your emotional patterns.
+        </p>
       </div>
-      <div className="flex px-6 pb-8 sm:px-8">
-        <Link
-          to="/journal"
-          aria-describedby="Journaling Card"
-          className="items-center justify-center w-full px-6 py-2.5 text-center text-white duration-200 bg-black border-2 border-black rounded-full inline-flex hover:bg-transparent hover:border-black hover:text-black focus:outline-none focus-visible:outline-black text-sm focus-visible:ring-black"
-        >
-          Get started
-        </Link>
-      </div>
-    </div>
+      <Link
+        to="/journal"
+        className="inline-block text-center bg-primary.DEFAULT hover:bg-primary.dark text-white px-6 py-3 rounded-full transition-colors duration-300"
+      >
+        Start Writing
+      </Link>
+    </motion.div>
   );
 }
 

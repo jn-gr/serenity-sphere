@@ -1,35 +1,28 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { useTheme } from '../../context/ThemeContext';
+import { motion } from 'framer-motion';
 
 const HomeMoodLogCard = () => {
-  const { isDark } = useTheme(); // Get the current theme state
-
   return (
-    <div className={`flex flex-col ${isDark ? 'bg-theme-color-dark-card' : 'bg-theme-color-card'} rounded-3xl`}>
-      <div className="px-6 py-8 sm:p-10 sm:pb-6">
-        <div className="grid items-center justify-center w-full grid-cols-1 text-left">
-          <div>
-            <h2 className="text-lg font-medium tracking-tighter" style={{ color: 'var(--text-color)' }}>
-              Log your daily mood
-            </h2>
-            <p className="mt-2 text-sm" style={{ color: 'var(--text-color)' }}>
-              Express your daily mood.
-            </p>
-          </div>
-        </div>
+    <motion.div 
+      whileHover={{ scale: 1.02 }}
+      className="flex flex-col bg-white rounded-3xl p-8 shadow-lg hover:shadow-xl transition-shadow duration-300 h-full"
+    >
+      <div className="flex-1">
+        <div className="text-secondary.DEFAULT text-4xl mb-4">😌</div>
+        <h3 className="text-xl font-semibold mb-3">Mood Tracker</h3>
+        <p className="text-calm-400 mb-4">
+          Track your daily emotions and visualize your mental health journey through interactive charts.
+        </p>
       </div>
-      <div className="flex px-6 pb-8 sm:px-8">
-        <Link
-          to="/mood-log"
-          aria-describedby="Mood Logging Card"
-          className="items-center justify-center w-full px-6 py-2.5 text-center text-white duration-200 bg-black border-2 border-black rounded-full inline-flex hover:bg-transparent hover:border-black hover:text-black focus:outline-none focus-visible:outline-black text-sm focus-visible:ring-black"
-        >
-          Get started
-        </Link>
-      </div>
-    </div>
+      <Link
+        to="/mood-log"
+        className="inline-block text-center bg-secondary.DEFAULT hover:bg-secondary.dark text-white px-6 py-3 rounded-full transition-colors duration-300"
+      >
+        Track Mood
+      </Link>
+    </motion.div>
   );
-}
+};
 
 export default HomeMoodLogCard;

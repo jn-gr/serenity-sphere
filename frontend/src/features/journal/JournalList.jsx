@@ -1,94 +1,110 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import '../../styles/components/_journal.css';
-import JournalForm from './JournalForm';
 import { fetchJournalEntries, deleteJournalEntry } from './journalSlice';
+import JournalForm from './JournalForm';
+import { motion } from 'framer-motion';
 
 const JournalList = () => {
-    const dispatch = useDispatch();
-    const { entries, status, error } = useSelector(state => state.journal);
-    const [activeTab, setActiveTab] = useState("history");
+  const dispatch = useDispatch();
+  const { entries, status, error } = useSelector(state => state.journal);
+  const [activeTab, setActiveTab] = useState("history");
 
-    // When the history tab is active, fetch entries if needed.
-    useEffect(() => {
-        if (activeTab === "history" && status === 'idle') {
-            dispatch(fetchJournalEntries());
-        }
-    }, [activeTab, status, dispatch]);
+  useEffect(() => {
+    if (activeTab === "history" && status === 'idle') {
+      dispatch(fetchJournalEntries());
+    }
+  }, [activeTab, status, dispatch]);
 
-    const handleTabClick = (tab) => {
-        setActiveTab(tab);
-    };
+  const handleDelete = (id) => {
+    if (window.confirm("Are you sure you want to delete this entry?")) {
+      dispatch(deleteJournalEntry(id));
+    }
+  };
 
-    const handleDelete = (id) => {
-        if (window.confirm("Are you sure you want to delete this journal entry?")) {
-            dispatch(deleteJournalEntry(id));
-        }
-    };
-
-    return (
-        <div className="container mx-auto my-8">
-            <h2 className="text-2xl font-bold mb-4">Your Journal</h2>
-            <div className="flex gap-4">
-                <div className="w-60">
-                    <ul className="menu p-2 bg-base-200 rounded-box">
-                        <li className={activeTab === 'create' ? 'bg-base-300' : ''} onClick={() => handleTabClick('create')}>
-                            <a>Create Journal</a>
-                        </li>
-                        <li className={activeTab === 'history' ? 'bg-base-300' : ''} onClick={() => handleTabClick('history')}>
-                            <a>View Journal History</a>
-                        </li>
-                    </ul>
-                </div>
-                {/* Main Content Area */}
-                <div className="flex-1">
-                    {activeTab === 'create' ? (
-                        <div className="card bg-base-100 shadow-xl">
-                            <div className="card-body">
-                                <JournalForm />
-                            </div>
-                        </div>
-                    ) : (
-                        <div>
-                            {status === 'loading' && <p>Loading...</p>}
-                            {status === 'failed' && <p>{error}</p>}
-                            {status === 'succeeded' && entries.length === 0 && <p>No journal entries found.</p>}
-                            {status === 'succeeded' && entries.length > 0 && (
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    {entries.map(entry => (
-                                        <div key={entry.id} className="card bg-base-100 shadow-xl relative">
-                                            <div className="card-body">
-                                                <h3 className="card-title">{new Date(entry.date).toLocaleString()}</h3>
-                                                <p>{entry.content}</p>
-                                                {entry.emotions && entry.emotions.length > 0 && (
-                                                    <div className="mt-2">
-                                                        <h4 className="font-semibold">Emotions:</h4>
-                                                        <ul className="list-disc list-inside">
-                                                            {entry.emotions.map((emotion, idx) => (
-                                                                <li key={idx}>
-                                                                    {emotion[0]}: {Number(emotion[1]).toFixed(2)}
-                                                                </li>
-                                                            ))}
-                                                        </ul>
-                                                    </div>
-                                                )}
-                                            </div>
-                                            <button
-                                                className="btn btn-square btn-sm absolute top-2 right-2"
-                                                onClick={() => handleDelete(entry.id)}
-                                            >
-                                                &times;
-                                            </button>
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
-                        </div>
-                    )}
-                </div>
-            </div>
+  return (
+    <div className="min-h-screen p-6 bg-calm-100">
+      <div className="max-w-4xl mx-auto">
+        <div className="flex gap-4 mb-8">
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            onClick={() => setActiveTab('create')}
+            className={`px-6 py-2 rounded-full ${
+              activeTab === 'create' 
+                ? 'bg-primary.DEFAULT text-white' 
+                : 'bg-white text-serenity-dark'
+            }`}
+          >
+            New Entry
+          </motion.button>
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            onClick={() => setActiveTab('history')}
+            className={`px-6 py-2 rounded-full ${
+              activeTab === 'history' 
+                ? 'bg-primary.DEFAULT text-white' 
+                : 'bg-white text-serenity-dark'
+            }`}
+          >
+            History
+          </motion.button>
         </div>
-    );
+
+        {activeTab === 'create' ? (
+          <JournalForm />
+        ) : (
+          <div className="space-y-6">
+            {status === 'loading' && <p>Loading...</p>}
+            {status === 'failed' && (
+              <div className="p-3 bg-red-100 text-red-700 rounded-lg">
+                {error}
+              </div>
+            )}
+            {status === 'succeeded' && entries.length === 0 && (
+              <div className="text-center text-calm-400">
+                No entries found. Start by creating your first journal entry.
+              </div>
+            )}
+            {entries.map((entry) => (
+              <motion.div
+                key={entry.id}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className={`p-6 rounded-2xl bg-white shadow-lg`}
+              >
+                <div className="flex justify-between items-start mb-4">
+                  <h3 className="text-lg font-semibold">
+                    {new Date(entry.date).toLocaleDateString()}
+                  </h3>
+                  <button
+                    onClick={() => handleDelete(entry.id)}
+                    className="text-red-500 hover:text-red-700"
+                  >
+                    Delete
+                  </button>
+                </div>
+                <p className="text-calm-400 mb-4">{entry.content}</p>
+                {entry.emotions && entry.emotions.length > 0 && (
+                  <div className="mt-4">
+                    <h4 className="font-medium mb-2">Emotional Insights</h4>
+                    <div className="flex flex-wrap gap-2">
+                      {entry.emotions.map(([emotion, score], index) => (
+                        <span
+                          key={index}
+                          className="px-3 py-1 rounded-full bg-primary.light text-primary.DEFAULT text-sm"
+                        >
+                          {emotion} ({Number(score).toFixed(2)})
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </motion.div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
 };
 
-export default JournalList; 
+export default JournalList;

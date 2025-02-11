@@ -1,11 +1,10 @@
 import React, { useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import { Link, useNavigate } from 'react-router-dom'
 import { setCredentials } from './authSlice'
 import api from '../../services/api'
-import '../../styles/layouts/_auth.css'
-import '../../styles/components/_forms.css'
 import { useTheme } from '../../context/ThemeContext'
+import { motion } from 'framer-motion'
 
 const Register = () => {
   const { isDark } = useTheme()
@@ -31,25 +30,8 @@ const Register = () => {
     setError(null)
   }
 
-  const validateForm = () => {
-    const errors = {}
-    if (!formData.email) errors.email = 'Email is required'
-    if (!formData.username) errors.username = 'Username is required'
-    if (!formData.password) errors.password = 'Password is required'
-    if (formData.password !== formData.confirmPassword) {
-      errors.confirmPassword = 'Passwords do not match'
-    }
-    return errors
-  }
-
   const handleSubmit = async (e) => {
     e.preventDefault()
-    const errors = validateForm()
-    if (Object.keys(errors).length > 0) {
-      setFieldErrors(errors)
-      return
-    }
-    
     setIsLoading(true)
     setError(null)
     
@@ -75,79 +57,127 @@ const Register = () => {
   }
 
   return (
-    <div className="auth-container">
-      <div className={`auth-box ${isDark ? 'bg-theme-color-dark-card' : 'bg-theme-color-card'}`}>
-        <h2 className="auth-title">
-          Create your account
-        </h2>
-        <p className="auth-subtitle">
-          Or <Link to="/login" className="auth-link">sign in to your account</Link>
-        </p>
+    <div className="min-h-screen bg-calm-100 flex items-center justify-center p-4">
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className={`w-full max-w-md rounded-3xl p-8 shadow-xl ${
+          isDark ? 'bg-serenity-dark text-white' : 'bg-white'
+        }`}
+      >
+        <div className="text-center mb-8">
+          <h2 className="text-3xl font-bold mb-2">Create Account</h2>
+          <p className="text-calm-400">
+            Or{' '}
+            <Link 
+              to="/login" 
+              className="text-primary.DEFAULT hover:text-primary.dark transition-colors"
+            >
+              sign in to your account
+            </Link>
+          </p>
+        </div>
 
-        <form onSubmit={handleSubmit} className="auth-form">
-          {error && <div className="auth-error">{error}</div>}
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {error && (
+            <div className="p-3 bg-red-100 text-red-700 rounded-lg">
+              {error}
+            </div>
+          )}
 
-          <div className="auth-form-group">
-            <div className="auth-input-group">
-              <label htmlFor="email" className="form-label">Email address</label>
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium mb-2">Email</label>
               <input
-                id="email"
                 name="email"
                 type="email"
                 value={formData.email}
                 onChange={handleChange}
-                className={`form-input ${fieldErrors.email ? 'form-input-error' : ''}`}
+                className={`w-full p-3 rounded-lg border ${
+                  fieldErrors.email 
+                    ? 'border-red-500' 
+                    : isDark 
+                    ? 'border-calm-400 bg-serenity-dark' 
+                    : 'border-calm-200'
+                }`}
               />
-              {fieldErrors.email && <p className="form-error-text">{fieldErrors.email}</p>}
+              {fieldErrors.email && (
+                <p className="text-red-500 text-sm mt-1">{fieldErrors.email}</p>
+              )}
             </div>
 
-            <div className="auth-input-group">
-              <label htmlFor="username" className="form-label">Username</label>
+            <div>
+              <label className="block text-sm font-medium mb-2">Username</label>
               <input
-                id="username"
                 name="username"
                 type="text"
                 value={formData.username}
                 onChange={handleChange}
-                className={`form-input ${fieldErrors.username ? 'form-input-error' : ''}`}
+                className={`w-full p-3 rounded-lg border ${
+                  fieldErrors.username 
+                    ? 'border-red-500' 
+                    : isDark 
+                    ? 'border-calm-400 bg-serenity-dark' 
+                    : 'border-calm-200'
+                }`}
               />
-              {fieldErrors.username && <p className="form-error-text">{fieldErrors.username}</p>}
+              {fieldErrors.username && (
+                <p className="text-red-500 text-sm mt-1">{fieldErrors.username}</p>
+              )}
             </div>
 
-            <div className="auth-input-group">
-              <label htmlFor="password" className="form-label">Password</label>
+            <div>
+              <label className="block text-sm font-medium mb-2">Password</label>
               <input
-                id="password"
                 name="password"
                 type="password"
                 value={formData.password}
                 onChange={handleChange}
-                className={`form-input ${fieldErrors.password ? 'form-input-error' : ''}`}
+                className={`w-full p-3 rounded-lg border ${
+                  fieldErrors.password 
+                    ? 'border-red-500' 
+                    : isDark 
+                    ? 'border-calm-400 bg-serenity-dark' 
+                    : 'border-calm-200'
+                }`}
               />
-              {fieldErrors.password && <p className="form-error-text">{fieldErrors.password}</p>}
+              {fieldErrors.password && (
+                <p className="text-red-500 text-sm mt-1">{fieldErrors.password}</p>
+              )}
             </div>
 
-            <div className="auth-input-group">
-              <label htmlFor="confirmPassword" className="form-label">Confirm Password</label>
+            <div>
+              <label className="block text-sm font-medium mb-2">Confirm Password</label>
               <input
-                id="confirmPassword"
                 name="confirmPassword"
                 type="password"
                 value={formData.confirmPassword}
                 onChange={handleChange}
-                className={`form-input ${fieldErrors.confirmPassword ? 'form-input-error' : ''}`}
+                className={`w-full p-3 rounded-lg border ${
+                  fieldErrors.confirmPassword 
+                    ? 'border-red-500' 
+                    : isDark 
+                    ? 'border-calm-400 bg-serenity-dark' 
+                    : 'border-calm-200'
+                }`}
               />
               {fieldErrors.confirmPassword && (
-                <p className="form-error-text">{fieldErrors.confirmPassword}</p>
+                <p className="text-red-500 text-sm mt-1">{fieldErrors.confirmPassword}</p>
               )}
             </div>
-
-            <button type="submit" disabled={isLoading} className="form-button">
-              {isLoading ? 'Creating account...' : 'Create account'}
-            </button>
           </div>
+
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            type="submit"
+            disabled={isLoading}
+            className="w-full bg-primary.DEFAULT hover:bg-primary.dark text-white py-3 rounded-full transition-colors"
+          >
+            {isLoading ? 'Creating account...' : 'Create Account'}
+          </motion.button>
         </form>
-      </div>
+      </motion.div>
     </div>
   )
 }

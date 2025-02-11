@@ -5,17 +5,13 @@ import { logout } from '../../features/auth/authSlice';
 import ThemeToggle from './ThemeToggle';
 import '../../styles/components/_navbar.css';
 import api from '../../services/api';
-import { useTheme } from '../../context/ThemeContext';
 import { FaSignOutAlt, FaBook, FaSignInAlt, FaHome, FaUser } from 'react-icons/fa';
+import { motion } from 'framer-motion';
 
 const Navbar = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
-  const user = useSelector((state) => state.auth.user);
-  const { isDark } = useTheme();
-
-  console.log('Is Authenticated:', isAuthenticated);
 
   const handleLogout = async () => {
     try {
@@ -28,48 +24,56 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="navbar bg-base-100 shadow-lg">
-      <div className="flex-1">
-        <Link to="/" className="btn btn-ghost normal-case text-xl">
-          Serenity Sphere
-        </Link>
-      </div>
-      <div className="flex-none">
-        <ul className="menu menu-horizontal p-0">
-          <li>
-            <Link to="/" title="Home">
-              <FaHome size={20} />
-            </Link>
-          </li>
-          {isAuthenticated ? (
-            <>
+    <nav className="bg-white shadow-lg fixed w-full z-50">
+      <div className="container mx-auto px-4">
+        <div className="flex items-center justify-between h-16">
+          <Link to="/" className="flex items-center">
+            <motion.span 
+              whileHover={{ scale: 1.05 }}
+              className="text-2xl font-bold text-serenity-dark"
+            >
+              Serenity Sphere
+            </motion.span>
+          </Link>
+          <div className="flex items-center space-x-6">
+            
+            <ul className="flex items-center space-x-6">
               <li>
-                <Link to="/journal" title="Journal">
-                  <FaBook size={20} />
+                <Link to="/" className="hover:text-primary.DEFAULT transition-colors text-calm-400">
+                  <FaHome size={20} />
                 </Link>
               </li>
-              <li>
-                <Link to="/profile" title="Profile">
-                  <FaUser size={20} />
-                </Link>
-              </li>
-              <li>
-                <button onClick={handleLogout} aria-label="Logout">
-                  <FaSignOutAlt size={20} />
-                </button>
-              </li>
-            </>
-          ) : (
-            <li>
-              <Link to="/login" title="Login">
-                <FaSignInAlt size={20} />
-              </Link>
-            </li>
-          )}
-          <li>
-            <ThemeToggle />
-          </li>
-        </ul>
+              {isAuthenticated ? (
+                <>
+                  <li>
+                    <Link to="/journal" className="hover:text-primary.DEFAULT transition-colors text-calm-400">
+                      <FaBook size={20} />
+                    </Link>
+                  </li>
+                  <li>
+                    <Link to="/profile" className="hover:text-primary.DEFAULT transition-colors text-calm-400">
+                      <FaUser size={20} />
+                    </Link>
+                  </li>
+                  <li>
+                    <button 
+                      onClick={handleLogout}
+                      className="hover:text-primary.DEFAULT transition-colors text-calm-400"
+                    >
+                      <FaSignOutAlt size={20} />
+                    </button>
+                  </li>
+                </>
+              ) : (
+                <li>
+                  <Link to="/login" className="hover:text-primary.DEFAULT transition-colors text-calm-400">
+                    <FaSignInAlt size={20} />
+                  </Link>
+                </li>
+              )}
+            </ul>
+          </div>
+        </div>
       </div>
     </nav>
   );
