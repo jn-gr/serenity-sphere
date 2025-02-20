@@ -1,114 +1,220 @@
 // frontend/src/features/home/Home.jsx
 import React from 'react';
+import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import HomeJournalCard from '../../components/cards/HomeJournalCard';
-import HomeMoodLogCard from '../../components/cards/HomeMoodLogCard';
 import '../../styles/layouts/_home.css';
+import JournalPreview from '../journal/JournalPreview';
 
 const Home = () => {
-  const features = [
-    {
-      title: "AI-Powered Insights",
-      description: "Get instant emotional analysis of your journal entries",
-      icon: "🧠"
-    },
-    {
-      title: "Mood Tracking",
-      description: "Visualize your emotional journey over time",
-      icon: "📈"
-    },
-    {
-      title: "Secure & Private",
-      description: "Your data remains completely confidential",
-      icon: "🔒"
-    }
-  ];
+  const { isAuthenticated } = useSelector(state => state.auth);
+  const journalEntries = useSelector(state => state.journal.entries);
+  
+  const today = new Date().toISOString().split('T')[0];
+  const todaysEntry = journalEntries.find(entry => 
+    new Date(entry.date).toISOString().split('T')[0] === today
+  );
 
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-[#0F172A]">
+        {/* Add margin-top to account for the navbar */}
+        <div className="pt-20">
+          {/* Hero Section */}
+          <div className="max-w-7xl mx-auto px-6 py-24">
+            <div className="flex flex-col lg:flex-row items-center gap-16">
+              <div className="lg:w-1/2 space-y-8">
+                <motion.h1 
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="text-5xl font-bold text-white leading-tight"
+                >
+                  Transform Your Mental Health with
+                  <span className="block bg-gradient-to-r from-[#3E60C1] to-[#5983FC] bg-clip-text text-transparent mt-3">
+                    AI-Powered Insights
+                  </span>
+                </motion.h1>
+                <p className="text-lg text-[#B8C7E0] leading-relaxed">
+                  Track your emotions, analyze patterns, and find balance through intelligent journaling.
+                </p>
+                <div className="flex gap-4">
+                  <Link to="/register">
+                    <motion.button
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      className="bg-gradient-to-r from-[#3E60C1] to-[#5983FC] text-white px-8 py-4 rounded-xl font-semibold text-lg shadow-lg hover:shadow-[#5983FC]/30 transition-all"
+                    >
+                      Get Started
+                    </motion.button>
+                  </Link>
+                </div>
+              </div>
+              <div className="lg:w-1/2">
+                <div className="relative bg-gradient-to-br from-[#3E60C1] to-[#5983FC] p-[1px] rounded-2xl shadow-2xl">
+                  <div className="bg-[#1A2335] rounded-2xl p-6 backdrop-blur-xl">
+                    <div className="space-y-6">
+                      <div className="h-64 bg-gradient-to-r from-[#3E60C1]/20 to-[#5983FC]/20 rounded-xl animate-pulse" />
+                      <div className="space-y-4">
+                        <div className="h-4 bg-[#3E60C1]/20 rounded-full w-3/4" />
+                        <div className="h-4 bg-[#3E60C1]/20 rounded-full w-1/2" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Features Section */}
+          <div className="bg-[#1A2335] py-24">
+            <div className="max-w-7xl mx-auto px-6">
+              <div className="text-center mb-16">
+                <h2 className="text-3xl font-bold text-white mb-4">
+                  Features that Empower You
+                </h2>
+                <p className="text-[#B8C7E0] max-w-2xl mx-auto">
+                  Experience a new way of understanding your mental health journey
+                </p>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <motion.div 
+                  whileHover={{ y: -5 }}
+                  className="bg-[#0F172A] p-8 rounded-2xl border border-[#2A3547] hover:border-[#3E60C1] transition-all duration-300"
+                >
+                  <div className="text-[#5983FC] text-4xl mb-4">🧠</div>
+                  <h3 className="text-xl font-semibold text-white mb-3">
+                    Emotional AI Analysis
+                  </h3>
+                  <p className="text-[#B8C7E0]">
+                    Deep learning models detect subtle emotional patterns
+                  </p>
+                </motion.div>
+                {/* Add more feature cards here */}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Authenticated Dashboard with animations
   return (
-    <div className="min-h-screen bg-calm-100">
-      {/* Hero Section */}
-      <section className="relative pt-20 pb-24 bg-gradient-to-b from-primary.light to-white">
-        <div className="container mx-auto px-4">
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="text-center"
+    <div className="ml-64 min-h-screen bg-[#0F172A]">
+      <div className="max-w-7xl mx-auto px-8 py-12">
+        {/* Header */}
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="flex justify-between items-center mb-12"
+        >
+          <div>
+            <h1 className="text-3xl font-bold text-white">Welcome Back</h1>
+            <p className="text-[#B8C7E0]">Here's your mental health overview</p>
+          </div>
+          <div className="flex items-center space-x-4">
+            <span className="text-sm text-[#5983FC]">{new Date().toLocaleDateString()}</span>
+          </div>
+        </motion.div>
+
+        {/* Stats Grid */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.2 }}
+          className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12"
+        >
+          <motion.div
+            whileHover={{ y: -5, transition: { duration: 0.2 } }}
+            className="bg-[#1A2335] p-6 rounded-2xl border border-[#2A3547] hover:border-[#3E60C1] transition-colors"
           >
-            <h1 className="text-5xl font-bold text-serenity-dark mb-6">
-              Find Your Inner Peace with Serenity Sphere
-            </h1>
-            <p className="text-xl text-calm-400 mb-8">
-              Your compassionate companion for mental wellness and emotional balance
-            </p>
-            <div className="flex justify-center gap-4">
+            <div className="text-[#B8C7E0] mb-2">Weekly Entries</div>
+            <div className="text-3xl font-bold text-[#5983FC]">
+              {journalEntries.filter(entry => {
+                const entryDate = new Date(entry.date);
+                const weekAgo = new Date();
+                weekAgo.setDate(weekAgo.getDate() - 7);
+                return entryDate >= weekAgo;
+              }).length}
+            </div>
+            <div className="h-1 bg-gradient-to-r from-[#5983FC] to-[#3E60C1] mt-4 rounded-full" />
+          </motion.div>
+
+          <motion.div
+            whileHover={{ y: -5, transition: { duration: 0.2 } }}
+            className="bg-[#1A2335] p-6 rounded-2xl border border-[#2A3547] hover:border-[#3E60C1] transition-colors"
+          >
+            <div className="text-[#B8C7E0] mb-2">Monthly Progress</div>
+            <div className="text-3xl font-bold text-[#5983FC]">
+              {journalEntries.filter(entry => {
+                const entryDate = new Date(entry.date);
+                const monthAgo = new Date();
+                monthAgo.setMonth(monthAgo.getMonth() - 1);
+                return entryDate >= monthAgo;
+              }).length}
+            </div>
+            <div className="h-1 bg-gradient-to-r from-[#5983FC] to-[#3E60C1] mt-4 rounded-full" />
+          </motion.div>
+
+          <motion.div
+            whileHover={{ y: -5, transition: { duration: 0.2 } }}
+            className="bg-[#1A2335] p-6 rounded-2xl border border-[#2A3547] hover:border-[#3E60C1] transition-colors"
+          >
+            <div className="text-[#B8C7E0] mb-2">Total Entries</div>
+            <div className="text-3xl font-bold text-[#5983FC]">{journalEntries.length}</div>
+            <div className="h-1 bg-gradient-to-r from-[#5983FC] to-[#3E60C1] mt-4 rounded-full" />
+          </motion.div>
+        </motion.div>
+
+        {/* Main Content */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.4 }}
+            className="bg-[#1A2335] p-8 rounded-2xl border border-[#2A3547] hover:border-[#3E60C1] transition-colors"
+          >
+            <h3 className="text-xl font-semibold text-white mb-6">Mood Trends</h3>
+            <div className="h-96 bg-[#0F172A]/50 rounded-xl flex items-center justify-center">
+              <p className="text-[#B8C7E0]">Mood visualization coming soon</p>
+            </div>
+          </motion.div>
+          
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.4 }}
+            className="bg-[#1A2335] p-8 rounded-2xl border border-[#2A3547] hover:border-[#3E60C1] transition-colors"
+          >
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="text-xl font-semibold text-white">Recent Entries</h3>
               <Link 
                 to="/journal" 
-                className="bg-primary.DEFAULT hover:bg-primary.dark text-white px-8 py-4 rounded-full shadow-lg transition-all duration-300 transform hover:scale-105"
+                className="text-[#5983FC] hover:text-[#3E60C1] transition-colors"
               >
-                Start Journaling
+                View All
               </Link>
-              <Link 
-                to="/mood-log" 
-                className="bg-secondary.DEFAULT hover:bg-secondary.dark text-white px-8 py-4 rounded-full shadow-lg transition-all duration-300 transform hover:scale-105"
-              >
-                Track Your Mood
-              </Link>
+            </div>
+            <div className="space-y-4">
+              {journalEntries.slice(0, 4).map((entry, index) => (
+                <motion.div
+                  key={entry.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.5 + index * 0.1 }}
+                >
+                  <JournalPreview entry={entry} />
+                </motion.div>
+              ))}
+              {journalEntries.length === 0 && (
+                <p className="text-[#B8C7E0] text-center py-4">No entries yet</p>
+              )}
             </div>
           </motion.div>
         </div>
-      </section>
-
-      {/* Features Grid */}
-      <section className="py-20 bg-white">
-        <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {features.map((feature, index) => (
-              <motion.div 
-                key={index}
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: index * 0.2 }}
-                className="bg-white p-8 rounded-3xl shadow-lg hover:shadow-xl transition-shadow duration-300"
-              >
-                <div className="text-5xl mb-4">{feature.icon}</div>
-                <h3 className="text-2xl font-semibold text-serenity-dark mb-3">
-                  {feature.title}
-                </h3>
-                <p className="text-calm-400">{feature.description}</p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Interactive Cards Section */}
-      <section className="py-16 bg-calm-100">
-        <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center text-serenity-dark mb-12">
-            Start Your Wellness Journey
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-            <HomeJournalCard />
-            <HomeMoodLogCard />
-          </div>
-        </div>
-      </section>
-
-      {/* Testimonial Section */}
-      <section className="py-20 bg-white">
-        <div className="container mx-auto px-4">
-          <div className="bg-primary.light rounded-3xl p-12 text-center">
-            <h3 className="text-2xl font-semibold text-serenity-dark mb-6">
-              "Serenity Sphere helped me understand my emotions better than any other app I've tried."
-            </h3>
-            <p className="text-calm-400">- Sarah, Daily User</p>
-          </div>
-        </div>
-      </section>
+      </div>
     </div>
   );
-}
+};
 
 export default Home;

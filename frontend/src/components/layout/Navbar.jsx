@@ -5,7 +5,7 @@ import { logout } from '../../features/auth/authSlice';
 import ThemeToggle from './ThemeToggle';
 import '../../styles/components/_navbar.css';
 import api from '../../services/api';
-import { FaSignOutAlt, FaBook, FaSignInAlt, FaHome, FaUser } from 'react-icons/fa';
+import { FaSignOutAlt, FaBook, FaSignInAlt, FaHome, FaUser, FaChartLine } from 'react-icons/fa';
 import { motion } from 'framer-motion';
 
 const Navbar = () => {
@@ -23,57 +23,89 @@ const Navbar = () => {
     }
   };
 
-  return (
-    <nav className="bg-white shadow-lg fixed w-full z-50">
-      <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between h-16">
-          <Link to="/" className="flex items-center">
-            <motion.span 
-              whileHover={{ scale: 1.05 }}
-              className="text-2xl font-bold text-serenity-dark"
-            >
-              Serenity Sphere
-            </motion.span>
+  // Don't render the sidebar at all for unauthenticated users
+  if (!isAuthenticated) {
+    return (
+      <nav className="fixed top-0 left-0 right-0 bg-[#1A2335] border-b border-[#2A3547] z-50">
+        <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+          <Link to="/" className="text-2xl font-bold bg-gradient-to-r from-[#5983FC] to-[#3E60C1] bg-clip-text text-transparent">
+            Serenity Sphere
           </Link>
-          <div className="flex items-center space-x-6">
-            
-            <ul className="flex items-center space-x-6">
-              <li>
-                <Link to="/" className="hover:text-primary.DEFAULT transition-colors text-calm-400">
-                  <FaHome size={20} />
-                </Link>
-              </li>
-              {isAuthenticated ? (
-                <>
-                  <li>
-                    <Link to="/journal" className="hover:text-primary.DEFAULT transition-colors text-calm-400">
-                      <FaBook size={20} />
-                    </Link>
-                  </li>
-                  <li>
-                    <Link to="/profile" className="hover:text-primary.DEFAULT transition-colors text-calm-400">
-                      <FaUser size={20} />
-                    </Link>
-                  </li>
-                  <li>
-                    <button 
-                      onClick={handleLogout}
-                      className="hover:text-primary.DEFAULT transition-colors text-calm-400"
-                    >
-                      <FaSignOutAlt size={20} />
-                    </button>
-                  </li>
-                </>
-              ) : (
-                <li>
-                  <Link to="/login" className="hover:text-primary.DEFAULT transition-colors text-calm-400">
-                    <FaSignInAlt size={20} />
-                  </Link>
-                </li>
-              )}
-            </ul>
+          <div className="flex items-center space-x-4">
+            <Link
+              to="/login"
+              className="px-6 py-2 rounded-lg text-[#B8C7E0] hover:bg-[#2A3547] transition-colors"
+            >
+              Sign In
+            </Link>
+            <Link
+              to="/register"
+              className="px-6 py-2 rounded-lg bg-[#3E60C1] text-white hover:bg-[#5983FC] transition-colors"
+            >
+              Sign Up
+            </Link>
           </div>
         </div>
+      </nav>
+    );
+  }
+
+  // Render sidebar for authenticated users
+  return (
+    <nav className="fixed left-0 top-0 h-screen w-64 bg-[#1A2335] border-r border-[#2A3547] flex flex-col p-6">
+      <div className="mb-10">
+        <span className="text-2xl font-bold bg-gradient-to-r from-[#5983FC] to-[#3E60C1] bg-clip-text text-transparent">
+          Serenity Sphere
+        </span>
+      </div>
+
+      <ul className="space-y-4 flex-1">
+        <li>
+          <Link
+            to="/"
+            className="flex items-center space-x-3 p-3 rounded-xl hover:bg-[#2A3547] transition-colors text-[#B8C7E0]"
+          >
+            <FaHome size={20} />
+            <span>Dashboard</span>
+          </Link>
+        </li>
+        <li>
+          <Link
+            to="/journal"
+            className="flex items-center space-x-3 p-3 rounded-xl hover:bg-[#2A3547] transition-colors text-[#B8C7E0]"
+          >
+            <FaBook size={20} />
+            <span>Journal</span>
+          </Link>
+        </li>
+        <li>
+          <Link
+            to="/profile"
+            className="flex items-center space-x-3 p-3 rounded-xl hover:bg-[#2A3547] transition-colors text-[#B8C7E0]"
+          >
+            <FaUser size={20} />
+            <span>Profile</span>
+          </Link>
+        </li>
+        <li>
+          <Link
+            to="/mood-log"
+            className="flex items-center space-x-3 p-3 rounded-xl hover:bg-[#2A3547] transition-colors text-[#B8C7E0]"
+          >
+            <FaChartLine size={20} />
+            <span>Mood Log</span>
+          </Link>
+        </li>
+      </ul>
+
+      <div className="border-t border-[#2A3547] pt-6">
+        <button
+          onClick={handleLogout}
+          className="w-full flex items-center space-x-3 p-3 rounded-xl hover:bg-[#2A3547] text-[#B8C7E0]"
+        >
+          <FaSignOutAlt size={20} />
+          <span>Log Out</span>
+        </button>
       </div>
     </nav>
   );

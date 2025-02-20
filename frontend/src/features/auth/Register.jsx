@@ -57,126 +57,113 @@ const Register = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary.light/20 to-calm-100 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-[#0F172A] pt-20 p-8">
+      <br />
+      <br />
+      <br />
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-4xl bg-white rounded-3xl shadow-xl flex"
+        className="max-w-2xl mx-auto bg-[#1A2335] rounded-2xl border border-[#2A3547] p-12"
       >
-        {/* Form Section (Left side on desktop) */}
-        <div className="w-full md:w-1/2 p-12">
-          <div className="text-center mb-10">
-            <h1 className="text-4xl font-bold text-serenity-dark mb-4">
-              Get Started
-            </h1>
-            <h2 className="text-2xl text-calm-500 font-medium">
-              Create your wellness account
-            </h2>
-          </div>
-
-          <form onSubmit={handleSubmit} className="space-y-8">
-            {error && (
-              <div className="p-3 bg-red-50 text-red-600 rounded-xl text-sm flex items-center gap-2">
-                <span>{error}</span>
-              </div>
-            )}
-
-            <div className="space-y-6">
-              <div className="relative">
-                <FiMail className="absolute left-4 top-1/2 -translate-y-1/2 text-calm-400" />
-                <input
-                  name="email"
-                  type="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  className="w-full pl-11 pr-4 py-4 rounded-xl border-2 border-calm-200 focus:border-primary.DEFAULT focus:ring-0 transition-all"
-                  placeholder="Email address"
-                />
-                {fieldErrors.email && (
-                  <p className="text-red-500 text-sm mt-2 ml-1">{fieldErrors.email}</p>
-                )}
-              </div>
-
-              <div className="relative">
-                <FiUser className="absolute left-4 top-1/2 -translate-y-1/2 text-calm-400" />
-                <input
-                  name="username"
-                  type="text"
-                  value={formData.username}
-                  onChange={handleChange}
-                  className="w-full pl-11 pr-4 py-4 rounded-xl border-2 border-calm-200 focus:border-primary.DEFAULT focus:ring-0 transition-all"
-                  placeholder="Username"
-                />
-                {fieldErrors.username && (
-                  <p className="text-red-500 text-sm mt-2 ml-1">{fieldErrors.username}</p>
-                )}
-              </div>
-
-              <div className="relative">
-                <FiLock className="absolute left-4 top-1/2 -translate-y-1/2 text-calm-400" />
-                <input
-                  name="password"
-                  type="password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  className="w-full pl-11 pr-4 py-4 rounded-xl border-2 border-calm-200 focus:border-primary.DEFAULT focus:ring-0 transition-all"
-                  placeholder="Password"
-                />
-                {fieldErrors.password && (
-                  <p className="text-red-500 text-sm mt-2 ml-1">{fieldErrors.password}</p>
-                )}
-              </div>
-
-              <div className="relative">
-                <FiLock className="absolute left-4 top-1/2 -translate-y-1/2 text-calm-400" />
-                <input
-                  name="confirmPassword"
-                  type="password"
-                  value={formData.confirmPassword}
-                  onChange={handleChange}
-                  className="w-full pl-11 pr-4 py-4 rounded-xl border-2 border-calm-200 focus:border-primary.DEFAULT focus:ring-0 transition-all"
-                  placeholder="Confirm Password"
-                />
-                {fieldErrors.confirmPassword && (
-                  <p className="text-red-500 text-sm mt-2 ml-1">{fieldErrors.confirmPassword}</p>
-                )}
-              </div>
-            </div>
-
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              type="submit"
-              disabled={isLoading}
-              className="w-full bg-gradient-to-r from-primary.DEFAULT to-primary.dark text-white py-5 rounded-xl font-semibold text-lg shadow-lg hover:shadow-primary.light/40 transition-all"
-            >
-              {isLoading ? 'Creating account...' : 'Sign Up'}
-            </motion.button>
-
-            <div className="text-center mt-6">
-              <p className="text-calm-500">
-                Already have an account?{' '}
-                <Link 
-                  to="/login" 
-                  className="text-primary.DEFAULT font-semibold hover:text-primary.dark transition-colors"
-                >
-                  Sign in
-                </Link>
-              </p>
-            </div>
-          </form>
+        <div className="text-center mb-12">
+          <h1 className="text-3xl font-bold text-white mb-2">
+            Create Your Account
+          </h1>
+          <p className="text-[#B8C7E0]">Start your mental wellness journey today</p>
         </div>
 
-        {/* Image Section (Right side on desktop) */}
-        <div className="hidden md:block w-1/2 bg-gradient-to-br from-primary.DEFAULT to-primary.dark p-12">
-          <div className="h-full flex items-center justify-center">
-            <img 
-              src={RegisterImage}
-              alt="Wellness Illustration"
-              className="w-full h-full object-cover rounded-r-3xl"
-            />
+        <form onSubmit={handleSubmit} className="space-y-8">
+          {error && (
+            <div className="p-3 bg-red-50 text-red-600 rounded-xl text-sm flex items-center gap-2">
+              <span>{error}</span>
+            </div>
+          )}
+
+          <div className="space-y-6">
+            <div className="relative">
+              <FiMail className="absolute left-4 top-1/2 -translate-y-1/2 text-[#5983FC]" />
+              <input
+                name="email"
+                type="email"
+                value={formData.email}
+                onChange={handleChange}
+                className="w-full pl-11 pr-4 py-4 bg-[#0F172A] rounded-xl border-2 border-[#2A3547] focus:border-[#5983FC] focus:ring-0 text-[#B8C7E0] placeholder-[#4A5568]"
+                placeholder="Email address"
+              />
+              {fieldErrors.email && (
+                <p className="text-red-500 text-sm mt-2 ml-1">{fieldErrors.email}</p>
+              )}
+            </div>
+
+            <div className="relative">
+              <FiUser className="absolute left-4 top-1/2 -translate-y-1/2 text-[#5983FC]" />
+              <input
+                name="username"
+                type="text"
+                value={formData.username}
+                onChange={handleChange}
+                className="w-full pl-11 pr-4 py-4 bg-[#0F172A] rounded-xl border-2 border-[#2A3547] focus:border-[#5983FC] focus:ring-0 text-[#B8C7E0] placeholder-[#4A5568]"
+                placeholder="Username"
+              />
+              {fieldErrors.username && (
+                <p className="text-red-500 text-sm mt-2 ml-1">{fieldErrors.username}</p>
+              )}
+            </div>
+
+            <div className="relative">
+              <FiLock className="absolute left-4 top-1/2 -translate-y-1/2 text-[#5983FC]" />
+              <input
+                name="password"
+                type="password"
+                value={formData.password}
+                onChange={handleChange}
+                className="w-full pl-11 pr-4 py-4 bg-[#0F172A] rounded-xl border-2 border-[#2A3547] focus:border-[#5983FC] focus:ring-0 text-[#B8C7E0] placeholder-[#4A5568]"
+                placeholder="Password"
+              />
+              {fieldErrors.password && (
+                <p className="text-red-500 text-sm mt-2 ml-1">{fieldErrors.password}</p>
+              )}
+            </div>
+
+            <div className="relative">
+              <FiLock className="absolute left-4 top-1/2 -translate-y-1/2 text-[#5983FC]" />
+              <input
+                name="confirmPassword"
+                type="password"
+                value={formData.confirmPassword}
+                onChange={handleChange}
+                className="w-full pl-11 pr-4 py-4 bg-[#0F172A] rounded-xl border-2 border-[#2A3547] focus:border-[#5983FC] focus:ring-0 text-[#B8C7E0] placeholder-[#4A5568]"
+                placeholder="Confirm Password"
+              />
+              {fieldErrors.confirmPassword && (
+                <p className="text-red-500 text-sm mt-2 ml-1">{fieldErrors.confirmPassword}</p>
+              )}
+            </div>
           </div>
-        </div>
+
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            type="submit"
+            disabled={isLoading}
+            className="w-full bg-gradient-to-r from-[#3E60C1] to-[#5983FC] text-white py-4 rounded-xl font-semibold shadow-lg hover:shadow-[#5983FC]/30 transition-all"
+          >
+            {isLoading ? 'Creating account...' : 'Sign Up'}
+          </motion.button>
+
+          <div className="text-center mt-6">
+            <p className="text-[#B8C7E0]">
+              Already have an account?{' '}
+              <Link 
+                to="/login" 
+                className="text-[#5983FC] font-semibold hover:text-[#3E60C1] transition-colors"
+              >
+                Sign in
+              </Link>
+            </p>
+          </div>
+        </form>
       </motion.div>
     </div>
   )

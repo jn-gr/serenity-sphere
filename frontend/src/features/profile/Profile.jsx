@@ -3,6 +3,8 @@ import api from '../../services/api';
 import { useDispatch, useSelector } from 'react-redux';
 import { setCredentials } from '../auth/authSlice';
 import { useTheme } from '../../context/ThemeContext';
+import { FiUser, FiMail, FiLock } from 'react-icons/fi';
+import { motion } from 'framer-motion';
 
 const Profile = () => {
   const { isDark } = useTheme();
@@ -94,79 +96,91 @@ const Profile = () => {
   };
 
   return (
-    <div className="auth-container">
-      <div className={`auth-box ${isDark ? 'bg-theme-color-dark-card' : 'bg-theme-color-card'}`}>
-        <h2 className="auth-title">Your Profile</h2>
-        <form onSubmit={handleSubmit} className="auth-form">
-          {message && <div className="auth-error">{message}</div>}
-          <div className="auth-form-group">
-            <div className="auth-input-group">
-              <label htmlFor="username" className="form-label">Username</label>
-              <input
-                id="username"
-                name="username"
-                type="text"
-                value={formData.username}
-                onChange={handleChange}
-                className={`form-input ${fieldErrors.username ? 'form-input-error' : ''}`}
-                required
-              />
-              {fieldErrors.username && <p className="form-error-text">{fieldErrors.username}</p>}
+    <div className="ml-64 min-h-screen bg-[#0F172A] p-8">
+      <div className="max-w-3xl mx-auto">
+        <div className="bg-[#1A2335] rounded-2xl border border-[#2A3547] p-8">
+          <h2 className="text-2xl font-bold text-white mb-8">Profile Settings</h2>
+          
+          <form onSubmit={handleSubmit} className="space-y-8">
+            {message && (
+              <div className="p-3 bg-green-500/10 text-green-500 rounded-xl text-sm">
+                {message}
+              </div>
+            )}
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="relative">
+                <FiUser className="absolute left-4 top-1/2 -translate-y-1/2 text-[#5983FC]" />
+                <input
+                  name="username"
+                  type="text"
+                  value={formData.username}
+                  onChange={handleChange}
+                  className="w-full pl-11 pr-4 py-4 bg-[#0F172A] rounded-xl border-2 border-[#2A3547] focus:border-[#5983FC] focus:ring-0 text-[#B8C7E0] placeholder-[#4A5568]"
+                  placeholder="Username"
+                />
+              </div>
+
+              <div className="relative">
+                <FiMail className="absolute left-4 top-1/2 -translate-y-1/2 text-[#5983FC]" />
+                <input
+                  name="email"
+                  type="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  className="w-full pl-11 pr-4 py-4 bg-[#0F172A] rounded-xl border-2 border-[#2A3547] focus:border-[#5983FC] focus:ring-0 text-[#B8C7E0] placeholder-[#4A5568]"
+                  placeholder="Email"
+                />
+              </div>
+
+              <div className="relative">
+                <FiLock className="absolute left-4 top-1/2 -translate-y-1/2 text-[#5983FC]" />
+                <input
+                  name="oldPassword"
+                  type="password"
+                  value={oldPassword}
+                  onChange={(e) => setOldPassword(e.target.value)}
+                  className="w-full pl-11 pr-4 py-4 bg-[#0F172A] rounded-xl border-2 border-[#2A3547] focus:border-[#5983FC] focus:ring-0 text-[#B8C7E0] placeholder-[#4A5568]"
+                  placeholder="Old Password"
+                />
+              </div>
+
+              <div className="relative">
+                <FiLock className="absolute left-4 top-1/2 -translate-y-1/2 text-[#5983FC]" />
+                <input
+                  name="password"
+                  type="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  className="w-full pl-11 pr-4 py-4 bg-[#0F172A] rounded-xl border-2 border-[#2A3547] focus:border-[#5983FC] focus:ring-0 text-[#B8C7E0] placeholder-[#4A5568]"
+                  placeholder="New Password"
+                />
+              </div>
+
+              <div className="relative">
+                <FiLock className="absolute left-4 top-1/2 -translate-y-1/2 text-[#5983FC]" />
+                <input
+                  name="confirmPassword"
+                  type="password"
+                  value={formData.confirmPassword}
+                  onChange={handleChange}
+                  className="w-full pl-11 pr-4 py-4 bg-[#0F172A] rounded-xl border-2 border-[#2A3547] focus:border-[#5983FC] focus:ring-0 text-[#B8C7E0] placeholder-[#4A5568]"
+                  placeholder="Confirm New Password"
+                />
+              </div>
             </div>
-            <div className="auth-input-group">
-              <label htmlFor="email" className="form-label">Email</label>
-              <input
-                id="email"
-                name="email"
-                type="email"
-                value={formData.email}
-                onChange={handleChange}
-                className={`form-input ${fieldErrors.email ? 'form-input-error' : ''}`}
-                required
-              />
-              {fieldErrors.email && <p className="form-error-text">{fieldErrors.email}</p>}
-            </div>
-            <div className="auth-input-group">
-              <label htmlFor="oldPassword" className="form-label">Old Password</label>
-              <input
-                id="oldPassword"
-                name="oldPassword"
-                type="password"
-                value={oldPassword}
-                onChange={(e) => setOldPassword(e.target.value)}
-                className={`form-input ${fieldErrors.oldPassword ? 'form-input-error' : ''}`}
-              />
-              {fieldErrors.oldPassword && <p className="form-error-text">{fieldErrors.oldPassword}</p>}
-            </div>
-            <div className="auth-input-group">
-              <label htmlFor="password" className="form-label">New Password</label>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                value={formData.password}
-                onChange={handleChange}
-                className={`form-input ${fieldErrors.password ? 'form-input-error' : ''}`}
-              />
-              {fieldErrors.password && <p className="form-error-text">{fieldErrors.password}</p>}
-            </div>
-            <div className="auth-input-group">
-              <label htmlFor="confirmPassword" className="form-label">Confirm New Password</label>
-              <input
-                id="confirmPassword"
-                name="confirmPassword"
-                type="password"
-                value={formData.confirmPassword}
-                onChange={handleChange}
-                className={`form-input ${fieldErrors.confirmPassword ? 'form-input-error' : ''}`}
-              />
-              {fieldErrors.confirmPassword && <p className="form-error-text">{fieldErrors.confirmPassword}</p>}
-            </div>
-            <button type="submit" disabled={isLoading} className="form-button">
-              {isLoading ? "Updating..." : "Update Profile"}
-            </button>
-          </div>
-        </form>
+
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              type="submit"
+              disabled={isLoading}
+              className="w-full bg-gradient-to-r from-[#3E60C1] to-[#5983FC] text-white py-4 rounded-xl font-semibold shadow-lg hover:shadow-[#5983FC]/30 transition-all"
+            >
+              {isLoading ? 'Updating...' : 'Update Profile'}
+            </motion.button>
+          </form>
+        </div>
       </div>
     </div>
   );
