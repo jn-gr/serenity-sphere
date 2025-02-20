@@ -1,19 +1,28 @@
 // frontend/src/features/home/Home.jsx
-import React from 'react';
-import { useSelector } from 'react-redux';
+import React, { useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import '../../styles/layouts/_home.css';
 import JournalPreview from '../journal/JournalPreview';
+import { fetchJournalEntries } from '../journal/journalSlice';
 
 const Home = () => {
+  const dispatch = useDispatch();
   const { isAuthenticated } = useSelector(state => state.auth);
   const journalEntries = useSelector(state => state.journal.entries);
+  const journalStatus = useSelector(state => state.journal.status);
   
   const today = new Date().toISOString().split('T')[0];
   const todaysEntry = journalEntries.find(entry => 
     new Date(entry.date).toISOString().split('T')[0] === today
   );
+
+  useEffect(() => {
+    if (isAuthenticated && journalStatus === 'idle') {
+      dispatch(fetchJournalEntries());
+    }
+  }, [isAuthenticated, journalStatus, dispatch]);
 
   if (!isAuthenticated) {
     return (
@@ -35,7 +44,7 @@ const Home = () => {
                   </span>
                 </motion.h1>
                 <p className="text-lg text-[#B8C7E0] leading-relaxed">
-                  Track your emotions, analyze patterns, and find balance through intelligent journaling.
+                  Track your emotions, analyse patterns, and find balance through intelligent journaling.
                 </p>
                 <div className="flex gap-4">
                   <Link to="/register">
@@ -176,7 +185,7 @@ const Home = () => {
           >
             <h3 className="text-xl font-semibold text-white mb-6">Mood Trends</h3>
             <div className="h-96 bg-[#0F172A]/50 rounded-xl flex items-center justify-center">
-              <p className="text-[#B8C7E0]">Mood visualization coming soon</p>
+              <p className="text-[#B8C7E0]">Mood visualisation coming soon</p>
             </div>
           </motion.div>
           

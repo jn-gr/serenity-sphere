@@ -5,6 +5,7 @@ import JournalForm from './JournalForm';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaPlus, FaHistory, FaTrash, FaBrain } from 'react-icons/fa';
 import { IoMdClose } from 'react-icons/io';
+import EmotionAnalysisModal from '../emotion/components/EmotionAnalysisModal';
 
 const EmotionModal = ({ emotions, isOpen, onClose }) => {
   if (!isOpen) return null;
@@ -65,6 +66,8 @@ const JournalList = () => {
   const [activeTab, setActiveTab] = useState("history");
   const [selectedEmotions, setSelectedEmotions] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [excitementSteps, setExcitementSteps] = useState([]);
+  const [currentStep, setCurrentStep] = useState('');
 
   useEffect(() => {
     if (activeTab === "history" && status === 'idle') {
@@ -81,6 +84,19 @@ const JournalList = () => {
   const handleAnalyzeEmotions = (emotions) => {
     setSelectedEmotions(emotions);
     setIsModalOpen(true);
+    
+    // Reset steps when opening modal
+    if (emotions.some(e => e[0].toLowerCase() === 'excitement')) {
+      setExcitementSteps([]);
+      setCurrentStep('');
+    }
+  };
+
+  const handleAddStep = () => {
+    if (currentStep.trim()) {
+      setExcitementSteps([...excitementSteps, currentStep]);
+      setCurrentStep('');
+    }
   };
 
   return (
@@ -198,10 +214,14 @@ const JournalList = () => {
         )}
       </div>
 
-      <EmotionModal
-        emotions={selectedEmotions || []}
+      <EmotionAnalysisModal
+        selectedEmotions={selectedEmotions}
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
+        excitementSteps={excitementSteps}
+        setExcitementSteps={setExcitementSteps}
+        currentStep={currentStep}
+        setCurrentStep={setCurrentStep}
       />
     </div>
   );
