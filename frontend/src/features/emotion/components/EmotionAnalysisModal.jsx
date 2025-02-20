@@ -20,7 +20,6 @@ const EmotionAnalysisModal = ({
 
   if (!isOpen) return null;
 
-  // Sort emotions by threshold descending
   const sortedEmotions = [...selectedEmotions].sort((a, b) => b[1] - a[1]);
   const primaryEmotion = sortedEmotions[0][0].toLowerCase();
   const isExcitementPrimary = primaryEmotion === 'excitement';
@@ -31,7 +30,6 @@ const EmotionAnalysisModal = ({
       <div className="bg-[#1A2335] rounded-2xl border border-[#2A3547] p-8 max-w-md w-full mx-4">
         <h3 className="text-xl font-semibold text-white mb-4">Emotion Analysis</h3>
         
-        {/* Updated emotion percentage display */}
         <div className="space-y-2 mb-6">
           {sortedEmotions.map(([emotion, threshold], idx) => {
             const percentage = Math.round(threshold * 100);
@@ -58,7 +56,6 @@ const EmotionAnalysisModal = ({
                     className="absolute left-0 top-0 h-full bg-gradient-to-r from-[#3E60C1] to-[#5983FC] rounded-full transition-all duration-500"
                     style={{ 
                       width: `${percentage}%`,
-                      // Add shimmer animation for top emotion
                       animation: idx === 0 ? 'shimmer 3s infinite' : 'none'
                     }}
                   />
@@ -68,7 +65,6 @@ const EmotionAnalysisModal = ({
           })}
         </div>
 
-        {/* Show excitement planning only if it's the primary emotion */}
         {isExcitementPrimary && (
           <div className="space-y-4 border-t border-[#2A3547] pt-6">
             <p className="text-[#B8C7E0]">
@@ -104,7 +100,7 @@ const EmotionAnalysisModal = ({
           <div className="space-y-4 border-t border-[#2A3547] pt-6">
             <div className="space-y-3">
               <h4 className="text-[#B8C7E0] font-medium">
-                Let's savor this joyful moment 🎉
+                Let's savour this joyful moment 🎉
               </h4>
               <p className="text-sm text-[#B8C7E0]/80">
                 Reflect on what made this experience amusing or uplifting
