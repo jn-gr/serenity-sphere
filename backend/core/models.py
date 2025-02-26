@@ -1,5 +1,7 @@
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.db import models
+from django.core.validators import MinValueValidator, MaxValueValidator
+from django.utils import timezone
 
 class CustomUserManager(BaseUserManager):
     def create_user(self, email, username, password=None, **extra_fields):
@@ -45,4 +47,48 @@ class JournalEntry(models.Model):
         return f"Journal Entry by {self.user.email} on {self.date}"
     
 class MoodLog(models.Model):
-    user = models.ForeignKey(CustomUser, related_name='Mood_logs',on_delete=models.CASCADE)
+    MOOD_CHOICES = [
+        ('happy', 'Happy'),
+        ('sad', 'Sad'),
+        ('anxious', 'Anxious'),
+        ('calm', 'Calm'),
+        ('angry', 'Angry'),
+        ('excited', 'Excited'),
+        ('neutral', 'Neutral'),
+        ('amused', 'Amused'),
+        ('loving', 'Loving'),
+        ('optimistic', 'Optimistic'),
+        ('caring', 'Caring'),
+        ('proud', 'Proud'),
+        ('grateful', 'Grateful'),
+        ('relieved', 'Relieved'),
+        ('surprised', 'Surprised'),
+        ('curious', 'Curious'),
+        ('confused', 'Confused'),
+        ('nervous', 'Nervous'),
+        ('remorseful', 'Remorseful'),
+        ('embarrassed', 'Embarrassed'),
+        ('disappointed', 'Disappointed'),
+        ('grieving', 'Grieving'),
+        ('disgusted', 'Disgusted'),
+        ('annoyed', 'Annoyed'),
+        ('disapproving', 'Disapproving'),
+    ]
+    
+    user = models.ForeignKey(CustomUser, related_name='mood_logs', on_delete=models.CASCADE)
+    date = models.DateField(default=timezone.now)
+    mood = models.CharField(max_length=20, choices=MOOD_CHOICES, default='neutral')
+    intensity = models.IntegerField(default=5, validators=[
+        MinValueValidator(1),
+        MaxValueValidator(10)
+    ])
+    notes = models.TextField(blank=True, null=True)
+    journal_entry = models.ForeignKey(JournalEntry, related_name='mood_logs', on_delete=models.SET_NULL, null=True, blank=True)
+    created_at = models.DateTimeField(default=timezone.now)
+    
+    class Meta:
+        ordering = ['-date']
+        unique_together = ['user', 'date', 'mood']
+        
+    def __str__(self):
+        return f"{self.user.username}'s mood: {self.mood} ({self.date})"

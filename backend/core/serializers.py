@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from django.contrib.auth.password_validation import validate_password
-from .models import CustomUser, JournalEntry
+from .models import CustomUser, JournalEntry, MoodLog
 
 User = get_user_model()
 
@@ -53,4 +53,14 @@ class UserUpdateSerializer(serializers.ModelSerializer):
         if 'password' in validated_data:
             password = validated_data.pop('password')
             instance.set_password(password)
-        return super().update(instance, validated_data) 
+        return super().update(instance, validated_data)
+
+class MoodLogSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = MoodLog
+        fields = ['id', 'date', 'mood', 'intensity', 'notes', 'journal_entry', 'created_at']
+        read_only_fields = ['user']
+        
+    def create(self, validated_data):
+        validated_data['user'] = self.context['request'].user
+        return super().create(validated_data) 

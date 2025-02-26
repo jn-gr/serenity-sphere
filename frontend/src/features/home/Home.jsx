@@ -6,6 +6,7 @@ import { motion } from 'framer-motion';
 import '../../styles/layouts/_home.css';
 import JournalPreview from '../journal/JournalPreview';
 import { fetchJournalEntries } from '../journal/journalSlice';
+import MoodChart from '../mood/MoodChart';
 
 const Home = () => {
   const dispatch = useDispatch();
@@ -184,9 +185,7 @@ const Home = () => {
             className="bg-[#1A2335] p-8 rounded-2xl border border-[#2A3547] hover:border-[#3E60C1] transition-colors"
           >
             <h3 className="text-xl font-semibold text-white mb-6">Mood Trends</h3>
-            <div className="h-96 bg-[#0F172A]/50 rounded-xl flex items-center justify-center">
-              <p className="text-[#B8C7E0]">Mood visualisation coming soon</p>
-            </div>
+            <MoodChart />
           </motion.div>
           
           <motion.div

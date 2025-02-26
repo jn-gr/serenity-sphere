@@ -3,13 +3,14 @@ from rest_framework import status, viewsets, permissions
 from rest_framework.decorators import api_view, permission_classes, action
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
-from .serializers import RegisterSerializer, LoginSerializer, UserSerializer, UserUpdateSerializer, JournalEntrySerializer
-from .models import JournalEntry
+from .serializers import RegisterSerializer, LoginSerializer, UserSerializer, UserUpdateSerializer, JournalEntrySerializer, MoodLogSerializer
+from .models import JournalEntry, MoodLog
 from django.middleware.csrf import get_token
 from django.http import JsonResponse
 from .ai_services import predict_emotions
 import logging
 from django.contrib.auth.hashers import check_password
+from django.utils import timezone
 
 
 logger = logging.getLogger(__name__)
@@ -98,7 +99,65 @@ class JournalEntryViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         content = serializer.validated_data.get('content', '')
         emotions = predict_emotions(content)
-        serializer.save(user=self.request.user, emotions=emotions)
+        journal_entry = serializer.save(user=self.request.user, emotions=emotions)
+        
+        # Automatically create a mood log based on the dominant emotion
+        if emotions:
+            # Sort emotions by confidence score (descending)
+            sorted_emotions = sorted(emotions, key=lambda x: x[1], reverse=True)
+            dominant_emotion = sorted_emotions[0][0]
+            
+            # Map the emotion to a mood
+            emotion_to_mood = {
+                # Positive emotions
+                'amusement': 'amused',
+                'excitement': 'excited',
+                'joy': 'happy',
+                'love': 'loving',
+                'desire': 'loving',
+                'optimism': 'optimistic',
+                'caring': 'caring',
+                'pride': 'proud',
+                'admiration': 'proud',
+                'gratitude': 'grateful',
+                'relief': 'relieved',
+                'approval': 'happy',
+                'realization': 'surprised',
+                
+                # Neutral emotions
+                'surprise': 'surprised',
+                'curiosity': 'curious',
+                'confusion': 'confused',
+                'neutral': 'neutral',
+                
+                # Negative emotions
+                'fear': 'anxious',
+                'nervousness': 'nervous',
+                'remorse': 'remorseful',
+                'embarrassment': 'embarrassed',
+                'disappointment': 'disappointed',
+                'sadness': 'sad',
+                'grief': 'grieving',
+                'disgust': 'disgusted',
+                'anger': 'angry',
+                'annoyance': 'annoyed',
+                'disapproval': 'disapproving',
+            }
+            
+            # Default to neutral if emotion not in mapping
+            mood = emotion_to_mood.get(dominant_emotion.lower(), 'neutral')
+            
+            # Calculate intensity based on confidence score (scale 1-10)
+            intensity = min(int(sorted_emotions[0][1] * 10), 10)
+            
+            # Create the mood log
+            MoodLog.objects.create(
+                user=self.request.user,
+                date=journal_entry.date.date(),
+                mood=mood,
+                intensity=intensity,
+                journal_entry=journal_entry
+            )
 
     def perform_update(self, serializer):
         content = serializer.validated_data.get('content', None)
@@ -119,4 +178,27 @@ def detect_emotions(request):
 def get_journal_entries(request):
     entries = JournalEntry.objects.filter(user=request.user)
     serializer = JournalEntrySerializer(entries, many=True)
+    return Response(serializer.data)
+
+class MoodLogViewSet(viewsets.ModelViewSet):
+    serializer_class = MoodLogSerializer
+    permission_classes = [IsAuthenticated]
+    
+    def get_queryset(self):
+        return MoodLog.objects.filter(user=self.request.user)
+        
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_mood_trends(request):
+    # Get mood logs for the last 30 days
+    thirty_days_ago = timezone.now().date() - timezone.timedelta(days=30)
+    mood_logs = MoodLog.objects.filter(
+        user=request.user,
+        date__gte=thirty_days_ago
+    ).order_by('date')
+    
+    serializer = MoodLogSerializer(mood_logs, many=True)
     return Response(serializer.data)

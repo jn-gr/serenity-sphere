@@ -21,6 +21,7 @@ from core import views
 
 router = DefaultRouter()
 router.register(r'journal', views.JournalEntryViewSet, basename='journal')
+router.register(r'mood-logs', views.MoodLogViewSet, basename='mood-log')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -33,4 +34,5 @@ urlpatterns = [
     path('api/', include(router.urls)),
     path('api/detect-emotions/', views.detect_emotions, name='detect_emotions'),
     path('api/journal-entries/', views.get_journal_entries, name='get_journal_entries'),
+    path('api/mood-trends/', views.get_mood_trends, name='get_mood_trends'),
 ]
