@@ -89,7 +89,7 @@ const Navbar = () => {
         </li>
         <li>
           <Link
-            to="/mood-log"
+            to="/mood"
             className="flex items-center space-x-3 p-3 rounded-xl hover:bg-[#2A3547] transition-colors text-[#B8C7E0]"
           >
             <FaChartLine size={20} />
