@@ -2,6 +2,7 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.utils.translation import gettext_lazy as _
 from .models import CustomUser, JournalEntry, MoodLog
+from django.utils import timezone
 
 @admin.register(CustomUser)
 class CustomUserAdmin(UserAdmin):
@@ -44,6 +45,19 @@ class JournalEntryAdmin(admin.ModelAdmin):
     
     # Add a filter to see entries by date range
     date_hierarchy = 'date'
+    
+    # Add date to the editable fields
+    fieldsets = (
+        (None, {
+            'fields': ('user', 'date', 'content')
+        }),
+        ('Metadata', {
+            'fields': ('emotions', 'created_at', 'updated_at'),
+            'classes': ('collapse',),
+        }),
+    )
+    
+    readonly_fields = ('created_at', 'updated_at')
 
     def user_email(self, obj):
         return obj.user.email
@@ -66,6 +80,24 @@ class JournalEntryAdmin(admin.ModelAdmin):
                 return str(obj.emotions)[:75] + '...'
         return "No emotions detected"
     emotions_preview.short_description = 'Top Emotions'
+    
+    # Add actions for creating test data with different dates
+    actions = ['set_date_yesterday', 'set_date_last_week', 'set_date_last_month']
+    
+    def set_date_yesterday(self, request, queryset):
+        yesterday = timezone.now() - timezone.timedelta(days=1)
+        queryset.update(date=yesterday)
+    set_date_yesterday.short_description = "Set date to yesterday"
+    
+    def set_date_last_week(self, request, queryset):
+        last_week = timezone.now() - timezone.timedelta(days=7)
+        queryset.update(date=last_week)
+    set_date_last_week.short_description = "Set date to last week"
+    
+    def set_date_last_month(self, request, queryset):
+        last_month = timezone.now() - timezone.timedelta(days=30)
+        queryset.update(date=last_month)
+    set_date_last_month.short_description = "Set date to last month"
 
 @admin.register(MoodLog)
 class MoodLogAdmin(admin.ModelAdmin):
@@ -82,7 +114,8 @@ class MoodLogAdmin(admin.ModelAdmin):
     list_filter = ('mood', 'intensity', 'date')
     
     # Add actions for bulk operations
-    actions = ['set_intensity_high', 'set_intensity_medium', 'set_intensity_low']
+    actions = ['set_intensity_high', 'set_intensity_medium', 'set_intensity_low', 
+               'set_date_yesterday', 'set_date_last_week', 'set_date_last_month']
     
     def user_email(self, obj):
         return obj.user.email
@@ -105,13 +138,30 @@ class MoodLogAdmin(admin.ModelAdmin):
         queryset.update(intensity=2)
     set_intensity_low.short_description = "Set intensity to low (2)"
     
+    def set_date_yesterday(self, request, queryset):
+        yesterday = timezone.now().date() - timezone.timedelta(days=1)
+        queryset.update(date=yesterday)
+    set_date_yesterday.short_description = "Set date to yesterday"
+    
+    def set_date_last_week(self, request, queryset):
+        last_week = timezone.now().date() - timezone.timedelta(days=7)
+        queryset.update(date=last_week)
+    set_date_last_week.short_description = "Set date to last week"
+    
+    def set_date_last_month(self, request, queryset):
+        last_month = timezone.now().date() - timezone.timedelta(days=30)
+        queryset.update(date=last_month)
+    set_date_last_month.short_description = "Set date to last month"
+    
     # Add a form to make it easier to create test data
     fieldsets = (
         (None, {
             'fields': ('user', 'date', 'mood', 'intensity')
         }),
         ('Additional Information', {
-            'fields': ('notes', 'journal_entry'),
+            'fields': ('notes', 'journal_entry', 'created_at'),
             'classes': ('collapse',),
         }),
     )
+    
+    readonly_fields = ('created_at',)

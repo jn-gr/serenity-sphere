@@ -2,6 +2,8 @@ from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.utils import timezone
+from django.db.models import UniqueConstraint
+from django.db.models.functions import TruncDate
 
 class CustomUserManager(BaseUserManager):
     def create_user(self, email, username, password=None, **extra_fields):
@@ -34,7 +36,7 @@ class CustomUser(AbstractUser):
 
 class JournalEntry(models.Model):
     user = models.ForeignKey(CustomUser, related_name='journal_entries', on_delete=models.CASCADE)
-    date = models.DateTimeField(auto_now_add=True)
+    date = models.DateTimeField(default=timezone.now)
     content = models.TextField()
     emotions = models.JSONField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -45,6 +47,22 @@ class JournalEntry(models.Model):
 
     def __str__(self):
         return f"Journal Entry by {self.user.email} on {self.date}"
+    
+    def save(self, *args, **kwargs):
+        if not self.pk:
+            entry_date = self.date.date()
+            existing_entries = JournalEntry.objects.filter(
+                user=self.user, 
+                date__date=entry_date
+            )
+            
+            if existing_entries.exists():
+                existing_entry = existing_entries.first()
+                self.pk = existing_entry.pk
+                self.id = existing_entry.id
+                self.created_at = existing_entry.created_at
+        
+        super().save(*args, **kwargs)
     
 class MoodLog(models.Model):
     MOOD_CHOICES = [
@@ -83,7 +101,7 @@ class MoodLog(models.Model):
         MaxValueValidator(10)
     ])
     notes = models.TextField(blank=True, null=True)
-    journal_entry = models.ForeignKey(JournalEntry, related_name='mood_logs', on_delete=models.SET_NULL, null=True, blank=True)
+    journal_entry = models.ForeignKey(JournalEntry, related_name='mood_logs', on_delete=models.CASCADE, null=True, blank=True)
     created_at = models.DateTimeField(default=timezone.now)
     
     class Meta:

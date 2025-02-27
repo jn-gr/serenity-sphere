@@ -99,58 +99,90 @@ class JournalEntryViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         content = serializer.validated_data.get('content', '')
         emotions = predict_emotions(content)
-        journal_entry = serializer.save(user=self.request.user, emotions=emotions)
         
-        # Automatically create a mood log based on the dominant emotion
-        if emotions:
-            # Sort emotions by confidence score (descending)
-            sorted_emotions = sorted(emotions, key=lambda x: x[1], reverse=True)
-            dominant_emotion = sorted_emotions[0][0]
+        # Check if an entry already exists for today
+        today = timezone.now().date()
+        try:
+            # If entry exists, update it
+            existing_entry = JournalEntry.objects.get(user=self.request.user, date__date=today)
+            existing_entry.content = content
+            existing_entry.emotions = emotions
+            existing_entry.save()
             
-            # Map the emotion to a mood
-            emotion_to_mood = {
-                # Positive emotions
-                'amusement': 'amused',
-                'excitement': 'excited',
-                'joy': 'happy',
-                'love': 'loving',
-                'desire': 'loving',
-                'optimism': 'optimistic',
-                'caring': 'caring',
-                'pride': 'proud',
-                'admiration': 'proud',
-                'gratitude': 'grateful',
-                'relief': 'relieved',
-                'approval': 'happy',
-                'realization': 'surprised',
+            # Update associated mood log if it exists
+            if emotions:
+                self._update_or_create_mood_log(existing_entry, emotions)
                 
-                # Neutral emotions
-                'surprise': 'surprised',
-                'curiosity': 'curious',
-                'confusion': 'confused',
-                'neutral': 'neutral',
+            return existing_entry
+        except JournalEntry.DoesNotExist:
+            # If no entry exists, create a new one
+            journal_entry = serializer.save(user=self.request.user, emotions=emotions)
+            
+            # Create mood log for the new entry
+            if emotions:
+                self._update_or_create_mood_log(journal_entry, emotions)
                 
-                # Negative emotions
-                'fear': 'anxious',
-                'nervousness': 'nervous',
-                'remorse': 'remorseful',
-                'embarrassment': 'embarrassed',
-                'disappointment': 'disappointed',
-                'sadness': 'sad',
-                'grief': 'grieving',
-                'disgust': 'disgusted',
-                'anger': 'angry',
-                'annoyance': 'annoyed',
-                'disapproval': 'disapproving',
-            }
+            return journal_entry
+    
+    def _update_or_create_mood_log(self, journal_entry, emotions):
+        # Sort emotions by confidence score (descending)
+        sorted_emotions = sorted(emotions, key=lambda x: x[1], reverse=True)
+        dominant_emotion = sorted_emotions[0][0]
+        
+        # Map the emotion to a mood
+        emotion_to_mood = {
+            # Positive emotions
+            'amusement': 'amused',
+            'excitement': 'excited',
+            'joy': 'happy',
+            'love': 'loving',
+            'desire': 'loving',
+            'optimism': 'optimistic',
+            'caring': 'caring',
+            'pride': 'proud',
+            'admiration': 'proud',
+            'gratitude': 'grateful',
+            'relief': 'relieved',
+            'approval': 'happy',
+            'realization': 'surprised',
             
-            # Default to neutral if emotion not in mapping
-            mood = emotion_to_mood.get(dominant_emotion.lower(), 'neutral')
+            # Neutral emotions
+            'surprise': 'surprised',
+            'curiosity': 'curious',
+            'confusion': 'confused',
+            'neutral': 'neutral',
             
-            # Calculate intensity based on confidence score (scale 1-10)
-            intensity = min(int(sorted_emotions[0][1] * 10), 10)
-            
-            # Create the mood log
+            # Negative emotions
+            'fear': 'anxious',
+            'nervousness': 'nervous',
+            'remorse': 'remorseful',
+            'embarrassment': 'embarrassed',
+            'disappointment': 'disappointed',
+            'sadness': 'sad',
+            'grief': 'grieving',
+            'disgust': 'disgusted',
+            'anger': 'angry',
+            'annoyance': 'annoyed',
+            'disapproval': 'disapproving',
+        }
+        
+        # Default to neutral if emotion not in mapping
+        mood = emotion_to_mood.get(dominant_emotion.lower(), 'neutral')
+        
+        # Calculate intensity based on confidence score (scale 1-10)
+        intensity = min(int(sorted_emotions[0][1] * 10), 10)
+        
+        # Try to update existing mood log or create a new one
+        try:
+            mood_log = MoodLog.objects.get(
+                user=self.request.user,
+                date=journal_entry.date.date(),
+                mood=mood
+            )
+            mood_log.intensity = intensity
+            mood_log.journal_entry = journal_entry
+            mood_log.save()
+        except MoodLog.DoesNotExist:
             MoodLog.objects.create(
                 user=self.request.user,
                 date=journal_entry.date.date(),

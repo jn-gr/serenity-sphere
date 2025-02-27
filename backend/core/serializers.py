@@ -2,6 +2,7 @@ from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from django.contrib.auth.password_validation import validate_password
 from .models import CustomUser, JournalEntry, MoodLog
+from django.utils import timezone
 
 User = get_user_model()
 
@@ -39,7 +40,24 @@ class JournalEntrySerializer(serializers.ModelSerializer):
     class Meta:
         model = JournalEntry
         fields = ['id', 'user', 'date', 'content', 'emotions', 'created_at', 'updated_at']
-        read_only_fields = ['id', 'user', 'date', 'emotions', 'created_at', 'updated_at']
+        read_only_fields = ['id', 'user', 'emotions', 'created_at', 'updated_at']
+    
+    def create(self, validated_data):
+        user = validated_data.get('user')
+        date = validated_data.get('date', timezone.now())
+        
+        # Check if an entry already exists for this user on this date
+        entry_date = date.date()
+        try:
+            # If entry exists, update it
+            existing_entry = JournalEntry.objects.get(user=user, date__date=entry_date)
+            for attr, value in validated_data.items():
+                setattr(existing_entry, attr, value)
+            existing_entry.save()
+            return existing_entry
+        except JournalEntry.DoesNotExist:
+            # If no entry exists, create a new one
+            return super().create(validated_data)
 
 # New serializer for updating the user's profile
 class UserUpdateSerializer(serializers.ModelSerializer):

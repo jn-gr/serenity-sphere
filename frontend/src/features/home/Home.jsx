@@ -1,8 +1,9 @@
 // frontend/src/features/home/Home.jsx
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
+import { FaChartLine, FaBook, FaCalendarDay, FaRegSmile, FaRegSadTear, FaEllipsisH } from 'react-icons/fa';
 import '../../styles/layouts/_home.css';
 import JournalPreview from '../journal/JournalPreview';
 import { fetchJournalEntries } from '../journal/journalSlice';
@@ -10,9 +11,10 @@ import MoodChart from '../mood/MoodChart';
 
 const Home = () => {
   const dispatch = useDispatch();
-  const { isAuthenticated } = useSelector(state => state.auth);
+  const { user, isAuthenticated } = useSelector(state => state.auth);
   const journalEntries = useSelector(state => state.journal.entries);
   const journalStatus = useSelector(state => state.journal.status);
+  const [greeting, setGreeting] = useState('');
   
   const today = new Date().toISOString().split('T')[0];
   const todaysEntry = journalEntries.find(entry => 
@@ -23,6 +25,12 @@ const Home = () => {
     if (isAuthenticated && journalStatus === 'idle') {
       dispatch(fetchJournalEntries());
     }
+    
+    // Set greeting based on time of day
+    const hour = new Date().getHours();
+    if (hour < 12) setGreeting('Good morning');
+    else if (hour < 18) setGreeting('Good afternoon');
+    else setGreeting('Good evening');
   }, [isAuthenticated, journalStatus, dispatch]);
 
   if (!isAuthenticated) {
@@ -112,111 +120,276 @@ const Home = () => {
   return (
     <div className="ml-64 min-h-screen bg-[#0F172A]">
       <div className="max-w-7xl mx-auto px-8 py-12">
-        {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
+        {/* Welcome Header with Stats */}
+        <div className="mb-10">
+          <motion.div 
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="flex flex-col md:flex-row justify-between items-start md:items-center"
+          >
+            <div>
+              <h1 className="text-3xl font-bold text-white">
+                {greeting}, {user?.username || 'there'}
+              </h1>
+              <p className="text-[#B8C7E0] mt-1">
+                {new Date().toLocaleDateString('en-US', { 
+                  weekday: 'long', 
+                  year: 'numeric', 
+                  month: 'long', 
+                  day: 'numeric' 
+                })}
+              </p>
+            </div>
+            
+            <div className="flex gap-4 mt-4 md:mt-0">
+              <div className="bg-[#1A2335] rounded-xl border border-[#2A3547] p-3 flex items-center">
+                <div className="bg-[#3E60C1]/20 p-2 rounded-lg mr-3">
+                  <FaBook className="text-[#5983FC]" />
+                </div>
+                <div>
+                  <p className="text-[#B8C7E0] text-xs">Journal Entries</p>
+                  <p className="text-white font-semibold">{journalEntries.length}</p>
+                </div>
+              </div>
+              
+              <div className="bg-[#1A2335] rounded-xl border border-[#2A3547] p-3 flex items-center">
+                <div className="bg-[#3E60C1]/20 p-2 rounded-lg mr-3">
+                  <FaCalendarDay className="text-[#5983FC]" />
+                </div>
+                <div>
+                  <p className="text-[#B8C7E0] text-xs">Streak</p>
+                  <p className="text-white font-semibold">
+                    {todaysEntry ? "1 day" : "0 days"}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+        
+        {/* Quick Actions */}
+        <motion.div 
+          initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="flex justify-between items-center mb-12"
+          transition={{ delay: 0.1 }}
+          className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10"
         >
-          <div>
-            <h1 className="text-3xl font-bold text-white">Welcome Back</h1>
-            <p className="text-[#B8C7E0]">Here's your mental health overview</p>
-          </div>
-          <div className="flex items-center space-x-4">
-            <span className="text-sm text-[#5983FC]">{new Date().toLocaleDateString()}</span>
-          </div>
+          <Link to="/journal" className="col-span-1">
+            <motion.div 
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              className={`h-full flex items-center justify-center gap-3 p-4 rounded-xl ${
+                todaysEntry 
+                  ? "bg-[#1A2335] border border-[#2A3547] text-[#B8C7E0]" 
+                  : "bg-gradient-to-r from-[#3E60C1] to-[#5983FC] text-white"
+              }`}
+            >
+              <FaBook size={18} />
+              <span className="font-medium">
+                {todaysEntry ? "Edit Today's Journal" : "Write Today's Journal"}
+              </span>
+            </motion.div>
+          </Link>
+          
+          <Link to="/mood" className="col-span-1">
+            <motion.div 
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              className="h-full flex items-center justify-center gap-3 p-4 rounded-xl bg-[#1A2335] border border-[#2A3547] text-[#B8C7E0]"
+            >
+              <FaRegSmile size={18} />
+              <span className="font-medium">Log Your Mood</span>
+            </motion.div>
+          </Link>
+          
+          <Link to="/analytics" className="col-span-1">
+            <motion.div 
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              className="h-full flex items-center justify-center gap-3 p-4 rounded-xl bg-[#1A2335] border border-[#2A3547] text-[#B8C7E0]"
+            >
+              <FaChartLine size={18} />
+              <span className="font-medium">View Analytics</span>
+            </motion.div>
+          </Link>
         </motion.div>
-
-        {/* Stats Grid */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.2 }}
-          className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12"
-        >
-          <motion.div
-            whileHover={{ y: -5, transition: { duration: 0.2 } }}
-            className="bg-[#1A2335] p-6 rounded-2xl border border-[#2A3547] hover:border-[#3E60C1] transition-colors"
+        
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Journal Section */}
+          <motion.div 
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="lg:col-span-2"
           >
-            <div className="text-[#B8C7E0] mb-2">Weekly Entries</div>
-            <div className="text-3xl font-bold text-[#5983FC]">
-              {journalEntries.filter(entry => {
-                const entryDate = new Date(entry.date);
-                const weekAgo = new Date();
-                weekAgo.setDate(weekAgo.getDate() - 7);
-                return entryDate >= weekAgo;
-              }).length}
+            <div className="bg-[#1A2335] rounded-2xl border border-[#2A3547] p-6 h-full">
+              <div className="flex justify-between items-center mb-6">
+                <div className="flex items-center gap-3">
+                  <div className="bg-[#3E60C1]/20 p-2 rounded-lg">
+                    <FaBook className="text-[#5983FC]" />
+                  </div>
+                  <h2 className="text-xl font-semibold text-white">Journal</h2>
+                </div>
+                <Link to="/journal">
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    className="px-4 py-2 rounded-lg bg-[#0F172A] text-[#B8C7E0] text-sm hover:bg-[#2A3547] transition-colors"
+                  >
+                    View All
+                  </motion.button>
+                </Link>
+              </div>
+              
+              <AnimatePresence mode="wait">
+                {todaysEntry ? (
+                  <motion.div
+                    key="todaysEntry"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                  >
+                    <div className="bg-[#0F172A] rounded-xl p-4 mb-6">
+                      <div className="flex justify-between items-center mb-3">
+                        <h3 className="text-[#5983FC] font-medium">Today's Entry</h3>
+                        <span className="text-xs text-[#B8C7E0] bg-[#1A2335] px-2 py-1 rounded-full">
+                          {new Date(todaysEntry.date).toLocaleTimeString([], {
+                            hour: '2-digit',
+                            minute: '2-digit'
+                          })}
+                        </span>
+                      </div>
+                      <p className="text-[#B8C7E0] line-clamp-3 mb-3">
+                        {todaysEntry.content}
+                      </p>
+                      
+                      {todaysEntry.emotions && todaysEntry.emotions.length > 0 && (
+                        <div className="flex flex-wrap gap-2 mt-3">
+                          {todaysEntry.emotions.slice(0, 3).map((emotion, index) => (
+                            <span 
+                              key={index}
+                              className="text-xs bg-[#3E60C1]/20 text-[#5983FC] px-2 py-1 rounded-full"
+                            >
+                              {emotion[0]}: {(emotion[1] * 100).toFixed(0)}%
+                            </span>
+                          ))}
+                          {todaysEntry.emotions.length > 3 && (
+                            <span className="text-xs bg-[#1A2335] text-[#B8C7E0] px-2 py-1 rounded-full flex items-center">
+                              <FaEllipsisH size={10} className="mr-1" />
+                              {todaysEntry.emotions.length - 3} more
+                            </span>
+                          )}
+                        </div>
+                      )}
+                      
+                      <Link to="/journal">
+                        <motion.button
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
+                          className="w-full py-3 mt-4 rounded-xl bg-[#2A3547] text-[#B8C7E0] hover:bg-[#3A4557] transition-colors"
+                        >
+                          Edit Today's Entry
+                        </motion.button>
+                      </Link>
+                    </div>
+                  </motion.div>
+                ) : (
+                  <motion.div
+                    key="noEntry"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="bg-[#0F172A] rounded-xl p-6 mb-6 text-center"
+                  >
+                    <div className="inline-flex justify-center items-center w-16 h-16 bg-[#1A2335] rounded-full mb-4">
+                      <FaBook size={24} className="text-[#5983FC]" />
+                    </div>
+                    <h3 className="text-white font-medium mb-2">No Journal Entry Today</h3>
+                    <p className="text-[#B8C7E0] mb-4">
+                      Take a moment to reflect on your day and record your thoughts.
+                    </p>
+                    <Link to="/journal">
+                      <motion.button
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        className="w-full py-3 rounded-xl bg-gradient-to-r from-[#3E60C1] to-[#5983FC] text-white"
+                      >
+                        Write Today's Entry
+                      </motion.button>
+                    </Link>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+              
+              {journalEntries.length > 0 && (
+                <div>
+                  <div className="flex items-center gap-2 mb-4">
+                    <h3 className="text-[#5983FC] font-medium">Recent Entries</h3>
+                    <div className="h-[1px] flex-grow bg-[#2A3547]"></div>
+                  </div>
+                  <div className="space-y-2">
+                    {journalEntries.slice(0, 3).map((entry, index) => (
+                      <motion.div
+                        key={entry.id}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.1 * index }}
+                      >
+                        <JournalPreview entry={entry} />
+                      </motion.div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
-            <div className="h-1 bg-gradient-to-r from-[#5983FC] to-[#3E60C1] mt-4 rounded-full" />
-          </motion.div>
-
-          <motion.div
-            whileHover={{ y: -5, transition: { duration: 0.2 } }}
-            className="bg-[#1A2335] p-6 rounded-2xl border border-[#2A3547] hover:border-[#3E60C1] transition-colors"
-          >
-            <div className="text-[#B8C7E0] mb-2">Monthly Progress</div>
-            <div className="text-3xl font-bold text-[#5983FC]">
-              {journalEntries.filter(entry => {
-                const entryDate = new Date(entry.date);
-                const monthAgo = new Date();
-                monthAgo.setMonth(monthAgo.getMonth() - 1);
-                return entryDate >= monthAgo;
-              }).length}
-            </div>
-            <div className="h-1 bg-gradient-to-r from-[#5983FC] to-[#3E60C1] mt-4 rounded-full" />
-          </motion.div>
-
-          <motion.div
-            whileHover={{ y: -5, transition: { duration: 0.2 } }}
-            className="bg-[#1A2335] p-6 rounded-2xl border border-[#2A3547] hover:border-[#3E60C1] transition-colors"
-          >
-            <div className="text-[#B8C7E0] mb-2">Total Entries</div>
-            <div className="text-3xl font-bold text-[#5983FC]">{journalEntries.length}</div>
-            <div className="h-1 bg-gradient-to-r from-[#5983FC] to-[#3E60C1] mt-4 rounded-full" />
-          </motion.div>
-        </motion.div>
-
-        {/* Main Content */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.4 }}
-            className="bg-[#1A2335] p-8 rounded-2xl border border-[#2A3547] hover:border-[#3E60C1] transition-colors"
-          >
-            <h3 className="text-xl font-semibold text-white mb-6">Mood Trends</h3>
-            <MoodChart />
           </motion.div>
           
+          {/* Mood Chart Section */}
           <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.4 }}
-            className="bg-[#1A2335] p-8 rounded-2xl border border-[#2A3547] hover:border-[#3E60C1] transition-colors"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
           >
-            <div className="flex justify-between items-center mb-6">
-              <h3 className="text-xl font-semibold text-white">Recent Entries</h3>
-              <Link 
-                to="/journal" 
-                className="text-[#5983FC] hover:text-[#3E60C1] transition-colors"
-              >
-                View All
-              </Link>
-            </div>
-            <div className="space-y-4">
-              {journalEntries.slice(0, 4).map((entry, index) => (
-                <motion.div
-                  key={entry.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.5 + index * 0.1 }}
-                >
-                  <JournalPreview entry={entry} />
-                </motion.div>
-              ))}
-              {journalEntries.length === 0 && (
-                <p className="text-[#B8C7E0] text-center py-4">No entries yet</p>
-              )}
+            <div className="bg-[#1A2335] rounded-2xl border border-[#2A3547] p-6 h-full">
+              <div className="flex justify-between items-center mb-6">
+                <div className="flex items-center gap-3">
+                  <div className="bg-[#3E60C1]/20 p-2 rounded-lg">
+                    <FaRegSmile className="text-[#5983FC]" />
+                  </div>
+                  <h2 className="text-xl font-semibold text-white">Mood Trends</h2>
+                </div>
+                <Link to="/mood">
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    className="px-4 py-2 rounded-lg bg-[#0F172A] text-[#B8C7E0] text-sm hover:bg-[#2A3547] transition-colors"
+                  >
+                    View All
+                  </motion.button>
+                </Link>
+              </div>
+              
+              <div className="bg-[#0F172A] rounded-xl p-4 mb-4">
+                <MoodChart />
+              </div>
+              
+              <div className="grid grid-cols-2 gap-3">
+                <div className="bg-[#0F172A] rounded-xl p-3 flex flex-col items-center">
+                  <div className="text-[#5983FC] mb-1">
+                    <FaRegSmile size={20} />
+                  </div>
+                  <p className="text-xs text-[#B8C7E0]">Most Common</p>
+                  <p className="text-white font-medium">Happy</p>
+                </div>
+                
+                <div className="bg-[#0F172A] rounded-xl p-3 flex flex-col items-center">
+                  <div className="text-[#5983FC] mb-1">
+                    <FaRegSadTear size={20} />
+                  </div>
+                  <p className="text-xs text-[#B8C7E0]">Least Common</p>
+                  <p className="text-white font-medium">Sad</p>
+                </div>
+              </div>
             </div>
           </motion.div>
         </div>

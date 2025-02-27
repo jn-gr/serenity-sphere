@@ -1,102 +1,45 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
+import { motion } from 'framer-motion';
+import { FaPlus, FaHistory, FaTrash, FaBrain } from 'react-icons/fa';
 import { fetchJournalEntries, deleteJournalEntry } from './journalSlice';
 import JournalForm from './JournalForm';
-import { motion, AnimatePresence } from 'framer-motion';
-import { FaPlus, FaHistory, FaTrash, FaBrain } from 'react-icons/fa';
-import { IoMdClose } from 'react-icons/io';
-import EmotionAnalysisModal from '../emotion/components/EmotionAnalysisModal';
-
-const EmotionModal = ({ emotions, isOpen, onClose }) => {
-  if (!isOpen) return null;
-
-  return (
-    <AnimatePresence>
-      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0, scale: 0.95 }}
-          className="bg-[#1A2335] rounded-2xl border border-[#2A3547] p-8 max-w-md w-full mx-4"
-        >
-          <div className="flex justify-between items-center mb-6">
-            <h3 className="text-xl font-semibold text-white">Emotional Analysis</h3>
-            <button
-              onClick={onClose}
-              className="text-[#B8C7E0] hover:text-white transition-colors"
-            >
-              <IoMdClose size={24} />
-            </button>
-          </div>
-          
-          <div className="space-y-4">
-            {emotions.map(([emotion, score], index) => (
-              <div key={index} className="bg-[#0F172A] rounded-xl p-4">
-                <div className="flex justify-between items-center mb-2">
-                  <span className="text-[#B8C7E0] capitalize">{emotion}</span>
-                  <span className="text-[#5983FC] font-semibold">
-                    {Math.round(score * 100)}%
-                  </span>
-                </div>
-                <div className="h-2 bg-[#2A3547] rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-gradient-to-r from-[#3E60C1] to-[#5983FC] transition-all duration-500"
-                    style={{ width: `${score * 100}%` }}
-                  />
-                </div>
-              </div>
-            ))}
-          </div>
-          
-          <button
-            onClick={onClose}
-            className="w-full mt-6 bg-[#2A3547] text-[#B8C7E0] hover:bg-[#374151] py-3 rounded-xl transition-colors"
-          >
-            Close
-          </button>
-        </motion.div>
-      </div>
-    </AnimatePresence>
-  );
-};
+import EmotionAnalysis from '../emotion/components/EmotionAnalysisModal';
 
 const JournalList = () => {
-  const dispatch = useDispatch();
-  const { entries, status, error } = useSelector(state => state.journal);
-  const [activeTab, setActiveTab] = useState("history");
+  const [activeTab, setActiveTab] = useState('create');
   const [selectedEmotions, setSelectedEmotions] = useState(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [excitementSteps, setExcitementSteps] = useState([]);
-  const [currentStep, setCurrentStep] = useState('');
-
+  const [showEmotionModal, setShowEmotionModal] = useState(false);
+  const [hasEntryToday, setHasEntryToday] = useState(false);
+  
+  const dispatch = useDispatch();
+  const { entries, status } = useSelector(state => state.journal);
+  
   useEffect(() => {
-    if (activeTab === "history" && status === 'idle') {
+    if (status === 'idle') {
       dispatch(fetchJournalEntries());
     }
-  }, [activeTab, status, dispatch]);
+    
+    // Check if user already has an entry for today
+    if (entries.length > 0) {
+      const today = new Date().toISOString().split('T')[0];
+      const entryToday = entries.find(entry => 
+        new Date(entry.date).toISOString().split('T')[0] === today
+      );
+      
+      setHasEntryToday(!!entryToday);
+    }
+  }, [entries, status, dispatch]);
 
   const handleDelete = (id) => {
-    if (window.confirm("Are you sure you want to delete this entry?")) {
+    if (window.confirm('Are you sure you want to delete this journal entry?')) {
       dispatch(deleteJournalEntry(id));
     }
   };
 
   const handleAnalyzeEmotions = (emotions) => {
     setSelectedEmotions(emotions);
-    setIsModalOpen(true);
-    
-    // Reset steps when opening modal
-    if (emotions.some(e => e[0].toLowerCase() === 'excitement')) {
-      setExcitementSteps([]);
-      setCurrentStep('');
-    }
-  };
-
-  const handleAddStep = () => {
-    if (currentStep.trim()) {
-      setExcitementSteps([...excitementSteps, currentStep]);
-      setCurrentStep('');
-    }
+    setShowEmotionModal(true);
   };
 
   return (
@@ -120,7 +63,7 @@ const JournalList = () => {
               } transition-all duration-200`}
             >
               <FaPlus size={16} />
-              <span>New Entry</span>
+              <span>{hasEntryToday ? "Today's Entry" : "New Entry"}</span>
             </motion.button>
             <motion.button
               whileHover={{ scale: 1.02 }}
@@ -143,32 +86,6 @@ const JournalList = () => {
           <JournalForm />
         ) : (
           <div className="space-y-6">
-            {status === 'loading' && (
-              <div className="text-center py-12">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#5983FC] mx-auto"></div>
-              </div>
-            )}
-            
-            {status === 'failed' && (
-              <div className="p-4 bg-red-500/10 text-red-500 rounded-xl">
-                {error}
-              </div>
-            )}
-            
-            {status === 'succeeded' && entries.length === 0 && (
-              <div className="text-center py-12">
-                <div className="text-[#B8C7E0] mb-4">No entries found.</div>
-                <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  onClick={() => setActiveTab('create')}
-                  className="bg-gradient-to-r from-[#3E60C1] to-[#5983FC] text-white px-6 py-3 rounded-xl"
-                >
-                  Create Your First Entry
-                </motion.button>
-              </div>
-            )}
-
             {entries.map((entry) => (
               <motion.div
                 key={entry.id}
@@ -213,16 +130,14 @@ const JournalList = () => {
           </div>
         )}
       </div>
-
-      <EmotionAnalysisModal
-        selectedEmotions={selectedEmotions}
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        excitementSteps={excitementSteps}
-        setExcitementSteps={setExcitementSteps}
-        currentStep={currentStep}
-        setCurrentStep={setCurrentStep}
-      />
+      
+      {/* Emotion Analysis Modal */}
+      {showEmotionModal && (
+        <EmotionAnalysis 
+          emotions={selectedEmotions} 
+          onClose={() => setShowEmotionModal(false)} 
+        />
+      )}
     </div>
   );
 };
