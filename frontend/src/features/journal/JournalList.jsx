@@ -4,18 +4,13 @@ import { motion } from 'framer-motion';
 import { FaPlus, FaHistory, FaTrash, FaBrain } from 'react-icons/fa';
 import { fetchJournalEntries, deleteJournalEntry } from './journalSlice';
 import JournalForm from './JournalForm';
-import EmotionAnalysisModal from '../emotion/components/EmotionAnalysisModal';
+import EmotionAnalysis from '../emotion/components/EmotionAnalysisModal';
 
 const JournalList = () => {
   const [activeTab, setActiveTab] = useState('create');
   const [selectedEmotions, setSelectedEmotions] = useState(null);
   const [showEmotionModal, setShowEmotionModal] = useState(false);
   const [hasEntryToday, setHasEntryToday] = useState(false);
-  
-  // State for EmotionAnalysisModal
-  const [excitementSteps, setExcitementSteps] = useState([]);
-  const [currentStep, setCurrentStep] = useState('');
-  const [amusementDescription, setAmusementDescription] = useState('');
   
   const dispatch = useDispatch();
   const { entries, status } = useSelector(state => state.journal);
@@ -43,20 +38,8 @@ const JournalList = () => {
   };
 
   const handleAnalyzeEmotions = (emotions) => {
-    // Make sure emotions is properly formatted before setting it
-    if (emotions && Array.isArray(emotions)) {
-      console.log("Analyzing emotions:", emotions);
-      setSelectedEmotions(emotions);
-      setShowEmotionModal(true);
-    } else {
-      console.error("Invalid emotions data:", emotions);
-      alert("Sorry, emotion data is not available for this entry.");
-    }
-  };
-
-  const handleCloseModal = () => {
-    setShowEmotionModal(false);
-    setSelectedEmotions(null);
+    setSelectedEmotions(emotions);
+    setShowEmotionModal(true);
   };
 
   return (
@@ -126,7 +109,6 @@ const JournalList = () => {
                         whileTap={{ scale: 0.9 }}
                         onClick={() => handleAnalyzeEmotions(entry.emotions)}
                         className="text-[#5983FC] hover:text-[#3E60C1] transition-colors p-2"
-                        aria-label="Analyze emotions"
                       >
                         <FaBrain size={16} />
                       </motion.button>
@@ -136,7 +118,6 @@ const JournalList = () => {
                       whileTap={{ scale: 0.9 }}
                       onClick={() => handleDelete(entry.id)}
                       className="text-[#B8C7E0] hover:text-red-500 transition-colors p-2"
-                      aria-label="Delete entry"
                     >
                       <FaTrash size={16} />
                     </motion.button>
@@ -144,38 +125,17 @@ const JournalList = () => {
                 </div>
                 
                 <p className="text-[#B8C7E0] whitespace-pre-wrap">{entry.content}</p>
-                
-                {/* Display emotion tags if available */}
-                {entry.emotions && entry.emotions.length > 0 && (
-                  <div className="mt-4 flex flex-wrap gap-2">
-                    {entry.emotions.slice(0, 3).map((emotion, idx) => (
-                      <span 
-                        key={idx} 
-                        className="text-xs bg-[#3E60C1]/20 text-[#5983FC] px-2 py-1 rounded-full"
-                      >
-                        {emotion[0]}: {(emotion[1] * 100).toFixed(0)}%
-                      </span>
-                    ))}
-                  </div>
-                )}
               </motion.div>
             ))}
           </div>
         )}
       </div>
       
-      {/* Use the existing EmotionAnalysisModal component */}
-      {showEmotionModal && selectedEmotions && (
-        <EmotionAnalysisModal 
-          selectedEmotions={selectedEmotions}
-          isOpen={showEmotionModal}
-          onClose={handleCloseModal}
-          excitementSteps={excitementSteps}
-          setExcitementSteps={setExcitementSteps}
-          currentStep={currentStep}
-          setCurrentStep={setCurrentStep}
-          amusementDescription={amusementDescription}
-          setAmusementDescription={setAmusementDescription}
+      {/* Emotion Analysis Modal */}
+      {showEmotionModal && (
+        <EmotionAnalysis 
+          emotions={selectedEmotions} 
+          onClose={() => setShowEmotionModal(false)} 
         />
       )}
     </div>

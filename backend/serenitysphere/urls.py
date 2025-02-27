@@ -35,8 +35,4 @@ urlpatterns = [
     path('api/detect-emotions/', views.detect_emotions, name='detect_emotions'),
     path('api/journal-entries/', views.get_journal_entries, name='get_journal_entries'),
     path('api/mood-trends/', views.get_mood_trends, name='get_mood_trends'),
-    
-    # New mood analytics endpoints
-    path('api/mood-analytics/', views.MoodAnalyticsView.as_view(), name='mood-analytics'),
-    path('api/mood-summary/', views.mood_summary, name='mood-summary'),
 ]

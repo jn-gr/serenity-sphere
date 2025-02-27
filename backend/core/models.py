@@ -32,6 +32,8 @@ class CustomUser(AbstractUser):
     def __str__(self):
         return self.email
 
+    pass
+
 class JournalEntry(models.Model):
     user = models.ForeignKey(CustomUser, related_name='journal_entries', on_delete=models.CASCADE)
     date = models.DateTimeField(default=timezone.now)
@@ -42,35 +44,26 @@ class JournalEntry(models.Model):
     
     class Meta:
         ordering = ['-date']
-        constraints = [
-            models.UniqueConstraint(
-                fields=['user'],
-                condition=models.Q(date__date=models.F('date__date')),
-                name='unique_user_date_entry'
-            )
-        ]
 
     def __str__(self):
-        return f"{self.user.username}'s journal entry on {self.date.strftime('%Y-%m-%d')}"
+        return f"Journal Entry by {self.user.email} on {self.date}"
     
     def save(self, *args, **kwargs):
-        # Check if an entry already exists for this user on this date
-        if not self.pk:  # Only for new entries
+        if not self.pk:
             entry_date = self.date.date()
-            existing_entry = JournalEntry.objects.filter(
-                user=self.user,
+            existing_entries = JournalEntry.objects.filter(
+                user=self.user, 
                 date__date=entry_date
-            ).first()
+            )
             
-            if existing_entry:
-                # Update existing entry instead of creating a new one
-                existing_entry.content = self.content
-                existing_entry.emotions = self.emotions
-                existing_entry.save()
-                return existing_entry
-                
-        return super().save(*args, **kwargs)
-
+            if existing_entries.exists():
+                existing_entry = existing_entries.first()
+                self.pk = existing_entry.pk
+                self.id = existing_entry.id
+                self.created_at = existing_entry.created_at
+        
+        super().save(*args, **kwargs)
+    
 class MoodLog(models.Model):
     MOOD_CHOICES = [
         ('happy', 'Happy'),
@@ -100,12 +93,6 @@ class MoodLog(models.Model):
         ('disapproving', 'Disapproving'),
     ]
     
-    MOOD_CATEGORIES = {
-        'positive': ['happy', 'calm', 'excited', 'amused', 'loving', 'optimistic', 'caring', 'proud', 'grateful', 'relieved'],
-        'negative': ['sad', 'anxious', 'angry', 'nervous', 'remorseful', 'embarrassed', 'disappointed', 'grieving', 'disgusted', 'annoyed', 'disapproving'],
-        'neutral': ['neutral', 'surprised', 'curious', 'confused']
-    }
-    
     user = models.ForeignKey(CustomUser, related_name='mood_logs', on_delete=models.CASCADE)
     date = models.DateField(default=timezone.now)
     mood = models.CharField(max_length=20, choices=MOOD_CHOICES, default='neutral')
@@ -123,10 +110,3 @@ class MoodLog(models.Model):
         
     def __str__(self):
         return f"{self.user.username}'s mood: {self.mood} ({self.date})"
-    
-    @property
-    def category(self):
-        for category, moods in self.MOOD_CATEGORIES.items():
-            if self.mood in moods:
-                return category
-        return 'neutral'  # Default fallback
