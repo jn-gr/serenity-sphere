@@ -5,6 +5,7 @@ import { FaPlus, FaHistory, FaTrash, FaBrain } from 'react-icons/fa';
 import { fetchJournalEntries, deleteJournalEntry } from './journalSlice';
 import JournalForm from './JournalForm';
 import EmotionAnalysis from '../emotion/components/EmotionAnalysisModal';
+import { fetchMoodLogs, fetchMoodTrends } from '../mood/moodSlice'
 
 const JournalList = () => {
   const [activeTab, setActiveTab] = useState('create');
@@ -40,6 +41,16 @@ const JournalList = () => {
   const handleAnalyzeEmotions = (emotions) => {
     setSelectedEmotions(emotions);
     setShowEmotionModal(true);
+  };
+
+  const handleSubmit = async (content) => {
+    try {
+      await dispatch(createJournalEntry(content));
+      // Fetch updated mood trends after creating journal entry
+      dispatch(fetchMoodTrends());
+    } catch (error) {
+      console.error('Failed to create journal entry:', error);
+    }
   };
 
   return (

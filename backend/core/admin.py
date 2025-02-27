@@ -3,6 +3,7 @@ from django.contrib.auth.admin import UserAdmin
 from django.utils.translation import gettext_lazy as _
 from .models import CustomUser, JournalEntry, MoodLog
 from django.utils import timezone
+from datetime import datetime, time
 
 @admin.register(CustomUser)
 class CustomUserAdmin(UserAdmin):
@@ -86,16 +87,22 @@ class JournalEntryAdmin(admin.ModelAdmin):
     
     def set_date_yesterday(self, request, queryset):
         yesterday = timezone.now() - timezone.timedelta(days=1)
+        # Set time to start of day to avoid timezone issues
+        yesterday = datetime.combine(yesterday.date(), time.min)
         queryset.update(date=yesterday)
     set_date_yesterday.short_description = "Set date to yesterday"
     
     def set_date_last_week(self, request, queryset):
         last_week = timezone.now() - timezone.timedelta(days=7)
+        # Set time to start of day to avoid timezone issues
+        last_week = datetime.combine(last_week.date(), time.min)
         queryset.update(date=last_week)
     set_date_last_week.short_description = "Set date to last week"
     
     def set_date_last_month(self, request, queryset):
         last_month = timezone.now() - timezone.timedelta(days=30)
+        # Set time to start of day to avoid timezone issues
+        last_month = datetime.combine(last_month.date(), time.min)
         queryset.update(date=last_month)
     set_date_last_month.short_description = "Set date to last month"
 

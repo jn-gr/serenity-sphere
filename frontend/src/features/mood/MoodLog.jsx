@@ -1,22 +1,33 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { motion } from 'framer-motion';
-import { fetchMoodTrends } from './moodSlice';
+import { fetchMoodLogs, fetchMoodTrends } from './moodSlice';
 import MoodChart from './MoodChart';
 import { FaCalendarAlt, FaChartLine, FaThermometerHalf, FaStickyNote, FaRegSmile, FaRegSadTear, FaRegMeh } from 'react-icons/fa';
+import { Line } from 'react-chartjs-2';
 
 const MoodLog = () => {
   const dispatch = useDispatch();
-  const { trends, status } = useSelector(state => state.mood);
+  const { logs, status, error, trends } = useSelector(state => state.mood);
   const [selectedPeriod, setSelectedPeriod] = useState('month');
   const [moodFilter, setMoodFilter] = useState('all');
   const [isCalendarView, setIsCalendarView] = useState(false);
   
   useEffect(() => {
     if (status === 'idle') {
+      dispatch(fetchMoodLogs());
       dispatch(fetchMoodTrends());
     }
-  }, [dispatch, status]);
+  }, [status, dispatch]);
+  
+  // Refresh mood logs when journal entries are updated
+  useEffect(() => {
+    const refreshInterval = setInterval(() => {
+      dispatch(fetchMoodLogs());
+    }, 5000); // Refresh every 5 seconds
+
+    return () => clearInterval(refreshInterval);
+  }, [dispatch]);
   
   const getMoodIcon = (mood) => {
     const positiveMoods = ['happy', 'excited', 'loving', 'optimistic', 'proud', 'grateful', 'relieved', 'amused', 'calm', 'caring'];
@@ -53,12 +64,12 @@ const MoodLog = () => {
   };
   
   // Group trends by date
-  const trendsByDate = trends.reduce((acc, trend) => {
-    const date = trend.date;
+  const trendsByDate = logs.reduce((acc, log) => {
+    const date = log.date;
     if (!acc[date]) {
       acc[date] = [];
     }
-    acc[date].push(trend);
+    acc[date].push(log);
     return acc;
   }, {});
   
@@ -84,16 +95,16 @@ const MoodLog = () => {
   const filteredDates = filterByPeriod();
   
   // Further filter by mood if a specific mood is selected
-  const filteredTrends = filteredDates.flatMap(date => {
+  const filteredLogs = filteredDates.flatMap(date => {
     if (moodFilter === 'all') {
       return trendsByDate[date];
     } else {
-      return trendsByDate[date].filter(trend => trend.mood === moodFilter);
+      return trendsByDate[date].filter(log => log.mood === moodFilter);
     }
   });
   
   // Get unique moods for filter dropdown
-  const uniqueMoods = [...new Set(trends.map(trend => trend.mood))];
+  const uniqueMoods = [...new Set(logs.map(log => log.mood))];
   
   if (status === 'loading') {
     return (
@@ -107,18 +118,54 @@ const MoodLog = () => {
     );
   }
   
-  if (status === 'failed' || trends.length === 0) {
+  if (status === 'failed') {
     return (
       <div className="min-h-screen bg-[#0F172A] ml-64">
         <div className="max-w-7xl mx-auto px-8 py-12">
           <div className="h-96 flex items-center justify-center flex-col">
-            <p className="text-[#B8C7E0] mb-4">No mood data available yet.</p>
+            <p className="text-[#B8C7E0] mb-4">Error: {error}</p>
             <p className="text-[#5983FC] text-sm">Start journaling to track your mood!</p>
           </div>
         </div>
       </div>
     );
   }
+  
+  // Process the data for the chart
+  const moodData = trends.reduce((acc, log) => {
+    const date = new Date(log.date).toLocaleDateString();
+    if (!acc[date]) {
+      acc[date] = [];
+    }
+    acc[date].push({
+      mood: log.mood,
+      intensity: log.intensity
+    });
+    return acc;
+  }, {});
+
+  const chartData = {
+    labels: Object.keys(moodData),
+    datasets: [{
+      label: 'Mood Intensity',
+      data: Object.values(moodData).map(logs => {
+        // Average intensity if multiple moods per day
+        return logs.reduce((sum, log) => sum + log.intensity, 0) / logs.length;
+      }),
+      borderColor: '#5983FC',
+      tension: 0.4
+    }]
+  };
+
+  const chartOptions = {
+    responsive: true,
+    scales: {
+      y: {
+        beginAtZero: true,
+        max: 10
+      }
+    }
+  };
   
   return (
     <div className="min-h-screen bg-[#0F172A] ml-64">
@@ -227,8 +274,8 @@ const MoodLog = () => {
                 <div>
                   <p className="text-[#B8C7E0] text-sm">Avg. Intensity</p>
                   <p className="text-white font-semibold">
-                    {trends.length > 0 
-                      ? (trends.reduce((sum, t) => sum + t.intensity, 0) / trends.length).toFixed(1) 
+                    {logs.length > 0 
+                      ? (logs.reduce((sum, log) => sum + log.intensity, 0) / logs.length).toFixed(1) 
                       : "N/A"}
                   </p>
                 </div>
@@ -242,7 +289,7 @@ const MoodLog = () => {
                 </div>
                 <div>
                   <p className="text-[#B8C7E0] text-sm">Total Moods</p>
-                  <p className="text-white font-semibold">{filteredTrends.length}</p>
+                  <p className="text-white font-semibold">{filteredLogs.length}</p>
                 </div>
               </div>
             </div>
@@ -258,7 +305,7 @@ const MoodLog = () => {
         >
           {!isCalendarView ? (
             <div className="h-96">
-              <MoodChart />
+              <Line data={chartData} options={chartOptions} />
             </div>
           ) : (
             <div className="space-y-4">
@@ -281,16 +328,16 @@ const MoodLog = () => {
                   </div>
                   <div className="flex flex-wrap gap-2 mb-2">
                     {trendsByDate[date]
-                      .filter(trend => moodFilter === 'all' || trend.mood === moodFilter)
-                      .map((trend, idx) => (
+                      .filter(log => moodFilter === 'all' || log.mood === moodFilter)
+                      .map((log, idx) => (
                         <div 
                           key={idx} 
-                          className={`flex items-center gap-2 px-3 py-2 rounded-lg border ${getMoodColor(trend.mood)}`}
+                          className={`flex items-center gap-2 px-3 py-2 rounded-lg border ${getMoodColor(log.mood)}`}
                         >
-                          <span>{getMoodIcon(trend.mood)}</span>
-                          <span className="capitalize">{trend.mood}</span>
-                          <div className={`ml-2 px-2 py-1 rounded-full text-xs ${getIntensityColor(trend.intensity)}`}>
-                            {trend.intensity}/10
+                          <span>{getMoodIcon(log.mood)}</span>
+                          <span className="capitalize">{log.mood}</span>
+                          <div className={`ml-2 px-2 py-1 rounded-full text-xs ${getIntensityColor(log.intensity)}`}>
+                            {log.intensity}/10
                           </div>
                         </div>
                       ))}

@@ -99,35 +99,36 @@ class JournalEntryViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         content = serializer.validated_data.get('content', '')
         emotions = predict_emotions(content)
+        date = serializer.validated_data.get('date', timezone.now())
         
-        # Check if an entry already exists for today
-        today = timezone.now().date()
         try:
-            # If entry exists, update it
-            existing_entry = JournalEntry.objects.get(user=self.request.user, date__date=today)
+            # Try to get existing entry for the given date
+            existing_entry = JournalEntry.objects.get(
+                user=self.request.user,
+                date__date=date.date()
+            )
+            # Update existing entry
             existing_entry.content = content
             existing_entry.emotions = emotions
             existing_entry.save()
             
-            # Update associated mood log if it exists
-            if emotions:
-                self._update_or_create_mood_log(existing_entry, emotions)
-                
+            # Update associated mood log
+            self._update_or_create_mood_log(existing_entry, emotions)
             return existing_entry
         except JournalEntry.DoesNotExist:
-            # If no entry exists, create a new one
+            # Create new entry if none exists
             journal_entry = serializer.save(user=self.request.user, emotions=emotions)
-            
-            # Create mood log for the new entry
-            if emotions:
-                self._update_or_create_mood_log(journal_entry, emotions)
-                
+            # Create associated mood log
+            self._update_or_create_mood_log(journal_entry, emotions)
             return journal_entry
-    
+
     def _update_or_create_mood_log(self, journal_entry, emotions):
+        if not emotions:
+            return
+            
         # Sort emotions by confidence score (descending)
         sorted_emotions = sorted(emotions, key=lambda x: x[1], reverse=True)
-        dominant_emotion = sorted_emotions[0][0]
+        dominant_emotion = sorted_emotions[0][0].lower()
         
         # Map the emotion to a mood
         emotion_to_mood = {
@@ -167,35 +168,31 @@ class JournalEntryViewSet(viewsets.ModelViewSet):
         }
         
         # Default to neutral if emotion not in mapping
-        mood = emotion_to_mood.get(dominant_emotion.lower(), 'neutral')
+        mood = emotion_to_mood.get(dominant_emotion, 'neutral')
         
         # Calculate intensity based on confidence score (scale 1-10)
         intensity = min(int(sorted_emotions[0][1] * 10), 10)
         
-        # Try to update existing mood log or create a new one
-        try:
-            mood_log = MoodLog.objects.get(
-                user=self.request.user,
-                date=journal_entry.date.date(),
-                mood=mood
-            )
-            mood_log.intensity = intensity
-            mood_log.journal_entry = journal_entry
-            mood_log.save()
-        except MoodLog.DoesNotExist:
-            MoodLog.objects.create(
-                user=self.request.user,
-                date=journal_entry.date.date(),
-                mood=mood,
-                intensity=intensity,
-                journal_entry=journal_entry
-            )
+        # First, delete any existing mood logs for this journal entry to avoid duplicates
+        MoodLog.objects.filter(journal_entry=journal_entry).delete()
+        
+        # Create new mood log
+        MoodLog.objects.create(
+            user=self.request.user,
+            date=journal_entry.date.date(),
+            mood=mood,
+            intensity=intensity,
+            journal_entry=journal_entry,
+            notes=f"Auto-generated from journal entry emotions: {dominant_emotion} ({sorted_emotions[0][1]:.2f})"
+        )
 
     def perform_update(self, serializer):
         content = serializer.validated_data.get('content', None)
         if content is not None:
             emotions = predict_emotions(content)
-            serializer.save(emotions=emotions)
+            journal_entry = serializer.save(emotions=emotions)
+            # Update mood log when journal entry is updated
+            self._update_or_create_mood_log(journal_entry, emotions)
         else:
             serializer.save()
 
@@ -225,7 +222,7 @@ class MoodLogViewSet(viewsets.ModelViewSet):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_mood_trends(request):
-    # Get mood logs for the last 30 days
+    # Get mood logs for the last 30 days for the logged-in user only
     thirty_days_ago = timezone.now().date() - timezone.timedelta(days=30)
     mood_logs = MoodLog.objects.filter(
         user=request.user,

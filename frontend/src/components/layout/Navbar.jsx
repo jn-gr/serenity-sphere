@@ -1,7 +1,7 @@
 // frontend/src/components/layout/Navbar.jsx
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { logout } from '../../features/auth/authSlice';
+import { logout, resetState } from '../../features/auth/authSlice';
 import ThemeToggle from './ThemeToggle';
 import '../../styles/components/_navbar.css';
 import api from '../../services/api';
@@ -16,6 +16,7 @@ const Navbar = () => {
   const handleLogout = async () => {
     try {
       await api.post('/api/auth/logout/');
+      dispatch(resetState());
       dispatch(logout());
       navigate('/login');
     } catch (err) {

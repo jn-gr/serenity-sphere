@@ -10,7 +10,7 @@ import Login from './features/auth/Login'
 import Register from './features/auth/Register'
 import JournalList from './features/journal/JournalList'
 import MoodLog from './features/mood/MoodLog'
-import { setCredentials } from './features/auth/authSlice'
+import { setCredentials, logout } from './features/auth/authSlice'
 import { ThemeProvider } from './context/ThemeContext'
 import Profile from './features/profile/Profile'
 
@@ -29,17 +29,24 @@ const AppContent = () => {
     }
     fetchCSRFToken()
 
-    // Optionally, fetch user data to maintain authentication state
-    const fetchUser = async () => {
-      try {
-        const response = await api.get('/api/auth/user/')
-        dispatch(setCredentials({ user: response.data, isAuthenticated: true }))
-      } catch (error) {
-        console.error('Error fetching user:', error)
+    // If user is authenticated (from localStorage), verify the session
+    if (isAuthenticated) {
+      const verifySession = async () => {
+        try {
+          const response = await api.get('/api/auth/user/')
+          // Update the user data in case it changed
+          dispatch(setCredentials({ user: response.data }))
+        } catch (error) {
+          console.error('Session verification failed:', error)
+          // Only logout if the error is authentication-related (401 or 403)
+          if (error.response && [401, 403].includes(error.response.status)) {
+            dispatch(logout())
+          }
+        }
       }
+      verifySession()
     }
-    fetchUser()
-  }, [dispatch])
+  }, [dispatch, isAuthenticated])
 
   return (
     <Router>

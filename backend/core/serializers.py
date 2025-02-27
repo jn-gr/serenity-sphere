@@ -41,22 +41,24 @@ class JournalEntrySerializer(serializers.ModelSerializer):
         model = JournalEntry
         fields = ['id', 'user', 'date', 'content', 'emotions', 'created_at', 'updated_at']
         read_only_fields = ['id', 'user', 'emotions', 'created_at', 'updated_at']
-    
+
     def create(self, validated_data):
-        user = validated_data.get('user')
+        user = self.context['request'].user
         date = validated_data.get('date', timezone.now())
         
-        # Check if an entry already exists for this user on this date
-        entry_date = date.date()
         try:
-            # If entry exists, update it
-            existing_entry = JournalEntry.objects.get(user=user, date__date=entry_date)
+            # Try to get existing entry for the same date
+            existing_entry = JournalEntry.objects.get(
+                user=user,
+                date__date=date.date()
+            )
+            # Update existing entry
             for attr, value in validated_data.items():
                 setattr(existing_entry, attr, value)
             existing_entry.save()
             return existing_entry
         except JournalEntry.DoesNotExist:
-            # If no entry exists, create a new one
+            # Create new entry
             return super().create(validated_data)
 
 # New serializer for updating the user's profile
@@ -80,5 +82,12 @@ class MoodLogSerializer(serializers.ModelSerializer):
         read_only_fields = ['user']
         
     def create(self, validated_data):
+        # Ensure the user is set to the logged-in user
         validated_data['user'] = self.context['request'].user
-        return super().create(validated_data) 
+        return super().create(validated_data)
+
+    def validate_journal_entry(self, value):
+        # Ensure users can only link to their own journal entries
+        if value and value.user != self.context['request'].user:
+            raise serializers.ValidationError("You can only link to your own journal entries.")
+        return value 

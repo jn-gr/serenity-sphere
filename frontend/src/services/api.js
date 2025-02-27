@@ -36,4 +36,17 @@ api.interceptors.request.use(
   }
 );
 
+// Add response interceptor to handle 401/403 errors
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response && [401, 403].includes(error.response.status)) {
+      // Clear local storage and reload page if session is invalid
+      localStorage.removeItem('user');
+      window.location.reload();
+    }
+    return Promise.reject(error);
+  }
+);
+
 export default api;
