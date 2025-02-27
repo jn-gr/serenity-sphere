@@ -1,9 +1,9 @@
 from django.contrib.auth import login, logout, authenticate, update_session_auth_hash
-from rest_framework import status, viewsets, permissions
+from rest_framework import status, viewsets, permissions, generics
 from rest_framework.decorators import api_view, permission_classes, action
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
-from .serializers import RegisterSerializer, LoginSerializer, UserSerializer, UserUpdateSerializer, JournalEntrySerializer, MoodLogSerializer
+from .serializers import RegisterSerializer, LoginSerializer, UserSerializer, UserUpdateSerializer, JournalEntrySerializer, MoodLogSerializer, MoodAnalyticsSerializer
 from .models import JournalEntry, MoodLog
 from django.middleware.csrf import get_token
 from django.http import JsonResponse
@@ -11,6 +11,9 @@ from .ai_services import predict_emotions
 import logging
 from django.contrib.auth.hashers import check_password
 from django.utils import timezone
+from rest_framework.views import APIView
+from datetime import datetime, timedelta
+from django.db.models import Count, Avg
 
 
 logger = logging.getLogger(__name__)
@@ -89,6 +92,21 @@ def user_profile(request):
         logger.error(f'Profile update error: {e}')
         return Response({'detail': 'Profile update failed. Please try again later.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+class RegisterView(generics.CreateAPIView):
+    queryset = User.objects.all()
+    permission_classes = (AllowAny,)
+    serializer_class = RegisterSerializer
+
+
+class UserDetailView(generics.RetrieveAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = [IsAuthenticated]
+    
+    def get_object(self):
+        return self.request.user
+
+
 class JournalEntryViewSet(viewsets.ModelViewSet):
     serializer_class = JournalEntrySerializer
     permission_classes = [IsAuthenticated]
@@ -110,64 +128,64 @@ class JournalEntryViewSet(viewsets.ModelViewSet):
             existing_entry.save()
             
             # Update associated mood log if it exists
-            if emotions:
-                self._update_or_create_mood_log(existing_entry, emotions)
-                
+            self._update_mood_from_emotions(existing_entry, emotions)
+            
             return existing_entry
         except JournalEntry.DoesNotExist:
             # If no entry exists, create a new one
             journal_entry = serializer.save(user=self.request.user, emotions=emotions)
             
-            # Create mood log for the new entry
-            if emotions:
-                self._update_or_create_mood_log(journal_entry, emotions)
-                
+            # Create associated mood log
+            self._update_mood_from_emotions(journal_entry, emotions)
+            
             return journal_entry
     
-    def _update_or_create_mood_log(self, journal_entry, emotions):
-        # Sort emotions by confidence score (descending)
-        sorted_emotions = sorted(emotions, key=lambda x: x[1], reverse=True)
-        dominant_emotion = sorted_emotions[0][0]
+    def _update_mood_from_emotions(self, journal_entry, emotions):
+        if not emotions or len(emotions) == 0:
+            return
         
-        # Map the emotion to a mood
+        # Map emotion to mood
         emotion_to_mood = {
-            # Positive emotions
-            'amusement': 'amused',
-            'excitement': 'excited',
             'joy': 'happy',
+            'happiness': 'happy',
+            'sadness': 'sad',
+            'anger': 'angry',
+            'fear': 'anxious',
+            'anxiety': 'anxious',
+            'surprise': 'surprised',
+            'disgust': 'disgusted',
+            'neutral': 'neutral',
+            'excitement': 'excited',
             'love': 'loving',
-            'desire': 'loving',
             'optimism': 'optimistic',
             'caring': 'caring',
             'pride': 'proud',
-            'admiration': 'proud',
             'gratitude': 'grateful',
             'relief': 'relieved',
-            'approval': 'happy',
-            'realization': 'surprised',
-            
-            # Neutral emotions
-            'surprise': 'surprised',
             'curiosity': 'curious',
             'confusion': 'confused',
-            'neutral': 'neutral',
-            
-            # Negative emotions
-            'fear': 'anxious',
             'nervousness': 'nervous',
             'remorse': 'remorseful',
             'embarrassment': 'embarrassed',
             'disappointment': 'disappointed',
-            'sadness': 'sad',
             'grief': 'grieving',
-            'disgust': 'disgusted',
-            'anger': 'angry',
             'annoyance': 'annoyed',
             'disapproval': 'disapproving',
+            'amusement': 'amused',
+            'calmness': 'calm'
         }
         
-        # Default to neutral if emotion not in mapping
-        mood = emotion_to_mood.get(dominant_emotion.lower(), 'neutral')
+        # Sort emotions by confidence score
+        sorted_emotions = sorted(emotions, key=lambda x: x[1], reverse=True)
+        
+        # Get the top emotion and map it to a mood
+        top_emotion = sorted_emotions[0][0].lower()
+        mood = 'neutral'  # Default
+        
+        for emotion, mood_value in emotion_to_mood.items():
+            if emotion in top_emotion:
+                mood = mood_value
+                break
         
         # Calculate intensity based on confidence score (scale 1-10)
         intensity = min(int(sorted_emotions[0][1] * 10), 10)
@@ -234,3 +252,58 @@ def get_mood_trends(request):
     
     serializer = MoodLogSerializer(mood_logs, many=True)
     return Response(serializer.data)
+
+class MoodAnalyticsView(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def get(self, request):
+        period = request.query_params.get('period', 'week')
+        serializer = MoodAnalyticsSerializer(data={'period': period})
+        serializer.is_valid(raise_exception=True)
+        
+        analytics = serializer.get_analytics(request.user)
+        return Response(analytics)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def mood_summary(request):
+    # Get mood logs for the last 30 days
+    end_date = timezone.now().date()
+    start_date = end_date - timedelta(days=30)
+    
+    mood_logs = MoodLog.objects.filter(
+        user=request.user,
+        date__gte=start_date,
+        date__lte=end_date
+    )
+    
+    # Get most common mood
+    mood_counts = mood_logs.values('mood').annotate(count=Count('mood')).order_by('-count')
+    most_common_mood = mood_counts.first()['mood'] if mood_counts.exists() else None
+    
+    # Get average intensity
+    avg_intensity = mood_logs.aggregate(avg=Avg('intensity'))['avg']
+    
+    # Count positive vs negative moods
+    positive_moods = ['happy', 'calm', 'excited', 'amused', 'loving', 'optimistic', 'caring', 'proud', 'grateful', 'relieved']
+    negative_moods = ['sad', 'anxious', 'angry', 'nervous', 'remorseful', 'embarrassed', 'disappointed', 'grieving', 'disgusted', 'annoyed', 'disapproving']
+    
+    positive_count = mood_logs.filter(mood__in=positive_moods).count()
+    negative_count = mood_logs.filter(mood__in=negative_moods).count()
+    neutral_count = mood_logs.exclude(mood__in=positive_moods + negative_moods).count()
+    
+    total = positive_count + negative_count + neutral_count
+    
+    # Calculate percentages
+    positive_percent = (positive_count / total) * 100 if total > 0 else 0
+    negative_percent = (negative_count / total) * 100 if total > 0 else 0
+    neutral_percent = (neutral_count / total) * 100 if total > 0 else 0
+    
+    return Response({
+        'most_common_mood': most_common_mood,
+        'avg_intensity': avg_intensity,
+        'positive_percent': positive_percent,
+        'negative_percent': negative_percent,
+        'neutral_percent': neutral_percent,
+        'total_logs': total
+    })
