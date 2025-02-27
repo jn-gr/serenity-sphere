@@ -80,20 +80,20 @@ const Navbar = () => {
         </li>
         <li>
           <Link
+            to="/mood"
+            className="flex items-center space-x-3 p-3 rounded-xl hover:bg-[#2A3547] transition-colors text-[#B8C7E0]"
+          >
+            <FaChartLine size={20} />
+            <span>Mood Trends</span>
+          </Link>
+        </li>
+        <li>
+          <Link
             to="/profile"
             className="flex items-center space-x-3 p-3 rounded-xl hover:bg-[#2A3547] transition-colors text-[#B8C7E0]"
           >
             <FaUser size={20} />
             <span>Profile</span>
-          </Link>
-        </li>
-        <li>
-          <Link
-            to="/mood"
-            className="flex items-center space-x-3 p-3 rounded-xl hover:bg-[#2A3547] transition-colors text-[#B8C7E0]"
-          >
-            <FaChartLine size={20} />
-            <span>Mood Log</span>
           </Link>
         </li>
       </ul>

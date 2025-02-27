@@ -198,18 +198,7 @@ const Home = () => {
               className="h-full flex items-center justify-center gap-3 p-4 rounded-xl bg-[#1A2335] border border-[#2A3547] text-[#B8C7E0]"
             >
               <FaRegSmile size={18} />
-              <span className="font-medium">Log Your Mood</span>
-            </motion.div>
-          </Link>
-          
-          <Link to="/analytics" className="col-span-1">
-            <motion.div 
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              className="h-full flex items-center justify-center gap-3 p-4 rounded-xl bg-[#1A2335] border border-[#2A3547] text-[#B8C7E0]"
-            >
-              <FaChartLine size={18} />
-              <span className="font-medium">View Analytics</span>
+              <span className="font-medium">View your Mood Trends</span>
             </motion.div>
           </Link>
         </motion.div>
