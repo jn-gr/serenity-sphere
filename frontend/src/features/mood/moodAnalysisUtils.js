@@ -13,7 +13,7 @@ export const analyzeMoodTrends = (logs, period = 'week') => {
     };
   }
 
-  // Map moods to numerical values (-1 to 1 scale) using the emotion labels from ai_services.py
+  // Map moods to numerical values (-1 to 1 scale)
   const moodScores = {
     // Positive emotions
     'admiration': 0.7,
