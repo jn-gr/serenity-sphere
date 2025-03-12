@@ -15,6 +15,9 @@ import {
   FaChartPie,
   FaChartArea
 } from 'react-icons/fa';
+// New imports for recommendation component
+import { FaLightbulb, FaArrowTrendUp, FaArrowTrendDown, FaMinus, FaExclamation } from 'react-icons/fa6';
+import { analyzeMoodTrends } from './moodAnalysisUtils';
 import MoodChart from './MoodChart';
 
 // Import the visualization components
@@ -27,12 +30,94 @@ import MoodDistributionChart from './components/MoodDistributionChart';
 // import MoodCalendarHeatmap from './components/MoodCalendarHeatmap';
 // import MoodDistributionChart from './components/MoodDistributionChart';
 
+// New component for mood recommendations
+const MoodRecommendation = ({ logs, selectedPeriod }) => {
+  // Skip if no logs
+  if (!logs || logs.length === 0) {
+    return (
+      <div className="text-center py-8">
+        <p className="text-[#B8C7E0]">No mood data available for analysis.</p>
+      </div>
+    );
+  }
+  
+  const analysis = analyzeMoodTrends(logs, selectedPeriod);
+  
+  if (analysis.status === 'insufficient_data') {
+    return (
+      <div className="bg-[#0F172A] p-5 rounded-xl border border-[#2A3547]">
+        <div className="flex items-start">
+          <div className="bg-blue-500/20 p-3 rounded-lg mr-4">
+            <FaLightbulb className="text-blue-400" />
+          </div>
+          <div>
+            <h3 className="text-white font-medium mb-3">Keep Tracking Your Moods</h3>
+            <p className="text-[#B8C7E0]">{analysis.message || "We need more data to provide personalized recommendations."}</p>
+            <p className="text-[#B8C7E0] mt-3">{analysis.recommendation}</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+  
+  // Determine icon based on trend
+  let TrendIcon = FaMinus;
+  let iconColor = "text-blue-400";
+  let bgColor = "bg-blue-500/20";
+  
+  if (analysis.trendStrength.includes('improving')) {
+    TrendIcon = FaArrowTrendUp;
+    iconColor = "text-emerald-400";
+    bgColor = "bg-emerald-500/20";
+  } else if (analysis.trendStrength.includes('declining')) {
+    TrendIcon = FaArrowTrendDown;
+    iconColor = "text-red-400";
+    bgColor = "bg-red-500/20";
+  }
+  
+  // If sudden change, override with alert icon
+  if (analysis.suddenChange) {
+    TrendIcon = FaExclamation;
+    iconColor = "text-amber-400";
+    bgColor = "bg-amber-500/20";
+  }
+  
+  return (
+    <div className="bg-[#0F172A] p-5 rounded-xl border border-[#2A3547]">
+      <div className="flex items-start">
+        <div className={`${bgColor} p-3 rounded-lg mr-4`}>
+          <TrendIcon className={iconColor} />
+        </div>
+        <div className="flex-1">
+          <h3 className="text-white font-medium mb-1">Your Mood Insight</h3>
+          <p className="text-[#B8C7E0] mb-4">{analysis.insight}</p>
+          
+          <div className="border-t border-[#2A3547] my-4"></div>
+          
+          <h4 className="text-[#5983FC] font-medium mb-2">Recommendation</h4>
+          <p className="text-[#B8C7E0] mb-4">{analysis.recommendation}</p>
+          
+          <h4 className="text-[#5983FC] font-medium mb-2">Suggested Activities</h4>
+          <ul className="space-y-2">
+            {analysis.activities.map((activity, index) => (
+              <li key={index} className="flex items-start">
+                <FaLightbulb className="text-yellow-400 mt-1 mr-2 flex-shrink-0" />
+                <span className="text-[#B8C7E0]">{activity}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const MoodLog = () => {
   const dispatch = useDispatch();
   const { logs, status, error, trends } = useSelector(state => state.mood);
   const [selectedPeriod, setSelectedPeriod] = useState('month');
   const [moodFilter, setMoodFilter] = useState('all');
-  const [selectedView, setSelectedView] = useState('line');
+  const [selectedView, setSelectedView] = useState('chart');
   const [selectedChart, setSelectedChart] = useState('line');
   
   // Debug log - this will help see if we're even getting to this component
@@ -210,6 +295,14 @@ const MoodLog = () => {
               >
                 <FaTable className="inline mr-1" /> List View
               </button>
+              <button 
+                onClick={() => setSelectedView('analysis')}
+                className={`px-4 py-2 rounded-lg transition-colors flex items-center gap-2 ${selectedView === 'analysis' 
+                  ? 'bg-[#3E60C1] text-white' 
+                  : 'bg-[#0F172A] text-[#B8C7E0] hover:bg-[#2A3547]'}`}
+              >
+                <FaLightbulb className="inline mr-1" /> Analysis
+              </button>
             </div>
             
             <div className="flex flex-wrap items-center gap-2">
@@ -352,7 +445,7 @@ const MoodLog = () => {
                 {selectedChart === 'calendar' && <MoodCalendarHeatmap trends={trends} />}
               </div>
             </>
-          ) : (
+          ) : selectedView === 'list' ? (
             <>
               <h2 className="text-xl font-semibold text-white mb-4">Mood Entries List</h2>
               <div className="space-y-4 max-h-[600px] overflow-y-auto pr-2">
@@ -402,50 +495,58 @@ const MoodLog = () => {
                 )}
               </div>
             </>
+          ) : (
+            // Analysis view (for selectedView === 'analysis')
+            <>
+              <h2 className="text-xl font-semibold text-white mb-4">Mood Analysis & Recommendations</h2>
+              
+              {/* Now show the MoodRecommendation component here */}
+              <MoodRecommendation logs={safetyLogs} selectedPeriod={selectedPeriod} />
+              
+              {/* Add additional insights below the recommendations */}
+              <div className="mt-8">
+                <h3 className="text-xl font-semibold text-white mb-4">Additional Insights</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="bg-[#0F172A] p-5 rounded-xl border border-[#2A3547]">
+                    <h3 className="text-[#5983FC] font-medium mb-3">Your Mood Pattern</h3>
+                    <p className="text-[#B8C7E0]">
+                      {filteredLogs.length > 5 ? (
+                        <>
+                          Based on your {filteredLogs.length} mood entries, you tend to experience 
+                          <span className="text-white font-medium"> {getMostCommonMood()} </span> 
+                          moods most frequently. Your average mood intensity is 
+                          <span className="text-white font-medium"> {getAverageIntensity()}/10</span>.
+                        </>
+                      ) : (
+                        <>
+                          Add more mood entries to see insights about your mood patterns.
+                        </>
+                      )}
+                    </p>
+                  </div>
+                  
+                  <div className="bg-[#0F172A] p-5 rounded-xl border border-[#2A3547]">
+                    <h3 className="text-[#5983FC] font-medium mb-3">Mood Variability</h3>
+                    <p className="text-[#B8C7E0]">
+                      {filteredLogs.length > 5 ? (
+                        <>
+                          Your mood shows {uniqueMoods.length <= 2 ? 'low' : uniqueMoods.length <= 5 ? 'moderate' : 'high'} variability 
+                          with {uniqueMoods.length} different moods recorded in this period. 
+                          {uniqueMoods.length > 3 && (
+                            <span> You experience a diverse range of emotions.</span>
+                          )}
+                        </>
+                      ) : (
+                        <>
+                          Track more moods to see insights about your emotional variability.
+                        </>
+                      )}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </>
           )}
-        </div>
-        
-        {/* Insights section */}
-        <div className="mt-8 bg-[#1A2335] p-6 rounded-xl border border-[#2A3547]">
-          <h2 className="text-xl font-semibold text-white mb-4">Mood Insights</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="bg-[#0F172A] p-5 rounded-xl border border-[#2A3547]">
-              <h3 className="text-[#5983FC] font-medium mb-3">Your Mood Pattern</h3>
-              <p className="text-[#B8C7E0]">
-                {filteredLogs.length > 5 ? (
-                  <>
-                    Based on your {filteredLogs.length} mood entries, you tend to experience 
-                    <span className="text-white font-medium"> {getMostCommonMood()} </span> 
-                    moods most frequently. Your average mood intensity is 
-                    <span className="text-white font-medium"> {getAverageIntensity()}/10</span>.
-                  </>
-                ) : (
-                  <>
-                    Add more mood entries to see insights about your mood patterns.
-                  </>
-                )}
-              </p>
-            </div>
-            
-            <div className="bg-[#0F172A] p-5 rounded-xl border border-[#2A3547]">
-              <h3 className="text-[#5983FC] font-medium mb-3">Mood Variability</h3>
-              <p className="text-[#B8C7E0]">
-                {filteredLogs.length > 5 ? (
-                  <>
-                    Your mood shows {uniqueMoods.length <= 2 ? 'low' : uniqueMoods.length <= 5 ? 'moderate' : 'high'} variability 
-                    with {uniqueMoods.length} different moods recorded in this period. 
-                    {uniqueMoods.length > 3 && (
-                      <span> You experience a diverse range of emotions.</span>
-                    )}
-                  </>
-                ) : (
-                  <>
-                    Track more moods to see insights about your emotional variability.
-                  </>
-                )}
-              </p>
-            </div>
-          </div>
         </div>
       </div>
     </div>

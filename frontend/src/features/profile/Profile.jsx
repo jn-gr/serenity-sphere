@@ -16,7 +16,6 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'react-toastify';
 import { FaCheckCircle as FaCheckCircleIcon, FaSpinner, FaUser } from 'react-icons/fa';
-import { updateProfile, clearError, clearSuccess } from './profileSlice';
 
 const Profile = () => {
   const { isDark } = useTheme();
