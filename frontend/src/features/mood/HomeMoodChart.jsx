@@ -116,6 +116,35 @@ const HomeMoodChart = () => {
   const trend = calculateTrend();
   const trendColor = trend === "improving" ? "#10B981" : trend === "declining" ? "#EF4444" : "#6366F1";
   
+  // Get gradient background
+  const getGradientColor = (score) => {
+    if (score >= 8) return 'rgba(16, 185, 129, 0.1)'; // Emerald/Very Positive
+    if (score >= 6) return 'rgba(59, 130, 246, 0.1)'; // Blue/Positive
+    if (score >= 4) return 'rgba(99, 102, 241, 0.1)'; // Indigo/Neutral
+    if (score >= 2) return 'rgba(249, 115, 22, 0.1)'; // Orange/Negative
+    return 'rgba(239, 68, 68, 0.1)'; // Red/Very Negative
+  };
+
+  // Create the line gradient - gradient based on trend direction
+  const createGradient = (ctx) => {
+    if (!ctx) return trendColor + '20';
+    
+    const gradient = ctx.createLinearGradient(0, 0, 0, 150);
+    
+    if (trend === "improving") {
+      gradient.addColorStop(0, 'rgba(16, 185, 129, 0.2)');
+      gradient.addColorStop(1, 'rgba(16, 185, 129, 0)');
+    } else if (trend === "declining") {
+      gradient.addColorStop(0, 'rgba(239, 68, 68, 0.2)');
+      gradient.addColorStop(1, 'rgba(239, 68, 68, 0)');
+    } else {
+      gradient.addColorStop(0, 'rgba(99, 102, 241, 0.2)');
+      gradient.addColorStop(1, 'rgba(99, 102, 241, 0)');
+    }
+    
+    return gradient;
+  };
+  
   // Data for the chart
   const data = {
     labels: formattedDates,
@@ -124,7 +153,10 @@ const HomeMoodChart = () => {
         label: 'Mood Score',
         data: moodScores,
         borderColor: trendColor,
-        backgroundColor: `${trendColor}20`, // 20% opacity for background
+        backgroundColor: (context) => {
+          const ctx = context.chart.ctx;
+          return createGradient(ctx);
+        },
         borderWidth: 2,
         tension: 0.4,
         fill: true,
@@ -197,9 +229,7 @@ const HomeMoodChart = () => {
           },
           callback: function(value) {
             if (value === 10) return 'Very Positive';
-            if (value === 8) return 'Positive';
             if (value === 5) return 'Neutral';
-            if (value === 2) return 'Negative';
             if (value === 0) return 'Very Negative';
             return '';
           },

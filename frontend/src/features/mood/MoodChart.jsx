@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchMoodTrends } from './moodSlice';
-import { Line } from 'react-chartjs-2';
+import { Bar } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -32,8 +32,8 @@ const MoodChart = () => {
   const dispatch = useDispatch();
   const { trends, status } = useSelector(state => state.mood);
   const [showLegend, setShowLegend] = useState(false);
-  const [showDataPoints, setShowDataPoints] = useState(true);
-  const [smoothLines, setSmoothLines] = useState(true);
+  const [showDataLabels, setShowDataLabels] = useState(false);
+  const [groupByDay, setGroupByDay] = useState(true);
   
   useEffect(() => {
     if (status === 'idle') {
@@ -144,16 +144,26 @@ const MoodChart = () => {
   });
   
   // Get gradient color based on mood score
-  const getGradientColor = (score) => {
-    if (score >= 8) return 'rgba(16, 185, 129, 0.1)'; // Emerald/Very Positive
-    if (score >= 6) return 'rgba(59, 130, 246, 0.1)'; // Blue/Positive
-    if (score >= 4) return 'rgba(99, 102, 241, 0.1)'; // Indigo/Neutral
-    if (score >= 2) return 'rgba(249, 115, 22, 0.1)'; // Orange/Negative
-    return 'rgba(239, 68, 68, 0.1)'; // Red/Very Negative
+  const getBarColor = (score) => {
+    if (score >= 8) return 'rgba(16, 185, 129, 0.9)'; // Emerald/Very Positive
+    if (score >= 6) return 'rgba(59, 130, 246, 0.9)'; // Blue/Positive
+    if (score >= 4) return 'rgba(99, 102, 241, 0.9)'; // Indigo/Neutral
+    if (score >= 2) return 'rgba(249, 115, 22, 0.9)'; // Orange/Negative
+    return 'rgba(239, 68, 68, 0.9)'; // Red/Very Negative
   };
 
-  // Create a gradient background that changes based on mood score
-  const backgroundColors = moodScores.map(score => getGradientColor(score));
+  // Get border colors for bars
+  const getBorderColor = (score) => {
+    if (score >= 8) return 'rgb(16, 185, 129)'; // Emerald/Very Positive
+    if (score >= 6) return 'rgb(59, 130, 246)'; // Blue/Positive
+    if (score >= 4) return 'rgb(99, 102, 241)'; // Indigo/Neutral
+    if (score >= 2) return 'rgb(249, 115, 22)'; // Orange/Negative
+    return 'rgb(239, 68, 68)'; // Red/Very Negative
+  };
+  
+  // Get bar colors for each mood score
+  const barColors = moodScores.map(score => getBarColor(score));
+  const borderColors = moodScores.map(score => getBorderColor(score));
   
   const data = {
     labels: formattedDates,
@@ -161,31 +171,17 @@ const MoodChart = () => {
       {
         label: 'Mood Score',
         data: moodScores,
-        borderColor: '#5983FC',
-        backgroundColor: ctx => {
-          // Return the color based on where we are in the dataset
-          const index = ctx.dataIndex;
-          return index !== undefined ? backgroundColors[index] : 'rgba(89, 131, 252, 0.1)';
-        },
-        borderWidth: 2,
-        tension: smoothLines ? 0.4 : 0,
-        fill: true,
-        pointBackgroundColor: ctx => {
-          if (!showDataPoints) return 'transparent';
-          
+        backgroundColor: barColors,
+        borderColor: borderColors,
+        borderWidth: 1,
+        borderRadius: 4,
+        barThickness: 24, // Adjust this value to control bar width
+        hoverBackgroundColor: (ctx) => {
           const index = ctx.dataIndex;
           const score = moodScores[index];
-          
-          if (score >= 8) return '#10B981'; // Emerald/Very Positive
-          if (score >= 6) return '#3B82F6'; // Blue/Positive
-          if (score >= 4) return '#6366F1'; // Indigo/Neutral
-          if (score >= 2) return '#F97316'; // Orange/Negative
-          return '#EF4444'; // Red/Very Negative
-        },
-        pointBorderColor: '#fff',
-        pointBorderWidth: 2,
-        pointRadius: showDataPoints ? 5 : 0,
-        pointHoverRadius: 7,
+          // Make hover color slightly darker
+          return getBorderColor(score);
+        }
       },
     ],
   };
@@ -212,6 +208,14 @@ const MoodChart = () => {
             };
             return moodLabels[value] || '';
           }
+        },
+        title: {
+          display: true,
+          text: 'Mood Score',
+          color: '#B8C7E0',
+          font: {
+            size: 12
+          }
         }
       },
       x: {
@@ -220,6 +224,14 @@ const MoodChart = () => {
         },
         ticks: {
           color: '#B8C7E0',
+        },
+        title: {
+          display: true,
+          text: 'Date',
+          color: '#B8C7E0',
+          font: {
+            size: 12
+          }
         }
       }
     },
@@ -329,16 +341,16 @@ const MoodChart = () => {
       
       <div className="flex justify-end space-x-3 mb-4">
         <button 
-          onClick={() => setShowDataPoints(!showDataPoints)}
-          className={`px-3 py-1 text-xs rounded ${showDataPoints ? 'bg-[#3E60C1] text-white' : 'bg-[#1A2335] text-[#B8C7E0]'}`}
+          onClick={() => setShowDataLabels(!showDataLabels)}
+          className={`px-3 py-1 text-xs rounded ${showDataLabels ? 'bg-[#3E60C1] text-white' : 'bg-[#1A2335] text-[#B8C7E0]'}`}
         >
-          Show Points
+          Show Labels
         </button>
         <button 
-          onClick={() => setSmoothLines(!smoothLines)}
-          className={`px-3 py-1 text-xs rounded ${smoothLines ? 'bg-[#3E60C1] text-white' : 'bg-[#1A2335] text-[#B8C7E0]'}`}
+          onClick={() => setGroupByDay(!groupByDay)}
+          className={`px-3 py-1 text-xs rounded ${groupByDay ? 'bg-[#3E60C1] text-white' : 'bg-[#1A2335] text-[#B8C7E0]'}`}
         >
-          Smooth Lines
+          Group By Day
         </button>
         <button 
           onClick={() => setShowLegend(!showLegend)}
@@ -349,7 +361,7 @@ const MoodChart = () => {
       </div>
       
       <div className="h-[300px]">
-        <Line data={data} options={options} />
+        <Bar data={data} options={options} />
       </div>
     </div>
   );

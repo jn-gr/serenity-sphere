@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaChartLine, FaBook, FaCalendarDay, FaRegSmile, FaRegSadTear, FaEllipsisH, FaChartPie } from 'react-icons/fa';
+import { FaChartLine, FaBook, FaCalendarDay, FaRegSmile, FaRegSadTear, FaEllipsisH, FaChartPie, FaUser } from 'react-icons/fa';
 import '../../styles/layouts/_home.css';
 import JournalPreview from '../journal/JournalPreview';
 import { fetchJournalEntries } from '../journal/journalSlice';
@@ -18,12 +18,22 @@ const Home = () => {
   const journalStatus = useSelector(state => state.journal.status);
   const { trends, status: moodStatus } = useSelector(state => state.mood);
   const [greeting, setGreeting] = useState('');
+  const [avatar, setAvatar] = useState(null);
   
   const today = new Date().toISOString().split('T')[0];
   const todaysEntry = journalEntries.find(entry => 
     new Date(entry.date).toISOString().split('T')[0] === today
   );
 
+  // Effect to set the greeting based on time of day
+  useEffect(() => {
+    const hour = new Date().getHours();
+    if (hour < 12) setGreeting('Good morning');
+    else if (hour < 18) setGreeting('Good afternoon');
+    else setGreeting('Good evening');
+  }, []);
+
+  // Effect to fetch data and update avatar when user state changes
   useEffect(() => {
     if (isAuthenticated) {
       if (journalStatus === 'idle') {
@@ -32,15 +42,21 @@ const Home = () => {
       if (moodStatus === 'idle') {
         dispatch(fetchMoodTrends());
       }
+      
+      // Update avatar whenever user object changes
+      updateAvatar();
     }
-    
-    // Set greeting based on time of day
-    const hour = new Date().getHours();
-    if (hour < 12) setGreeting('Good morning');
-    else if (hour < 18) setGreeting('Good afternoon');
-    else setGreeting('Good evening');
-  }, [isAuthenticated, journalStatus, moodStatus, dispatch]);
+  }, [isAuthenticated, journalStatus, moodStatus, dispatch, user]);
   
+  // Separate function to update avatar to keep the code clean
+  const updateAvatar = () => {
+    if (user?.username) {
+      setAvatar(`https://ui-avatars.com/api/?name=${user.username}&background=5983FC&color=fff`);
+    } else {
+      setAvatar(null);
+    }
+  };
+
   // Get most common and least common moods
   const getMoodStats = () => {
     if (!trends || trends.length === 0) {
@@ -164,18 +180,34 @@ const Home = () => {
             animate={{ opacity: 1, y: 0 }}
             className="flex flex-col md:flex-row justify-between items-start md:items-center"
           >
-            <div>
-              <h1 className="text-3xl font-bold text-white">
-                {greeting}, {user?.username || 'there'}
-              </h1>
-              <p className="text-[#B8C7E0] mt-1">
-                {new Date().toLocaleDateString('en-US', { 
-                  weekday: 'long', 
-                  year: 'numeric', 
-                  month: 'long', 
-                  day: 'numeric' 
-                })}
-              </p>
+            <div className="flex items-center">
+              {avatar ? (
+                <div className="h-14 w-14 rounded-full border-2 border-[#2A3547] overflow-hidden mr-4 bg-[#1A2335] flex-shrink-0">
+                  <img 
+                    src={avatar} 
+                    alt="Profile" 
+                    className="h-full w-full object-cover"
+                    key={user?.id || 'default'} // Add key to force re-render when user changes
+                  />
+                </div>
+              ) : (
+                <div className="h-14 w-14 rounded-full bg-[#3E60C1]/20 flex items-center justify-center mr-4 flex-shrink-0">
+                  <FaUser className="text-[#5983FC]" />
+                </div>
+              )}
+              <div>
+                <h1 className="text-3xl font-bold text-white">
+                  {greeting}, {user?.username || 'there'}
+                </h1>
+                <p className="text-[#B8C7E0] mt-1">
+                  {new Date().toLocaleDateString('en-US', { 
+                    weekday: 'long', 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric' 
+                  })}
+                </p>
+              </div>
             </div>
             
             <div className="flex gap-4 mt-4 md:mt-0">
@@ -236,6 +268,28 @@ const Home = () => {
             >
               <FaRegSmile size={18} />
               <span className="font-medium">View your Mood Trends</span>
+            </motion.div>
+          </Link>
+
+          <Link to="/profile" className="col-span-1">
+            <motion.div 
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              className="h-full flex items-center justify-center gap-3 p-4 rounded-xl bg-[#1A2335] border border-[#2A3547] text-[#B8C7E0]"
+            >
+              {avatar ? (
+                <div className="h-6 w-6 rounded-full overflow-hidden">
+                  <img 
+                    src={avatar} 
+                    alt="Profile" 
+                    className="h-full w-full object-cover"
+                    key={`small-${user?.id || 'default'}`} // Add key to force re-render when user changes
+                  />
+                </div>
+              ) : (
+                <FaUser size={18} />
+              )}
+              <span className="font-medium">Update Profile</span>
             </motion.div>
           </Link>
         </motion.div>
