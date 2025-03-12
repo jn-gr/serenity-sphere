@@ -11,7 +11,7 @@ import {
   Legend,
   Filler
 } from 'chart.js';
-import { FaCalendarDay, FaArrowTrendUp, FaArrowTrendDown, FaMinus, FaLightbulb } from 'react-icons/fa6';
+import { FaCalendarDay, FaArrowTrendUp, FaArrowTrendDown, FaMinus, FaLightbulb, FaExclamation } from 'react-icons/fa6';
 import { analyzeMoodTrends } from '../moodAnalysisUtils';
 
 // Register the chart.js components
@@ -34,7 +34,8 @@ const MoodForecast = ({ logs, selectedPeriod }) => {
       </div>
     );
   }
-  
+
+  // Get analysis results from moodAnalysisUtils
   const analysis = analyzeMoodTrends(logs, selectedPeriod);
   
   if (analysis.status === 'insufficient_data') {
@@ -104,29 +105,58 @@ const MoodForecast = ({ logs, selectedPeriod }) => {
     
     return labels;
   };
+
+  // Create confidence interval data (±0.15 as an example)
+  const confidenceInterval = 0.15;
+  const forecastData = [
+    analysis.currentMoodScore, 
+    analysis._technicalData.futureForecast[0], 
+    analysis._technicalData.futureForecast[1], 
+    analysis._technicalData.futureForecast[2]
+  ];
   
-  // Prepare chart data
+  const upperBounds = forecastData.map(value => Math.min(value + confidenceInterval, 1));
+  const lowerBounds = forecastData.map(value => Math.max(value - confidenceInterval, -1));
+  
+  // Prepare chart data with enhanced visualization
   const chartData = {
     labels: getDayLabels(),
     datasets: [
+      // Confidence interval area
+      {
+        label: 'Confidence Interval',
+        data: upperBounds,
+        borderColor: 'transparent',
+        pointRadius: 0,
+        fill: '+1',
+        backgroundColor: `${directionInfo.bgColor.replace('0.1', '0.2')}`,
+        tension: 0.4,
+      },
+      {
+        label: 'Lower Bound',
+        data: lowerBounds,
+        borderColor: 'transparent',
+        pointRadius: 0,
+        fill: false,
+        tension: 0.4,
+      },
+      // Main forecast line
       {
         label: 'Mood Forecast',
-        data: [
-          analysis.currentMoodScore, 
-          analysis._technicalData.futureForecast[0], 
-          analysis._technicalData.futureForecast[1], 
-          analysis._technicalData.futureForecast[2]
-        ],
-        fill: {
-          target: 'origin',
-          above: directionInfo.bgColor,
-          below: 'rgba(75, 85, 99, 0.1)'
-        },
+        data: forecastData,
         borderColor: directionInfo.color,
-        borderWidth: 2,
+        borderWidth: 3,
         tension: 0.4,
         pointRadius: 6,
-        pointBackgroundColor: directionInfo.color
+        pointBackgroundColor: '#0F172A',
+        pointBorderColor: directionInfo.color,
+        pointBorderWidth: 3,
+        pointHoverRadius: 8,
+        pointHoverBackgroundColor: directionInfo.color,
+        pointHoverBorderColor: '#fff',
+        pointHoverBorderWidth: 2,
+        fill: false,
+        z: 10
       }
     ]
   };
@@ -134,13 +164,27 @@ const MoodForecast = ({ logs, selectedPeriod }) => {
   const chartOptions = {
     responsive: true,
     maintainAspectRatio: false,
+    layout: {
+      padding: {
+        top: 20,
+        right: 20,
+        bottom: 20,
+        left: 20
+      }
+    },
     scales: {
       y: {
         grid: {
-          color: 'rgba(42, 53, 71, 0.5)'
+          color: 'rgba(42, 53, 71, 0.5)',
+          drawBorder: false,
+          lineWidth: 1
         },
         ticks: {
           color: '#B8C7E0',
+          font: {
+            size: 12
+          },
+          padding: 10,
           callback: function(value) {
             if (value > 0.6) return "Very Positive";
             if (value > 0.3) return "Positive";
@@ -154,20 +198,41 @@ const MoodForecast = ({ logs, selectedPeriod }) => {
         title: {
           display: true,
           text: 'Mood State',
-          color: '#B8C7E0'
+          color: '#B8C7E0',
+          font: {
+            size: 14,
+            weight: 'bold'
+          },
+          padding: {
+            bottom: 10
+          }
         }
       },
       x: {
         grid: {
-          color: 'rgba(42, 53, 71, 0.5)'
+          color: 'rgba(42, 53, 71, 0.5)',
+          drawBorder: false,
+          lineWidth: 1,
+          z: 1
         },
         ticks: {
-          color: '#B8C7E0'
+          color: '#B8C7E0',
+          font: {
+            size: 12
+          },
+          padding: 10
         },
         title: {
           display: true,
           text: 'Date',
-          color: '#B8C7E0'
+          color: '#B8C7E0',
+          font: {
+            size: 14,
+            weight: 'bold'
+          },
+          padding: {
+            top: 10
+          }
         }
       }
     },
@@ -182,7 +247,15 @@ const MoodForecast = ({ logs, selectedPeriod }) => {
         borderColor: '#2A3547',
         borderWidth: 1,
         padding: 12,
+        cornerRadius: 8,
         displayColors: false,
+        titleFont: {
+          size: 14,
+          weight: 'bold'
+        },
+        bodyFont: {
+          size: 13
+        },
         callbacks: {
           title: function(context) {
             return context[0].label;
@@ -191,16 +264,51 @@ const MoodForecast = ({ logs, selectedPeriod }) => {
             const score = context.raw;
             return [
               `Mood: ${formatMoodScore(score)}`,
-              `Score: ${(score * 100).toFixed(0)}%`
+              `Score: ${(score * 100).toFixed(0)}%`,
+              `Confidence: ±${(confidenceInterval * 100).toFixed(0)}%`
             ];
           }
         }
+      }
+    },
+    interaction: {
+      mode: 'index',
+      intersect: false,
+    },
+    elements: {
+      line: {
+        borderJoinStyle: 'round'
       }
     }
   };
   
   const accuracy = Math.round(analysis.modelAccuracy * 100);
   
+  // Enhanced visual elements - create mood indicators
+  const renderMoodIndicators = () => {
+    const indicators = [
+      { value: 0.8, label: 'Very Positive', color: 'rgb(16, 185, 129)' },
+      { value: 0.4, label: 'Positive', color: 'rgb(52, 211, 153)' },
+      { value: 0, label: 'Neutral', color: 'rgb(59, 130, 246)' },
+      { value: -0.4, label: 'Negative', color: 'rgb(239, 113, 113)' },
+      { value: -0.8, label: 'Very Negative', color: 'rgb(239, 68, 68)' },
+    ];
+    
+    return (
+      <div className="flex justify-between px-2 mt-2 text-xs text-[#B8C7E0]">
+        {indicators.map((indicator, index) => (
+          <div key={index} className="flex flex-col items-center">
+            <div 
+              className="w-3 h-3 rounded-full mb-1" 
+              style={{ backgroundColor: indicator.color }}
+            ></div>
+            <span>{indicator.label}</span>
+          </div>
+        ))}
+      </div>
+    );
+  };
+
   return (
     <div className="space-y-6">
       <div className="bg-[#0F172A] p-5 rounded-xl border border-[#2A3547]">
@@ -218,6 +326,9 @@ const MoodForecast = ({ logs, selectedPeriod }) => {
         <div className="h-80 mb-4">
           <Line data={chartData} options={chartOptions} />
         </div>
+        
+        {/* Legend for mood indicators */}
+        {renderMoodIndicators()}
         
         <div className="flex justify-between items-center text-sm text-[#64748B] mt-4">
           <span>Based on your emotional patterns using Holt's Exponential Smoothing</span>

@@ -200,6 +200,7 @@ const Register = () => {
             transition={{ delay: 0.2, duration: 0.5 }}
             className="text-5xl font-bold bg-gradient-to-r from-[#FFFFFF] to-[#B8C7E0] inline-block text-transparent bg-clip-text mb-3"
           >
+            <br />
             Join Serenity Sphere
           </motion.h1>
           <p className="text-[#B8C7E0] mt-3">Create your account and start your wellness journey</p>

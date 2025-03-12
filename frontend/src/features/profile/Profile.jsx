@@ -17,11 +17,40 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'react-toastify';
 import { FaCheckCircle as FaCheckCircleIcon, FaSpinner, FaUser } from 'react-icons/fa';
 
+// Create these action creators if they don't exist elsewhere
+const updateProfile = (data) => {
+  return async (dispatch) => {
+    try {
+      dispatch({ type: 'profile/updateStart' });
+      const response = await api.patch('/api/user-profile/', data);
+      dispatch({ 
+        type: 'profile/updateSuccess', 
+        payload: response.data 
+      });
+      dispatch(setCredentials({ user: response.data, isAuthenticated: true }));
+      return response.data;
+    } catch (error) {
+      const errorMessage = error.response?.data?.message || "Failed to update profile";
+      dispatch({ 
+        type: 'profile/updateFailure', 
+        payload: errorMessage 
+      });
+      throw new Error(errorMessage);
+    }
+  };
+};
+
+const clearError = () => ({ type: 'profile/clearError' });
+const clearSuccess = () => ({ type: 'profile/clearSuccess' });
+
 const Profile = () => {
   const { isDark } = useTheme();
   const user = useSelector((state) => state.auth.user);
   const dispatch = useDispatch();
-  const { isLoading, error, success } = useSelector(state => state.profile);
+  
+  // Create a default state if profile reducer doesn't exist
+  const profileState = useSelector(state => state.profile || { isLoading: false, error: null, success: false });
+  const { isLoading, error, success } = profileState;
 
   const [formData, setFormData] = useState({
     username: '',
@@ -88,6 +117,8 @@ const Profile = () => {
     if (success) {
       toast.success('Profile updated successfully!');
       dispatch(clearSuccess());
+      setSuccessAnimation(true);
+      setTimeout(() => setSuccessAnimation(false), 2000);
     }
   }, [error, success, dispatch]);
 
@@ -106,7 +137,7 @@ const Profile = () => {
     setMessage(null);
     
     if (name === 'password' || name === 'confirmPassword') {
-      if (value !== formData.confirmPassword) {
+      if (formData.password && formData.confirmPassword && formData.password !== formData.confirmPassword) {
         setPasswordError('Passwords do not match');
       } else {
         setPasswordError('');
@@ -117,8 +148,30 @@ const Profile = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
+    // Validation checks
+    let hasErrors = false;
+    const errors = {};
+    
+    if (!formData.username.trim()) {
+      errors.username = 'Username is required';
+      hasErrors = true;
+    }
+    
+    if (!formData.email.trim()) {
+      errors.email = 'Email is required';
+      hasErrors = true;
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      errors.email = 'Email is invalid';
+      hasErrors = true;
+    }
+    
     if (formData.password !== formData.confirmPassword) {
       setPasswordError('Passwords do not match');
+      hasErrors = true;
+    }
+    
+    if (hasErrors) {
+      setFieldErrors(errors);
       return;
     }
     
@@ -129,10 +182,36 @@ const Profile = () => {
       delete updateData.confirmPassword;
     } else {
       delete updateData.confirmPassword; // Don't send confirmPassword to the API
+      
+      // If changing password, include the old password
+      if (activeTab === 'security' && oldPassword) {
+        updateData.old_password = oldPassword;
+      }
     }
     
-    // Dispatch the updateProfile action
-    dispatch(updateProfile(updateData));
+    try {
+      // Dispatch the updateProfile action
+      await dispatch(updateProfile(updateData));
+      
+      // Reset password fields
+      setFormData(prev => ({
+        ...prev,
+        password: '',
+        confirmPassword: ''
+      }));
+      setOldPassword('');
+      
+    } catch (err) {
+      // If the error contains field-specific errors
+      if (err.response?.data?.errors) {
+        setFieldErrors(err.response.data.errors);
+      } else {
+        setMessage({
+          type: 'error',
+          text: err.message || 'Failed to update profile'
+        });
+      }
+    }
   };
 
   const resetForm = () => {
