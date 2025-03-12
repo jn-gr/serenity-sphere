@@ -52,27 +52,6 @@ class JournalEntry(models.Model):
     def __str__(self):
         return f"Journal Entry by {self.user.email} on {self.date}"
 
-    def save(self, *args, **kwargs):
-        if not self.pk:
-            # Get the date part of the current entry's datetime
-            entry_date = self.date.date()
-            
-            # Look for any existing entries from the same user on the same date
-            existing_entry = JournalEntry.objects.filter(
-                user=self.user,
-                date__date=entry_date
-            ).first()
-            
-            if existing_entry:
-                # Instead of creating a new entry, update the existing one
-                self.pk = existing_entry.pk
-                self.id = existing_entry.id
-                self.created_at = existing_entry.created_at
-                # Keep the original date's time part
-                self.date = timezone.make_aware(datetime.combine(self.date.date(), existing_entry.date.time()))
-        
-        super().save(*args, **kwargs)
-    
 class MoodLog(models.Model):
     MOOD_CHOICES = [
         ('happy', 'Happy'),

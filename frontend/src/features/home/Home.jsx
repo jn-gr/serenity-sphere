@@ -3,17 +3,20 @@ import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaChartLine, FaBook, FaCalendarDay, FaRegSmile, FaRegSadTear, FaEllipsisH } from 'react-icons/fa';
+import { FaChartLine, FaBook, FaCalendarDay, FaRegSmile, FaRegSadTear, FaEllipsisH, FaChartPie } from 'react-icons/fa';
 import '../../styles/layouts/_home.css';
 import JournalPreview from '../journal/JournalPreview';
 import { fetchJournalEntries } from '../journal/journalSlice';
-import MoodChart from '../mood/MoodChart';
+import HomeMoodChart from '../mood/HomeMoodChart';
+import HomeMoodDistributionChart from '../mood/HomeMoodDistributionChart';
+import { fetchMoodTrends } from '../mood/moodSlice';
 
 const Home = () => {
   const dispatch = useDispatch();
   const { user, isAuthenticated } = useSelector(state => state.auth);
   const journalEntries = useSelector(state => state.journal.entries);
   const journalStatus = useSelector(state => state.journal.status);
+  const { trends, status: moodStatus } = useSelector(state => state.mood);
   const [greeting, setGreeting] = useState('');
   
   const today = new Date().toISOString().split('T')[0];
@@ -22,8 +25,13 @@ const Home = () => {
   );
 
   useEffect(() => {
-    if (isAuthenticated && journalStatus === 'idle') {
-      dispatch(fetchJournalEntries());
+    if (isAuthenticated) {
+      if (journalStatus === 'idle') {
+        dispatch(fetchJournalEntries());
+      }
+      if (moodStatus === 'idle') {
+        dispatch(fetchMoodTrends());
+      }
     }
     
     // Set greeting based on time of day
@@ -31,7 +39,36 @@ const Home = () => {
     if (hour < 12) setGreeting('Good morning');
     else if (hour < 18) setGreeting('Good afternoon');
     else setGreeting('Good evening');
-  }, [isAuthenticated, journalStatus, dispatch]);
+  }, [isAuthenticated, journalStatus, moodStatus, dispatch]);
+  
+  // Get most common and least common moods
+  const getMoodStats = () => {
+    if (!trends || trends.length === 0) {
+      return { mostCommon: 'N/A', leastCommon: 'N/A' };
+    }
+    
+    const moodCounts = {};
+    trends.forEach(item => {
+      if (!moodCounts[item.mood]) {
+        moodCounts[item.mood] = 0;
+      }
+      moodCounts[item.mood]++;
+    });
+    
+    const sortedMoods = Object.entries(moodCounts).sort((a, b) => b[1] - a[1]);
+    
+    const mostCommon = sortedMoods.length > 0 
+      ? sortedMoods[0][0].charAt(0).toUpperCase() + sortedMoods[0][0].slice(1)
+      : 'N/A';
+    
+    const leastCommon = sortedMoods.length > 1
+      ? sortedMoods[sortedMoods.length - 1][0].charAt(0).toUpperCase() + sortedMoods[sortedMoods.length - 1][0].slice(1)
+      : 'N/A';
+    
+    return { mostCommon, leastCommon };
+  };
+  
+  const { mostCommon, leastCommon } = getMoodStats();
 
   if (!isAuthenticated) {
     return (
@@ -340,7 +377,7 @@ const Home = () => {
             transition={{ delay: 0.3 }}
           >
             <div className="bg-[#1A2335] rounded-2xl border border-[#2A3547] p-6 h-full">
-              <div className="flex justify-between items-center mb-6">
+              <div className="flex justify-between items-center mb-4">
                 <div className="flex items-center gap-3">
                   <div className="bg-[#3E60C1]/20 p-2 rounded-lg">
                     <FaRegSmile className="text-[#5983FC]" />
@@ -358,25 +395,51 @@ const Home = () => {
                 </Link>
               </div>
               
+              {/* Mood Chart Visualization */}
               <div className="bg-[#0F172A] rounded-xl p-4 mb-4">
-                <MoodChart />
+                <h3 className="text-white text-sm font-medium mb-2 flex items-center">
+                  <FaChartLine className="text-[#5983FC] mr-2" />
+                  <span>Weekly Mood Trends</span>
+                </h3>
+                <HomeMoodChart />
               </div>
               
-              <div className="grid grid-cols-2 gap-3">
-                <div className="bg-[#0F172A] rounded-xl p-3 flex flex-col items-center">
-                  <div className="text-[#5983FC] mb-1">
-                    <FaRegSmile size={20} />
+              {/* Mood Distribution Chart */}
+              <div className="mb-4 grid grid-cols-2 gap-4">
+                <div className="col-span-1 bg-[#0F172A] rounded-xl p-4">
+                  <div className="flex items-center mb-2">
+                    <FaChartPie className="text-[#5983FC] mr-2" />
+                    <h3 className="text-white text-sm font-medium">Mood Distribution</h3>
                   </div>
-                  <p className="text-xs text-[#B8C7E0]">Most Common</p>
-                  <p className="text-white font-medium">Happy</p>
+                  <HomeMoodDistributionChart />
                 </div>
                 
-                <div className="bg-[#0F172A] rounded-xl p-3 flex flex-col items-center">
-                  <div className="text-[#5983FC] mb-1">
-                    <FaRegSadTear size={20} />
+                <div className="col-span-1 bg-[#0F172A] rounded-xl p-4">
+                  <div className="flex items-center mb-2">
+                    <FaRegSmile className="text-[#5983FC] mr-2" />
+                    <h3 className="text-white text-sm font-medium">Mood Stats</h3>
                   </div>
-                  <p className="text-xs text-[#B8C7E0]">Least Common</p>
-                  <p className="text-white font-medium">Sad</p>
+                  <div className="grid grid-rows-2 gap-3 h-36">
+                    <div className="bg-[#1A2335] rounded-lg p-3 flex items-center">
+                      <div className="text-[#5983FC] mr-3">
+                        <FaRegSmile size={16} />
+                      </div>
+                      <div>
+                        <p className="text-xs text-[#B8C7E0]">Most Common</p>
+                        <p className="text-white text-sm font-medium">{mostCommon}</p>
+                      </div>
+                    </div>
+                    
+                    <div className="bg-[#1A2335] rounded-lg p-3 flex items-center">
+                      <div className="text-[#5983FC] mr-3">
+                        <FaRegSadTear size={16} />
+                      </div>
+                      <div>
+                        <p className="text-xs text-[#B8C7E0]">Least Common</p>
+                        <p className="text-white text-sm font-medium">{leastCommon}</p>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>

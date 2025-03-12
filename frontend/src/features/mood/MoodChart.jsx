@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchMoodTrends } from './moodSlice';
 import { Line } from 'react-chartjs-2';
@@ -11,7 +11,8 @@ import {
   Title,
   Tooltip,
   Legend,
-  Filler
+  Filler,
+  BarElement
 } from 'chart.js';
 
 // Register Chart.js components
@@ -20,6 +21,7 @@ ChartJS.register(
   LinearScale,
   PointElement,
   LineElement,
+  BarElement,
   Title,
   Tooltip,
   Legend,
@@ -29,6 +31,9 @@ ChartJS.register(
 const MoodChart = () => {
   const dispatch = useDispatch();
   const { trends, status } = useSelector(state => state.mood);
+  const [showLegend, setShowLegend] = useState(false);
+  const [showDataPoints, setShowDataPoints] = useState(true);
+  const [smoothLines, setSmoothLines] = useState(true);
   
   useEffect(() => {
     if (status === 'idle') {
@@ -44,7 +49,7 @@ const MoodChart = () => {
     );
   }
   
-  if (status === 'failed' || trends.length === 0) {
+  if (status === 'failed' || !trends || trends.length === 0) {
     return (
       <div className="h-96 flex items-center justify-center flex-col">
         <p className="text-[#B8C7E0] mb-4">No mood data available yet.</p>
@@ -91,13 +96,11 @@ const MoodChart = () => {
     'remorseful': 1
   };
   
-  console.log("Mood trends data:", trends);
-  
   // Group by date and get average mood value
   const groupedByDate = trends.reduce((acc, item) => {
     const date = item.date;
     if (!acc[date]) {
-      acc[date] = { total: 0, count: 0 };
+      acc[date] = { total: 0, count: 0, moods: [] };
     }
     
     // If mood is not in our mapping, default to neutral (5)
@@ -111,6 +114,11 @@ const MoodChart = () => {
     
     acc[date].total += score;
     acc[date].count += 1;
+    acc[date].moods.push({
+      mood: item.mood,
+      intensity: item.intensity,
+      score: score
+    });
     return acc;
   }, {});
   
@@ -120,11 +128,32 @@ const MoodChart = () => {
     return total / count;
   });
   
+  // Calculate mood variability - standard deviation of mood scores
+  const average = moodScores.reduce((sum, score) => sum + score, 0) / moodScores.length;
+  const variance = moodScores.reduce((sum, score) => sum + Math.pow(score - average, 2), 0) / moodScores.length;
+  const stdDev = Math.sqrt(variance);
+  
+  // Calculate mood ranges - the difference between highest and lowest mood
+  const moodRange = moodScores.length > 0 ? 
+    Math.max(...moodScores) - Math.min(...moodScores) : 0;
+  
   // Format dates for display
   const formattedDates = dates.map(date => {
     const d = new Date(date);
     return `${d.getMonth() + 1}/${d.getDate()}`;
   });
+  
+  // Get gradient color based on mood score
+  const getGradientColor = (score) => {
+    if (score >= 8) return 'rgba(16, 185, 129, 0.1)'; // Emerald/Very Positive
+    if (score >= 6) return 'rgba(59, 130, 246, 0.1)'; // Blue/Positive
+    if (score >= 4) return 'rgba(99, 102, 241, 0.1)'; // Indigo/Neutral
+    if (score >= 2) return 'rgba(249, 115, 22, 0.1)'; // Orange/Negative
+    return 'rgba(239, 68, 68, 0.1)'; // Red/Very Negative
+  };
+
+  // Create a gradient background that changes based on mood score
+  const backgroundColors = moodScores.map(score => getGradientColor(score));
   
   const data = {
     labels: formattedDates,
@@ -133,14 +162,30 @@ const MoodChart = () => {
         label: 'Mood Score',
         data: moodScores,
         borderColor: '#5983FC',
-        backgroundColor: 'rgba(89, 131, 252, 0.1)',
-        tension: 0.4,
+        backgroundColor: ctx => {
+          // Return the color based on where we are in the dataset
+          const index = ctx.dataIndex;
+          return index !== undefined ? backgroundColors[index] : 'rgba(89, 131, 252, 0.1)';
+        },
+        borderWidth: 2,
+        tension: smoothLines ? 0.4 : 0,
         fill: true,
-        pointBackgroundColor: '#3E60C1',
+        pointBackgroundColor: ctx => {
+          if (!showDataPoints) return 'transparent';
+          
+          const index = ctx.dataIndex;
+          const score = moodScores[index];
+          
+          if (score >= 8) return '#10B981'; // Emerald/Very Positive
+          if (score >= 6) return '#3B82F6'; // Blue/Positive
+          if (score >= 4) return '#6366F1'; // Indigo/Neutral
+          if (score >= 2) return '#F97316'; // Orange/Negative
+          return '#EF4444'; // Red/Very Negative
+        },
         pointBorderColor: '#fff',
         pointBorderWidth: 2,
-        pointRadius: 4,
-        pointHoverRadius: 6,
+        pointRadius: showDataPoints ? 5 : 0,
+        pointHoverRadius: 7,
       },
     ],
   };
@@ -180,7 +225,11 @@ const MoodChart = () => {
     },
     plugins: {
       legend: {
-        display: false,
+        display: showLegend,
+        position: 'top',
+        labels: {
+          color: '#B8C7E0'
+        }
       },
       tooltip: {
         backgroundColor: '#1A2335',
@@ -213,15 +262,95 @@ const MoodChart = () => {
               `Overall: ${mood} (${score.toFixed(1)}/10)`,
               `Moods: ${moodsList}`
             ];
+          },
+          afterLabel: function(context) {
+            const date = dates[context.dataIndex];
+            const moods = groupedByDate[date].moods;
+            
+            if (moods.length > 1) {
+              return [
+                '',
+                'Mood Breakdown:',
+                ...moods.map(m => `• ${m.mood.charAt(0).toUpperCase() + m.mood.slice(1)}: ${m.intensity}/10`)
+              ];
+            }
+            return null;
           }
         }
       }
     }
   };
   
+  // Get stability assessment
+  const getStabilityAssessment = () => {
+    if (stdDev < 1) return "very stable";
+    if (stdDev < 1.5) return "relatively stable";
+    if (stdDev < 2.5) return "somewhat variable";
+    if (stdDev < 3.5) return "highly variable";
+    return "extremely variable";
+  };
+  
+  // Get trend description
+  const getTrendDescription = () => {
+    if (moodScores.length <= 2) return "Track more moods to see trends over time.";
+    
+    const firstHalf = moodScores.slice(0, Math.floor(moodScores.length / 2));
+    const secondHalf = moodScores.slice(Math.floor(moodScores.length / 2));
+    
+    const firstAvg = firstHalf.reduce((sum, score) => sum + score, 0) / firstHalf.length;
+    const secondAvg = secondHalf.reduce((sum, score) => sum + score, 0) / secondHalf.length;
+    
+    const difference = secondAvg - firstAvg;
+    
+    if (Math.abs(difference) < 0.5) return "Your mood has been relatively stable over this period.";
+    if (difference > 0) return "Your mood shows an improving trend over this period.";
+    return "Your mood shows a declining trend over this period.";
+  };
+  
   return (
-    <div className="h-96">
-      <Line data={data} options={options} />
+    <div className="h-[500px]">
+      <div className="mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+          <div className="bg-[#1A2335] p-3 rounded-lg border border-[#2A3547]">
+            <p className="text-[#B8C7E0] text-sm mb-1">Mood Stability</p>
+            <p className="text-white">{getStabilityAssessment()} <span className="text-sm text-[#B8C7E0]">({stdDev.toFixed(1)})</span></p>
+          </div>
+          <div className="bg-[#1A2335] p-3 rounded-lg border border-[#2A3547]">
+            <p className="text-[#B8C7E0] text-sm mb-1">Mood Range</p>
+            <p className="text-white">{moodRange.toFixed(1)} <span className="text-sm text-[#B8C7E0]">points</span></p>
+          </div>
+          <div className="bg-[#1A2335] p-3 rounded-lg border border-[#2A3547]">
+            <p className="text-[#B8C7E0] text-sm mb-1">Average Mood</p>
+            <p className="text-white">{average.toFixed(1)} <span className="text-sm text-[#B8C7E0]">/10</span></p>
+          </div>
+        </div>
+        <p className="text-[#B8C7E0] text-sm">{getTrendDescription()}</p>
+      </div>
+      
+      <div className="flex justify-end space-x-3 mb-4">
+        <button 
+          onClick={() => setShowDataPoints(!showDataPoints)}
+          className={`px-3 py-1 text-xs rounded ${showDataPoints ? 'bg-[#3E60C1] text-white' : 'bg-[#1A2335] text-[#B8C7E0]'}`}
+        >
+          Show Points
+        </button>
+        <button 
+          onClick={() => setSmoothLines(!smoothLines)}
+          className={`px-3 py-1 text-xs rounded ${smoothLines ? 'bg-[#3E60C1] text-white' : 'bg-[#1A2335] text-[#B8C7E0]'}`}
+        >
+          Smooth Lines
+        </button>
+        <button 
+          onClick={() => setShowLegend(!showLegend)}
+          className={`px-3 py-1 text-xs rounded ${showLegend ? 'bg-[#3E60C1] text-white' : 'bg-[#1A2335] text-[#B8C7E0]'}`}
+        >
+          Show Legend
+        </button>
+      </div>
+      
+      <div className="h-[300px]">
+        <Line data={data} options={options} />
+      </div>
     </div>
   );
 };

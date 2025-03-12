@@ -2,31 +2,47 @@ import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { motion } from 'framer-motion';
 import { fetchMoodLogs, fetchMoodTrends } from './moodSlice';
+import { 
+  FaCalendarAlt, 
+  FaChartLine, 
+  FaThermometerHalf, 
+  FaStickyNote, 
+  FaRegSmile, 
+  FaRegSadTear, 
+  FaRegMeh,
+  FaChartBar,
+  FaTable,
+  FaChartPie,
+  FaChartArea
+} from 'react-icons/fa';
 import MoodChart from './MoodChart';
-import { FaCalendarAlt, FaChartLine, FaThermometerHalf, FaStickyNote, FaRegSmile, FaRegSadTear, FaRegMeh } from 'react-icons/fa';
-import { Line } from 'react-chartjs-2';
+
+// Import the visualization components
+import MoodRadarChart from './components/MoodRadarChart';
+import MoodCalendarHeatmap from './components/MoodCalendarHeatmap';
+import MoodDistributionChart from './components/MoodDistributionChart';
+
+// Temporarily comment out the imported components that might be causing issues
+// import MoodRadarChart from './components/MoodRadarChart';
+// import MoodCalendarHeatmap from './components/MoodCalendarHeatmap';
+// import MoodDistributionChart from './components/MoodDistributionChart';
 
 const MoodLog = () => {
   const dispatch = useDispatch();
   const { logs, status, error, trends } = useSelector(state => state.mood);
   const [selectedPeriod, setSelectedPeriod] = useState('month');
   const [moodFilter, setMoodFilter] = useState('all');
-  const [isCalendarView, setIsCalendarView] = useState(false);
+  const [selectedView, setSelectedView] = useState('line');
+  const [selectedChart, setSelectedChart] = useState('line');
+  
+  // Debug log - this will help see if we're even getting to this component
+  console.log("MoodLog rendering, status:", status, "logs:", logs?.length || 0);
   
   useEffect(() => {
-    if (status === 'idle') {
-      dispatch(fetchMoodLogs());
-      dispatch(fetchMoodTrends());
-    }
-  }, [status, dispatch]);
-  
-  // Refresh mood logs when journal entries are updated
-  useEffect(() => {
-    const refreshInterval = setInterval(() => {
-      dispatch(fetchMoodLogs());
-    }, 5000); // Refresh every 5 seconds
-
-    return () => clearInterval(refreshInterval);
+    // Fetch mood data when component mounts
+    console.log("Dispatching fetch actions");
+    dispatch(fetchMoodLogs());
+    dispatch(fetchMoodTrends());
   }, [dispatch]);
   
   const getMoodIcon = (mood) => {
@@ -62,9 +78,13 @@ const MoodLog = () => {
     if (intensity >= 2) return 'bg-orange-400/20';
     return 'bg-red-400/20';
   };
+
+  // Safety check for logs
+  const safetyLogs = logs || [];
+  const safetyTrends = trends || [];
   
   // Group trends by date
-  const trendsByDate = logs.reduce((acc, log) => {
+  const trendsByDate = safetyLogs.reduce((acc, log) => {
     const date = log.date;
     if (!acc[date]) {
       acc[date] = [];
@@ -102,110 +122,93 @@ const MoodLog = () => {
       return trendsByDate[date].filter(log => log.mood === moodFilter);
     }
   });
-  
+
   // Get unique moods for filter dropdown
-  const uniqueMoods = [...new Set(logs.map(log => log.mood))];
+  const uniqueMoods = [...new Set(safetyLogs.map(log => log.mood))];
+
+  // Get most common mood
+  const getMostCommonMood = () => {
+    if (uniqueMoods.length === 0) return "N/A";
+    
+    const moodCounts = {};
+    safetyLogs.forEach(log => {
+      if (!moodCounts[log.mood]) {
+        moodCounts[log.mood] = 0;
+      }
+      moodCounts[log.mood]++;
+    });
+    
+    const sortedMoods = Object.entries(moodCounts)
+      .sort((a, b) => b[1] - a[1]);
+    
+    if (sortedMoods.length > 0) {
+      const topMood = sortedMoods[0][0];
+      return topMood.charAt(0).toUpperCase() + topMood.slice(1);
+    }
+    
+    return "N/A";
+  };
+
+  // Calculate average intensity
+  const getAverageIntensity = () => {
+    if (filteredLogs.length === 0) return "N/A";
+    
+    const sum = filteredLogs.reduce((acc, log) => acc + log.intensity, 0);
+    return (sum / filteredLogs.length).toFixed(1);
+  };
   
+  // Handle loading state with clear message
   if (status === 'loading') {
     return (
-      <div className="min-h-screen bg-[#0F172A] ml-64">
-        <div className="max-w-7xl mx-auto px-8 py-12">
-          <div className="h-96 flex items-center justify-center">
-            <div className="animate-pulse text-[#B8C7E0]">Loading mood data...</div>
-          </div>
+      <div className="min-h-screen bg-[#0F172A] ml-64 flex items-center justify-center">
+        <div className="animate-pulse text-[#B8C7E0] text-xl">
+          Loading mood data...
         </div>
       </div>
     );
   }
-  
+
+  // Handle error state
   if (status === 'failed') {
     return (
-      <div className="min-h-screen bg-[#0F172A] ml-64">
-        <div className="max-w-7xl mx-auto px-8 py-12">
-          <div className="h-96 flex items-center justify-center flex-col">
-            <p className="text-[#B8C7E0] mb-4">Error: {error}</p>
-            <p className="text-[#5983FC] text-sm">Start journaling to track your mood!</p>
-          </div>
+      <div className="min-h-screen bg-[#0F172A] ml-64 flex items-center justify-center">
+        <div className="text-red-400 text-xl">
+          Error loading mood data: {error}
         </div>
       </div>
     );
   }
-  
-  // Process the data for the chart
-  const moodData = trends.reduce((acc, log) => {
-    const date = new Date(log.date).toLocaleDateString();
-    if (!acc[date]) {
-      acc[date] = [];
-    }
-    acc[date].push({
-      mood: log.mood,
-      intensity: log.intensity
-    });
-    return acc;
-  }, {});
-
-  const chartData = {
-    labels: Object.keys(moodData),
-    datasets: [{
-      label: 'Mood Intensity',
-      data: Object.values(moodData).map(logs => {
-        // Average intensity if multiple moods per day
-        return logs.reduce((sum, log) => sum + log.intensity, 0) / logs.length;
-      }),
-      borderColor: '#5983FC',
-      tension: 0.4
-    }]
-  };
-
-  const chartOptions = {
-    responsive: true,
-    scales: {
-      y: {
-        beginAtZero: true,
-        max: 10
-      }
-    }
-  };
   
   return (
     <div className="min-h-screen bg-[#0F172A] ml-64">
       <div className="max-w-7xl mx-auto px-8 py-12">
         {/* Header */}
-        <motion.div 
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mb-10"
-        >
-          <h1 className="text-3xl font-bold text-white mb-2">Mood Log</h1>
+        <div className="mb-10">
+          <h1 className="text-3xl font-bold text-white mb-2">Mood Analytics</h1>
           <p className="text-[#B8C7E0]">
             Track and visualize your emotional journey over time
           </p>
-        </motion.div>
+        </div>
         
         {/* Controls */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="bg-[#1A2335] p-6 rounded-xl border border-[#2A3547] mb-8"
-        >
+        <div className="bg-[#1A2335] p-6 rounded-xl border border-[#2A3547] mb-8">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-4">
-            <div className="flex items-center space-x-2">
+            <div className="flex flex-wrap items-center gap-2">
               <button 
-                onClick={() => setIsCalendarView(false)}
-                className={`px-4 py-2 rounded-lg transition-colors ${!isCalendarView 
+                onClick={() => setSelectedView('chart')}
+                className={`px-4 py-2 rounded-lg transition-colors flex items-center gap-2 ${selectedView === 'chart' 
                   ? 'bg-[#3E60C1] text-white' 
                   : 'bg-[#0F172A] text-[#B8C7E0] hover:bg-[#2A3547]'}`}
               >
-                <FaChartLine className="inline mr-2" /> Chart View
+                <FaChartLine className="inline mr-1" /> Charts
               </button>
               <button 
-                onClick={() => setIsCalendarView(true)}
-                className={`px-4 py-2 rounded-lg transition-colors ${isCalendarView 
+                onClick={() => setSelectedView('list')}
+                className={`px-4 py-2 rounded-lg transition-colors flex items-center gap-2 ${selectedView === 'list' 
                   ? 'bg-[#3E60C1] text-white' 
                   : 'bg-[#0F172A] text-[#B8C7E0] hover:bg-[#2A3547]'}`}
               >
-                <FaCalendarAlt className="inline mr-2" /> List View
+                <FaTable className="inline mr-1" /> List View
               </button>
             </div>
             
@@ -257,11 +260,7 @@ const MoodLog = () => {
                 </div>
                 <div>
                   <p className="text-[#B8C7E0] text-sm">Most Common</p>
-                  <p className="text-white font-semibold">
-                    {uniqueMoods.length > 0 
-                      ? uniqueMoods[0].charAt(0).toUpperCase() + uniqueMoods[0].slice(1) 
-                      : "N/A"}
-                  </p>
+                  <p className="text-white font-semibold">{getMostCommonMood()}</p>
                 </div>
               </div>
             </div>
@@ -273,11 +272,7 @@ const MoodLog = () => {
                 </div>
                 <div>
                   <p className="text-[#B8C7E0] text-sm">Avg. Intensity</p>
-                  <p className="text-white font-semibold">
-                    {logs.length > 0 
-                      ? (logs.reduce((sum, log) => sum + log.intensity, 0) / logs.length).toFixed(1) 
-                      : "N/A"}
-                  </p>
+                  <p className="text-white font-semibold">{getAverageIntensity()}</p>
                 </div>
               </div>
             </div>
@@ -294,68 +289,167 @@ const MoodLog = () => {
               </div>
             </div>
           </div>
-        </motion.div>
+        </div>
         
-        {/* Chart or List View */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="bg-[#1A2335] p-6 rounded-xl border border-[#2A3547]"
-        >
-          {!isCalendarView ? (
-            <div className="h-96">
-              <Line data={chartData} options={chartOptions} />
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {filteredDates.map(date => (
-                <motion.div 
-                  key={date}
-                  initial={{ opacity: 0, y: 5 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="bg-[#0F172A] p-4 rounded-xl border border-[#2A3547]"
-                >
-                  <div className="flex justify-between items-center mb-3">
-                    <h3 className="text-white font-medium">
-                      {new Date(date).toLocaleDateString('en-US', { 
-                        weekday: 'long', 
-                        year: 'numeric', 
-                        month: 'long', 
-                        day: 'numeric' 
-                      })}
-                    </h3>
-                  </div>
-                  <div className="flex flex-wrap gap-2 mb-2">
-                    {trendsByDate[date]
-                      .filter(log => moodFilter === 'all' || log.mood === moodFilter)
-                      .map((log, idx) => (
-                        <div 
-                          key={idx} 
-                          className={`flex items-center gap-2 px-3 py-2 rounded-lg border ${getMoodColor(log.mood)}`}
-                        >
-                          <span>{getMoodIcon(log.mood)}</span>
-                          <span className="capitalize">{log.mood}</span>
-                          <div className={`ml-2 px-2 py-1 rounded-full text-xs ${getIntensityColor(log.intensity)}`}>
-                            {log.intensity}/10
-                          </div>
-                        </div>
-                      ))}
-                  </div>
-                </motion.div>
-              ))}
-              
-              {filteredDates.length === 0 && (
-                <div className="text-center py-8">
-                  <p className="text-[#B8C7E0]">No mood data found for the selected filters.</p>
+        {/* Main content area */}
+        <div className="bg-[#1A2335] p-6 rounded-xl border border-[#2A3547]">
+          {selectedView === 'chart' ? (
+            <>
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-xl font-semibold text-white">Mood Visualizations</h2>
+                <div className="flex items-center space-x-2">
+                  <button
+                    onClick={() => setSelectedChart('line')}
+                    className={`p-2 rounded-lg transition-colors ${
+                      selectedChart === 'line' 
+                        ? 'bg-[#3E60C1] text-white' 
+                        : 'bg-[#0F172A] text-[#B8C7E0] hover:bg-[#2A3547]'
+                    }`}
+                    title="Line Chart"
+                  >
+                    <FaChartLine />
+                  </button>
+                  <button
+                    onClick={() => setSelectedChart('radar')}
+                    className={`p-2 rounded-lg transition-colors ${
+                      selectedChart === 'radar' 
+                        ? 'bg-[#3E60C1] text-white' 
+                        : 'bg-[#0F172A] text-[#B8C7E0] hover:bg-[#2A3547]'
+                    }`}
+                    title="Radar Chart"
+                  >
+                    <FaChartPie />
+                  </button>
+                  <button
+                    onClick={() => setSelectedChart('distribution')}
+                    className={`p-2 rounded-lg transition-colors ${
+                      selectedChart === 'distribution' 
+                        ? 'bg-[#3E60C1] text-white' 
+                        : 'bg-[#0F172A] text-[#B8C7E0] hover:bg-[#2A3547]'
+                    }`}
+                    title="Distribution Chart"
+                  >
+                    <FaChartBar />
+                  </button>
+                  <button
+                    onClick={() => setSelectedChart('calendar')}
+                    className={`p-2 rounded-lg transition-colors ${
+                      selectedChart === 'calendar' 
+                        ? 'bg-[#3E60C1] text-white' 
+                        : 'bg-[#0F172A] text-[#B8C7E0] hover:bg-[#2A3547]'
+                    }`}
+                    title="Calendar Heatmap"
+                  >
+                    <FaCalendarAlt />
+                  </button>
                 </div>
-              )}
-            </div>
+              </div>
+              
+              <div className="bg-[#0F172A] p-4 rounded-xl border border-[#2A3547]">
+                {selectedChart === 'line' && <MoodChart />}
+                {selectedChart === 'radar' && <MoodRadarChart trends={trends} />}
+                {selectedChart === 'distribution' && <MoodDistributionChart trends={trends} />}
+                {selectedChart === 'calendar' && <MoodCalendarHeatmap trends={trends} />}
+              </div>
+            </>
+          ) : (
+            <>
+              <h2 className="text-xl font-semibold text-white mb-4">Mood Entries List</h2>
+              <div className="space-y-4 max-h-[600px] overflow-y-auto pr-2">
+                {filteredDates.length > 0 ? (
+                  filteredDates.map(date => (
+                    <div 
+                      key={date}
+                      className="bg-[#0F172A] p-4 rounded-xl border border-[#2A3547]"
+                    >
+                      <div className="flex justify-between items-center mb-3">
+                        <h3 className="text-white font-medium">
+                          {new Date(date).toLocaleDateString('en-US', { 
+                            weekday: 'long', 
+                            year: 'numeric', 
+                            month: 'long', 
+                            day: 'numeric' 
+                          })}
+                        </h3>
+                      </div>
+                      <div className="flex flex-wrap gap-2 mb-2">
+                        {trendsByDate[date]
+                          .filter(log => moodFilter === 'all' || log.mood === moodFilter)
+                          .map((log, idx) => (
+                            <div 
+                              key={idx} 
+                              className={`flex items-center gap-2 px-3 py-2 rounded-lg border ${getMoodColor(log.mood)}`}
+                            >
+                              <span>{getMoodIcon(log.mood)}</span>
+                              <span className="capitalize">{log.mood}</span>
+                              <div className={`ml-2 px-2 py-1 rounded-full text-xs ${getIntensityColor(log.intensity)}`}>
+                                {log.intensity}/10
+                              </div>
+                            </div>
+                          ))}
+                      </div>
+                      {trendsByDate[date][0]?.notes && (
+                        <p className="mt-2 text-sm text-[#B8C7E0] italic">
+                          "{trendsByDate[date][0].notes}"
+                        </p>
+                      )}
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-center py-8">
+                    <p className="text-[#B8C7E0]">No mood data found for the selected filters.</p>
+                  </div>
+                )}
+              </div>
+            </>
           )}
-        </motion.div>
+        </div>
+        
+        {/* Insights section */}
+        <div className="mt-8 bg-[#1A2335] p-6 rounded-xl border border-[#2A3547]">
+          <h2 className="text-xl font-semibold text-white mb-4">Mood Insights</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="bg-[#0F172A] p-5 rounded-xl border border-[#2A3547]">
+              <h3 className="text-[#5983FC] font-medium mb-3">Your Mood Pattern</h3>
+              <p className="text-[#B8C7E0]">
+                {filteredLogs.length > 5 ? (
+                  <>
+                    Based on your {filteredLogs.length} mood entries, you tend to experience 
+                    <span className="text-white font-medium"> {getMostCommonMood()} </span> 
+                    moods most frequently. Your average mood intensity is 
+                    <span className="text-white font-medium"> {getAverageIntensity()}/10</span>.
+                  </>
+                ) : (
+                  <>
+                    Add more mood entries to see insights about your mood patterns.
+                  </>
+                )}
+              </p>
+            </div>
+            
+            <div className="bg-[#0F172A] p-5 rounded-xl border border-[#2A3547]">
+              <h3 className="text-[#5983FC] font-medium mb-3">Mood Variability</h3>
+              <p className="text-[#B8C7E0]">
+                {filteredLogs.length > 5 ? (
+                  <>
+                    Your mood shows {uniqueMoods.length <= 2 ? 'low' : uniqueMoods.length <= 5 ? 'moderate' : 'high'} variability 
+                    with {uniqueMoods.length} different moods recorded in this period. 
+                    {uniqueMoods.length > 3 && (
+                      <span> You experience a diverse range of emotions.</span>
+                    )}
+                  </>
+                ) : (
+                  <>
+                    Track more moods to see insights about your emotional variability.
+                  </>
+                )}
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
 };
 
-export default MoodLog; 
+export default MoodLog;
