@@ -86,10 +86,7 @@ export const analyzeMoodTrends = (logs, period = 'week') => {
     };
   }
 
-  // =====================================
-  // NEW: Holt-Winters Exponential Smoothing
-  // =====================================
-  
+  //Holt-Winters Exponential Smoothing
   // Extract scores for time series analysis
   const scores = filteredMoodData.map(item => item.score);
   
@@ -227,10 +224,7 @@ export const analyzeMoodTrends = (logs, period = 'week') => {
   return analysis;
 };
 
-/**
- * Generates personalized recommendations based on mood analysis
- * Enhanced to use additional insights from the exponential smoothing model
- */
+
 function getRecommendations(moodState, trendStrength, suddenChange, expectedDirection, isVolatile) {
   // Handle volatility as a special case
   if (isVolatile) {
