@@ -338,7 +338,7 @@ const MoodLog = () => {
             </div>
           </div>
 
-          {/* Stats cards */}
+          
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <div className="bg-[#0F172A] rounded-xl p-4 border border-[#2A3547]">
               <div className="flex items-center">
@@ -390,7 +390,7 @@ const MoodLog = () => {
           </div>
         </div>
 
-        {/* Main content area */}
+        
         <div className="bg-[#1A2335] p-6 rounded-xl border border-[#2A3547]">
           {selectedView === 'chart' ? (
             <>
