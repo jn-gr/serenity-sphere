@@ -502,10 +502,10 @@ const MoodLog = () => {
             <>
               <h2 className="text-xl font-semibold text-white mb-4">Mood Analysis & Recommendations</h2>
 
-              {/* Show the MoodRecommendation component here */}
+              
               <MoodRecommendation logs={safetyLogs} selectedPeriod={selectedPeriod} />
 
-              {/* Additional insights */}
+              
               <div className="mt-8">
                 <h3 className="text-xl font-semibold text-white mb-4">Additional Insights</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
