@@ -549,7 +549,7 @@ const MoodLog = () => {
               </div>
             </>
           ) : (
-            // Forecast view (for selectedView === 'forecast')
+            
             <>
               <h2 className="text-xl font-semibold text-white mb-4">Mood Forecast</h2>
 
