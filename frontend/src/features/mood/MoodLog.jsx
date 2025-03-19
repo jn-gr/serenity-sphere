@@ -264,7 +264,7 @@ const MoodLog = () => {
   return (
     <div className="min-h-screen bg-[#0F172A] ml-64">
       <div className="max-w-7xl mx-auto px-8 py-12">
-        {/* Header */}
+        
         <div className="mb-10">
           <h1 className="text-3xl font-bold text-white mb-2">Mood Analytics</h1>
           <p className="text-[#B8C7E0]">
@@ -272,7 +272,7 @@ const MoodLog = () => {
           </p>
         </div>
 
-        {/* Controls */}
+        
         <div className="bg-[#1A2335] p-6 rounded-xl border border-[#2A3547] mb-8">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-4">
             <div className="flex flex-wrap items-center gap-2">
@@ -300,7 +300,7 @@ const MoodLog = () => {
               >
                 <FaLightbulb className="inline mr-1" /> Analysis
               </button>
-              {/* New Forecast tab button */}
+              
               <button
                 onClick={() => setSelectedView('forecast')}
                 className={`px-4 py-2 rounded-lg transition-colors flex items-center gap-2 ${selectedView === 'forecast'
