@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
-import { FaTimes, FaLightbulb, FaExternalLinkAlt } from 'react-icons/fa';
+import { FaTimes, FaLightbulb, FaExternalLinkAlt, FaRegSmileBeam, FaRegSadTear, FaRegMeh, FaHeartbeat, FaStar, FaChevronRight, FaChevronLeft } from 'react-icons/fa';
 import ExerciseModal from './ExerciseModal';
 
 const MoodCausePrompt = ({ notification, onClose }) => {
@@ -783,8 +783,8 @@ const MoodCausePrompt = ({ notification, onClose }) => {
           fallbackRecommendations = [
             {
               title: "Active Listening Exercise",
-              description: "Practice listening without interrupting, then summarize what you heard before responding.",
-              link: "/exercises/mindfulness"
+              description: "Learn to truly hear what others are saying through active listening techniques that strengthen relationships.",
+              link: "/exercises/active-listening"
             },
             {
               title: "Appreciation Practice",
@@ -820,6 +820,21 @@ const MoodCausePrompt = ({ notification, onClose }) => {
               title: "One Small Step",
               description: "Identify one small, manageable action you can take today to move forward in your transition.",
               link: "/exercises/default"
+            }
+          ];
+          break;
+          
+        case 'disappointment':
+          fallbackRecommendations = [
+            {
+              title: "Self-Compassion Practice",
+              description: "Learn to respond to disappointment with kindness rather than harsh self-criticism.",
+              link: "/exercises/self-compassion"
+            },
+            {
+              title: "Disappointment Reflection",
+              description: "Transform disappointment into growth through structured reflection.",
+              link: "/exercises/three-good-things"
             }
           ];
           break;
@@ -885,39 +900,140 @@ const MoodCausePrompt = ({ notification, onClose }) => {
     onClose(); // Close the prompt
   };
   
+  // Get an appropriate mood icon based on the dominant emotion
+  const getMoodIcon = () => {
+    if (!dominantEmotion) return <FaHeartbeat className="text-[#5983FC]" />;
+    
+    const positiveEmotions = [
+      'happy', 'excited', 'loving', 'optimistic', 'proud', 
+      'grateful', 'relieved', 'amused', 'calm', 'caring'
+    ];
+    
+    const neutralEmotions = [
+      'neutral', 'surprised', 'curious'
+    ];
+    
+    if (positiveEmotions.includes(dominantEmotion)) {
+      return <FaRegSmileBeam className="text-emerald-400" />;
+    } else if (neutralEmotions.includes(dominantEmotion)) {
+      return <FaRegMeh className="text-[#5983FC]" />;
+    } else {
+      return <FaRegSadTear className="text-amber-400" />;
+    }
+  };
+  
+  // Get color theme based on emotional state for UI elements
+  const getEmotionTheme = () => {
+    if (emotionalChange?.isPositive) {
+      return {
+        primary: 'bg-emerald-500',
+        secondary: 'bg-emerald-400/20',
+        border: 'border-emerald-500/30',
+        text: 'text-emerald-400',
+        hover: 'hover:bg-emerald-500/90',
+        selected: 'bg-emerald-500/20 border-emerald-500/50'
+      };
+    } else if (emotionalChange?.isNeutral) {
+      return {
+        primary: 'bg-[#3E60C1]',
+        secondary: 'bg-[#3E60C1]/20',
+        border: 'border-[#3E60C1]/30',
+        text: 'text-[#5983FC]',
+        hover: 'hover:bg-[#5983FC]',
+        selected: 'bg-[#3E60C1]/20 border-[#5983FC]'
+      };
+    } else {
+      return {
+        primary: 'bg-amber-500',
+        secondary: 'bg-amber-400/20',
+        border: 'border-amber-500/30',
+        text: 'text-amber-400',
+        hover: 'hover:bg-amber-500/90',
+        selected: 'bg-amber-500/20 border-amber-500/50'
+      };
+    }
+  };
+  
+  const theme = getEmotionTheme();
+  
+  // Get an appropriate greeting based on time of day
+  const getTimeBasedGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return "Good morning";
+    if (hour < 18) return "Good afternoon";
+    return "Good evening";
+  };
+
+  // Get positive reinforcement header based on dominant emotion
+  const getPositiveHeader = () => {
+    const headers = {
+      'happy': "Happiness Noticed!",
+      'excited': "Excitement Detected!",
+      'loving': "Feeling the Love!",
+      'optimistic': "Optimism Flowing!",
+      'proud': "Pride Recognized!",
+      'grateful': "Gratitude Observed!",
+      'calm': "Peaceful Moments!",
+      'default': "Positive Vibes!"
+    };
+    
+    return headers[dominantEmotion] || headers.default;
+  };
+
   return (
-    <>
+    <AnimatePresence>
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+        className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm"
       >
         <motion.div 
-          initial={{ scale: 0.9, y: 20 }}
-          animate={{ scale: 1, y: 0 }}
-          className="bg-[#1A2335] border border-[#3E60C1] rounded-xl p-6 max-w-md w-full max-h-[90vh] overflow-y-auto mx-4"
+          initial={{ scale: 0.9, y: 20, opacity: 0 }}
+          animate={{ scale: 1, y: 0, opacity: 1 }}
+          transition={{ type: "spring", damping: 25, stiffness: 300 }}
+          className="bg-gradient-to-b from-[#1A2335] to-[#1A2335]/95 border border-[#3E60C1]/30 rounded-2xl p-6 max-w-md w-full max-h-[90vh] overflow-y-auto mx-4 shadow-xl"
         >
-          {/* Show positive reinforcement UI when appropriate */}
-          {showPositiveReinforcement ? (
-            <>
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="text-xl font-semibold text-white">
-                  Maintaining Positive Emotions
-                </h3>
-                <button onClick={onClose} className="text-[#B8C7E0] hover:text-white">
-                  <FaTimes />
-                </button>
+          {/* Header section with dynamic icon and message */}
+          <div className="flex justify-between items-center mb-6">
+            <div className="flex items-center">
+              <div className={`w-10 h-10 rounded-full flex items-center justify-center ${theme.secondary} mr-3`}>
+                {getMoodIcon()}
               </div>
-              
+              <h3 className="text-xl font-bold text-white">
+                {showRecommendations 
+                  ? 'Personalized Insights' 
+                  : showPositiveReinforcement 
+                  ? getPositiveHeader()
+                  : 'Mood Change Detected'}
+              </h3>
+            </div>
+            <button 
+              onClick={onClose} 
+              className="w-8 h-8 rounded-full flex items-center justify-center text-[#B8C7E0] hover:bg-[#2A3547] transition-colors"
+              aria-label="Close"
+            >
+              <FaTimes />
+            </button>
+          </div>
+
+          {/* Positive reinforcement UI */}
+          {showPositiveReinforcement ? (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+            >
               <div className="mb-6">
-                <div className="bg-[#0F172A] p-4 rounded-lg border border-[#2A3547] mb-4">
+                <div className={`p-5 rounded-xl ${theme.secondary} ${theme.border} mb-5`}>
                   <div className="flex items-start">
-                    <div className="bg-green-500/20 p-2 rounded-full mr-3 mt-1">
-                      <FaLightbulb className="text-green-400" />
+                    <div className="bg-gradient-to-br from-emerald-400 to-emerald-600 p-3 rounded-lg shadow-md mr-4 flex-shrink-0">
+                      <FaRegSmileBeam className="text-white text-xl" />
                     </div>
                     <div>
-                      <h4 className="text-white font-medium mb-2">Great job!</h4>
+                      <h4 className="text-white font-semibold mb-2">
+                        {getTimeBasedGreeting()}, Wellness Champion!
+                      </h4>
                       <p className="text-[#B8C7E0]">
                         {getPositiveReinforcementMessage()}
                       </p>
@@ -925,145 +1041,211 @@ const MoodCausePrompt = ({ notification, onClose }) => {
                   </div>
                 </div>
                 
-                <div className="bg-[#0F172A] p-4 rounded-lg border border-[#2A3547]">
-                  <div className="flex items-start">
-                    <div className="bg-blue-500/20 p-2 rounded-full mr-3 mt-1">
-                      <FaLightbulb className="text-blue-400" />
-                    </div>
-                    <div>
-                      <h4 className="text-white font-medium mb-2">Wellness Tip</h4>
-                      <p className="text-[#B8C7E0]">
-                        {getWellnessTip()}
-                      </p>
-                    </div>
+                <div className="bg-[#0F172A]/70 p-5 rounded-xl border border-[#2A3547] mb-5">
+                  <h4 className="text-white font-semibold mb-3 flex items-center">
+                    <FaStar className="text-yellow-400 mr-2" /> Wellness Tip
+                  </h4>
+                  <p className="text-[#B8C7E0]">
+                    {getWellnessTip()}
+                  </p>
+                </div>
+
+                <div className="bg-[#0F172A]/70 p-5 rounded-xl border border-[#2A3547]">
+                  <h4 className="text-white font-semibold mb-3">Continue Your Journey</h4>
+                  <p className="text-[#B8C7E0] mb-4">
+                    Would you like to explore practices that can help maintain your positive state?
+                  </p>
+                  <div className="flex flex-wrap gap-3">
+                    {['Gratitude Practice', 'Mindfulness', 'Celebration Ritual'].map((practice, i) => (
+                      <div 
+                        key={i}
+                        className="bg-[#0F172A] border border-[#2A3547] rounded-lg py-2 px-4 text-[#B8C7E0] cursor-pointer hover:border-[#5983FC] transition-colors"
+                        onClick={() => {
+                          setActiveExercise({
+                            title: practice,
+                            description: `A practice to help maintain and enhance your ${dominantEmotion || 'positive'} feelings.`,
+                            link: practice === 'Gratitude Practice' 
+                              ? '/exercises/gratitude' 
+                              : practice === 'Mindfulness' 
+                              ? '/exercises/mindfulness'
+                              : '/exercises/three-good-things'
+                          });
+                        }}
+                      >
+                        {practice}
+                      </div>
+                    ))}
                   </div>
                 </div>
               </div>
               
               <button
                 onClick={handlePositiveAcknowledgment}
-                className="w-full px-4 py-2 rounded-lg bg-[#3E60C1] text-white hover:bg-[#5983FC] transition-colors"
+                className={`w-full py-3 rounded-lg ${theme.primary} text-white font-medium ${theme.hover} transition-colors shadow-md flex items-center justify-center`}
               >
-                Thanks!
+                Got it, thanks!
               </button>
-            </>
-          ) : (
-            <>
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="text-xl font-semibold text-white">
-                  {showRecommendations ? 'Recommendations' : 'What might be causing this?'}
-                </h3>
-                <button onClick={onClose} className="text-[#B8C7E0] hover:text-white">
-                  <FaTimes />
-                </button>
-              </div>
-              
-              {!showRecommendations ? (
-                <>
-                  <p className="text-[#B8C7E0] mb-4">
-                    {emotionalChange.isPositive
-                      ? `That's wonderful! Understanding what improves your ${dominantEmotion || 'mood'} can help maintain positive emotions.`
-                      : emotionalChange.isNeutral
-                      ? "Understanding these emotional shifts can provide valuable insights."
-                      : `Understanding what affects your ${dominantEmotion || 'mood'} can help us provide better support.`}
-                  </p>
-                  
-                  {/* Add a notice about false notifications */}
-                  <div className="bg-[#0F172A] p-3 rounded-lg border border-[#2A3547] mb-4">
-                    <p className="text-[#B8C7E0] text-sm">
-                      Did your mood actually change recently? If you haven't experienced a mood shift, you can indicate there was no change.
-                    </p>
-                    <button
-                      onClick={handleFalsePositive}
-                      className="text-[#5983FC] hover:text-[#3E60C1] text-sm mt-2 flex items-center"
-                    >
-                      No, my mood hasn't changed
-                    </button>
+            </motion.div>
+          ) : !showRecommendations ? (
+            // Mood change cause selection UI
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+            >
+              <div className="mb-6">
+                <p className={`text-[#B8C7E0] ${dominantEmotion ? 'mb-2' : 'mb-5'}`}>
+                  {emotionalChange.isPositive
+                    ? `That's wonderful! Understanding what improves your ${dominantEmotion || 'mood'} can help maintain positive emotions.`
+                    : emotionalChange.isNeutral
+                    ? "Understanding these emotional shifts can provide valuable insights for your well-being journey."
+                    : `Understanding what affects your ${dominantEmotion || 'mood'} can help us provide better support.`}
+                </p>
+                
+                {dominantEmotion && (
+                  <div className={`inline-block px-3 py-1 rounded-full ${theme.secondary} ${theme.text} text-sm font-medium mb-5`}>
+                    Feeling: {dominantEmotion.charAt(0).toUpperCase() + dominantEmotion.slice(1)}
                   </div>
-                  
-                  <div className="space-y-3 mb-6">
+                )}
+                
+                {/* False positive notice - more friendly design */}
+                <div className="bg-[#0F172A]/70 p-4 rounded-xl border border-[#2A3547] mb-5">
+                  <p className="text-[#B8C7E0] text-sm">
+                    Not experiencing a mood change? If our detection doesn't match your experience, you can let us know.
+                  </p>
+                  <button
+                    onClick={handleFalsePositive}
+                    className="text-[#5983FC] hover:text-[#3E60C1] text-sm mt-2 flex items-center group"
+                  >
+                    <span>This isn't accurate for me</span>
+                    <FaChevronRight className="ml-1 text-xs transition-transform group-hover:translate-x-1" />
+                  </button>
+                </div>
+                
+                {/* Cause options with enhanced styling */}
+                <div className="mb-5">
+                  <h4 className="text-white font-medium mb-3">What might be contributing to this?</h4>
+                  <div className="space-y-2">
                     {getCauseOptions().map(option => (
-                      <div 
+                      <motion.div 
                         key={option.id}
+                        whileHover={{ scale: 1.01 }}
+                        whileTap={{ scale: 0.99 }}
                         onClick={() => setSelectedCause(option.id)}
-                        className={`p-3 rounded-lg border cursor-pointer transition-colors ${
+                        className={`p-3 rounded-lg border cursor-pointer transition-all ${
                           selectedCause === option.id
-                            ? 'bg-[#3E60C1]/20 border-[#5983FC] text-white'
-                            : 'bg-[#0F172A] border-[#2A3547] text-[#B8C7E0] hover:border-[#3E60C1]'
+                            ? `${theme.selected} text-white`
+                            : 'bg-[#0F172A]/70 border-[#2A3547] text-[#B8C7E0] hover:border-[#3E60C1]'
                         }`}
                       >
-                        {option.label}
-                      </div>
+                        <div className="flex items-center">
+                          <div className={`w-4 h-4 rounded-full mr-3 border-2 flex items-center justify-center ${
+                            selectedCause === option.id 
+                              ? `border-${theme.text.split('-')[1]} bg-${theme.text.split('-')[1]}/10` 
+                              : 'border-[#3E60C1]'
+                          }`}>
+                            {selectedCause === option.id && (
+                              <div className={`w-2 h-2 rounded-full ${theme.text}`}></div>
+                            )}
+                          </div>
+                          {option.label}
+                        </div>
+                      </motion.div>
                     ))}
                   </div>
-                  
-                  <div className="flex justify-end space-x-3">
-                    <button
-                      onClick={onClose}
-                      className="px-4 py-2 rounded-lg text-[#B8C7E0] hover:text-white transition-colors"
+                </div>
+              </div>
+              
+              <div className="flex justify-end space-x-3">
+                <button
+                  onClick={onClose}
+                  className="px-4 py-2 rounded-lg text-[#B8C7E0] hover:text-white transition-colors flex items-center"
+                >
+                  <FaTimes className="mr-1" /> Skip
+                </button>
+                <button
+                  onClick={handleSubmit}
+                  disabled={!selectedCause || isLoading}
+                  className={`px-6 py-2 rounded-lg flex items-center shadow-md ${
+                    selectedCause && !isLoading
+                      ? `${theme.primary} text-white ${theme.hover}`
+                      : 'bg-[#2A3547] text-[#B8C7E0] cursor-not-allowed'
+                  } transition-colors`}
+                >
+                  {isLoading ? (
+                    <>
+                      <svg className="animate-spin h-4 w-4 mr-2 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      Processing
+                    </>
+                  ) : (
+                    <>
+                      Submit <FaChevronRight className="ml-2" />
+                    </>
+                  )}
+                </button>
+              </div>
+            </motion.div>
+          ) : (
+            // Recommendations UI with enhanced styling
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+            >
+              <p className="text-[#B8C7E0] mb-6">
+                {emotionalChange.isPositive
+                  ? `Here are some ideas to help maintain your positive ${dominantEmotion || 'mood'}:`
+                  : emotionalChange.isNeutral
+                  ? "Based on your input, here are some considerations that might be helpful:"
+                  : `Based on what you shared, here are some suggestions that might help with your ${dominantEmotion || 'feelings'}:`}
+              </p>
+              
+              <div className="space-y-4 mb-6">
+                {recommendations.length > 0 ? (
+                  recommendations.map((rec, index) => (
+                    <motion.div 
+                      key={index} 
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.1 + index * 0.1 }}
+                      className="bg-[#0F172A]/70 p-5 rounded-xl border border-[#2A3547] hover:border-[#3E60C1]/50 transition-colors"
                     >
-                      Skip
-                    </button>
-                    <button
-                      onClick={handleSubmit}
-                      disabled={!selectedCause || isLoading}
-                      className={`px-4 py-2 rounded-lg ${
-                        selectedCause && !isLoading
-                          ? 'bg-[#3E60C1] text-white hover:bg-[#5983FC]'
-                          : 'bg-[#2A3547] text-[#B8C7E0] cursor-not-allowed'
-                      } transition-colors`}
-                    >
-                      {isLoading ? 'Loading...' : 'Submit'}
-                    </button>
-                  </div>
-                </>
-              ) : (
-                <>
-                  <p className="text-[#B8C7E0] mb-4">
-                    {emotionalChange.isPositive
-                      ? `Here are some ideas to help maintain your positive ${dominantEmotion || 'mood'}:`
-                      : emotionalChange.isNeutral
-                      ? "Based on your input, here are some considerations:"
-                      : `Based on your input, here are some suggestions that might help with your ${dominantEmotion || 'feelings'}:`}
-                  </p>
-                  
-                  <div className="space-y-4 mb-6">
-                    {recommendations.length > 0 ? (
-                      recommendations.map((rec, index) => (
-                        <div key={index} className="bg-[#0F172A] p-4 rounded-lg border border-[#2A3547]">
-                          <div className="flex items-start">
-                            <FaLightbulb className="text-yellow-400 mt-1.5 mr-3 flex-shrink-0" />
-                            <div>
-                              <h4 className="text-white font-medium mb-2">{rec.title}</h4>
-                              <p className="text-[#B8C7E0] text-sm">{rec.description}</p>
-                              {rec.link && (
-                                <button 
-                                  onClick={() => handleRecommendationClick(rec)}
-                                  className="flex items-center text-[#5983FC] hover:text-[#3E60C1] text-sm mt-2"
-                                >
-                                  Try this exercise <FaExternalLinkAlt className="ml-1 text-xs" />
-                                </button>
-                              )}
-                            </div>
-                          </div>
+                      <div className="flex items-start">
+                        <div className={`${theme.secondary} p-3 rounded-lg mr-4 flex-shrink-0`}>
+                          <FaLightbulb className={theme.text} />
                         </div>
-                      ))
-                    ) : (
-                      <div className="text-center py-4">
-                        <p className="text-[#B8C7E0]">No specific recommendations found. Try a different category.</p>
+                        <div className="flex-1">
+                          <h4 className="text-white font-medium mb-2">{rec.title}</h4>
+                          <p className="text-[#B8C7E0] text-sm mb-3">{rec.description}</p>
+                          {rec.link && (
+                            <button 
+                              onClick={() => handleRecommendationClick(rec)}
+                              className={`flex items-center ${theme.text} hover:underline text-sm group`}
+                            >
+                              Try this exercise <FaExternalLinkAlt className="ml-1 text-xs group-hover:translate-x-1 transition-transform" />
+                            </button>
+                          )}
+                        </div>
                       </div>
-                    )}
+                    </motion.div>
+                  ))
+                ) : (
+                  <div className="text-center py-6 bg-[#0F172A]/70 rounded-xl border border-[#2A3547]">
+                    <p className="text-[#B8C7E0]">No specific recommendations found. Try selecting a different cause.</p>
                   </div>
-                  
-                  <button
-                    onClick={onClose}
-                    className="w-full px-4 py-2 rounded-lg bg-[#3E60C1] text-white hover:bg-[#5983FC] transition-colors"
-                  >
-                    Close
-                  </button>
-                </>
-              )}
-            </>
+                )}
+              </div>
+              
+              <button
+                onClick={onClose}
+                className={`w-full py-3 rounded-lg ${theme.primary} text-white font-medium ${theme.hover} transition-colors shadow-md flex items-center justify-center`}
+              >
+                Close <FaTimes className="ml-2" />
+              </button>
+            </motion.div>
           )}
         </motion.div>
       </motion.div>
@@ -1075,7 +1257,7 @@ const MoodCausePrompt = ({ notification, onClose }) => {
           onClose={() => setActiveExercise(null)} 
         />
       )}
-    </>
+    </AnimatePresence>
   );
 };
 

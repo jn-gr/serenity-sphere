@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { FaTimes, FaSave, FaRegLightbulb, FaCheck, FaArrowRight, FaArrowLeft, FaPlay, FaPause } from 'react-icons/fa';
+import { FaTimes, FaSave, FaRegLightbulb, FaCheck, FaArrowRight, FaArrowLeft, FaPlay, FaPause, FaExternalLinkAlt } from 'react-icons/fa';
 
 const ExerciseModal = ({ exercise, onClose }) => {
   const [journalEntry, setJournalEntry] = useState('');
@@ -39,8 +39,8 @@ const ExerciseModal = ({ exercise, onClose }) => {
           'grief-journal': {
             title: "Grief Journaling Exercise",
             description: "Writing about your grief can help process emotions and honor your memories.",
-      steps: [
-        {
+            steps: [
+              {
                 title: "Prepare",
                 content: "Find a quiet space where you won't be interrupted. Take a few deep breaths to center yourself."
               },
@@ -70,6 +70,28 @@ const ExerciseModal = ({ exercise, onClose }) => {
               "You can save your journal entries to revisit when you need to feel connected.",
               "There's no timeline for grief. Be patient with yourself in this process."
             ],
+            resources: [
+              {
+                title: "What is Normal Grief? | Mayo Clinic",
+                description: "Expert information about grief processes and coping strategies",
+                link: "https://www.mayoclinic.org/patient-visitor-guide/support-groups/what-is-grief"
+              },
+              {
+                title: "Coping with Grief and Loss | HelpGuide.org",
+                description: "Comprehensive guide to understanding and navigating grief",
+                link: "https://www.helpguide.org/articles/grief/coping-with-grief-and-loss.htm"
+              },
+              {
+                title: "The Ball in the Box: A Helpful Analogy for Grief | Twitter Thread",
+                description: "A simple but profound way to understand how grief changes over time",
+                link: "https://twitter.com/LaurenHerschel/status/946887540732915712"
+              },
+              {
+                title: "What's Your Grief: 64 Journaling Prompts",
+                description: "Extensive list of journaling prompts specifically for grief",
+                link: "https://whatsyourgrief.com/64-journaling-prompts-for-coping-with-grief/"
+              }
+            ],
             type: "journal"
           },
           
@@ -77,8 +99,8 @@ const ExerciseModal = ({ exercise, onClose }) => {
           'breathing': {
             title: "4-7-8 Breathing Technique",
             description: "A calming breathing exercise to help reduce anxiety and stress.",
-      steps: [
-        {
+            steps: [
+              {
                 title: "Prepare",
                 content: "Find a comfortable sitting position. Place the tip of your tongue against the ridge behind your upper front teeth."
               },
@@ -100,6 +122,23 @@ const ExerciseModal = ({ exercise, onClose }) => {
               "This exercise is especially helpful before bed or during moments of stress.",
               "The ratio of 4:7:8 is important, but you can adjust the actual time if needed.",
               "You may feel lightheaded at first - this is normal and will pass with practice."
+            ],
+            resources: [
+              {
+                title: "The 4-7-8 Breathing Technique | Dr. Andrew Weil",
+                description: "Video demonstration by Dr. Weil who popularized this technique",
+                link: "https://www.drweil.com/videos-features/videos/breathing-exercises-4-7-8-breath/"
+              },
+              {
+                title: "Harvard Health: Relaxation techniques: Breath control helps quell errant stress response",
+                description: "Scientific explanation of how breathing exercises affect stress",
+                link: "https://www.health.harvard.edu/mind-and-mood/relaxation-techniques-breath-control-helps-quell-errant-stress-response"
+              },
+              {
+                title: "Guided 4-7-8 Breathing Exercise | YouTube",
+                description: "Follow along with this guided video for proper technique",
+                link: "https://www.youtube.com/watch?v=PmBYdfv5RSk"
+              }
             ],
             type: "breathing"
           },
@@ -133,6 +172,23 @@ const ExerciseModal = ({ exercise, onClose }) => {
               "If you're in a situation where you can't speak aloud, just note each observation silently.",
               "For a shorter exercise, you can do a 3-2-1 version with just three senses.",
               "Practice regularly to make this technique more effective during high-anxiety moments."
+            ],
+            resources: [
+              {
+                title: "Grounding Techniques | University of Rochester Medical Center",
+                description: "Evidence-based grounding techniques from mental health experts",
+                link: "https://www.urmc.rochester.edu/behavioral-health-partners/bhp-blog/april-2018/5-4-3-2-1-coping-technique-for-anxiety.aspx"
+              },
+              {
+                title: "How to Ground Yourself During an Anxiety Attack | Healthline",
+                description: "Practical strategies for using grounding during high anxiety moments",
+                link: "https://www.healthline.com/health/grounding-techniques"
+              },
+              {
+                title: "VA: PTSD Coach Online - Grounding Exercises",
+                description: "Collection of grounding exercises from the Veterans Administration",
+                link: "https://www.ptsd.va.gov/apps/ptsdcoachonline/tools/index.htm"
+              }
             ],
             type: "sensory"
           },
@@ -175,6 +231,23 @@ const ExerciseModal = ({ exercise, onClose }) => {
               "Breathe normally throughout the exercise, except when specifically instructed otherwise.",
               "Practice regularly for best results - aim for once or twice daily."
             ],
+            resources: [
+              {
+                title: "Progressive Muscle Relaxation | Anxiety Canada",
+                description: "Detailed guide with audio instructions for PMR",
+                link: "https://www.anxietycanada.com/articles/how-to-do-progressive-muscle-relaxation/"
+              },
+              {
+                title: "The Science Behind Progressive Muscle Relaxation | American Psychological Association",
+                description: "Scientific research on the effectiveness of progressive muscle relaxation",
+                link: "https://www.apa.org/topics/stress/relaxation"
+              },
+              {
+                title: "15-Minute Progressive Muscle Relaxation | YouTube",
+                description: "Guided video to follow along with a full PMR session",
+                link: "https://www.youtube.com/watch?v=1nZEdqcGVzo"
+              }
+            ],
             type: "physical"
           },
           
@@ -213,6 +286,23 @@ const ExerciseModal = ({ exercise, onClose }) => {
               "Consider surprising or unexpected things you're grateful for.",
               "Make this a regular practice - daily or weekly - for maximum benefit."
             ],
+            resources: [
+              {
+                title: "The Science of Gratitude | Greater Good Science Center, UC Berkeley",
+                description: "Research on the psychological benefits of gratitude practice",
+                link: "https://greatergood.berkeley.edu/topic/gratitude/definition"
+              },
+              {
+                title: "Giving Thanks Can Make You Happier | Harvard Health",
+                description: "Harvard's perspective on the mental health benefits of gratitude",
+                link: "https://www.health.harvard.edu/healthbeat/giving-thanks-can-make-you-happier"
+              },
+              {
+                title: "How Gratitude Changes You and Your Brain | Greater Good Magazine",
+                description: "Research findings on the neural effects of gratitude practice",
+                link: "https://greatergood.berkeley.edu/article/item/how_gratitude_changes_you_and_your_brain"
+              }
+            ],
             type: "journal"
           },
           'three-good-things': {
@@ -241,6 +331,23 @@ const ExerciseModal = ({ exercise, onClose }) => {
               "Keep a dedicated journal for your Three Good Things practice to build a collection of positive memories.",
               "Even on difficult days, challenge yourself to find three positive moments, no matter how small.",
               "Look for patterns over time - what consistently brings you joy or satisfaction?"
+            ],
+            resources: [
+              {
+                title: "Three Good Things Exercise | Positive Psychology Center, UPenn",
+                description: "The original research-backed Three Good Things practice from Dr. Martin Seligman's team",
+                link: "https://ppc.sas.upenn.edu/resources/three-good-things-exercise"
+              },
+              {
+                title: "The Three Good Things Exercise | Action for Happiness",
+                description: "Detailed instructions and variations on the practice",
+                link: "https://www.actionforhappiness.org/take-action/find-three-good-things-each-day"
+              },
+              {
+                title: "The Science of Three Good Things | Psychology Today",
+                description: "Scientific research on why this simple exercise is so effective",
+                link: "https://www.psychologytoday.com/us/blog/click-here-happiness/201807/the-three-good-things-exercise"
+              }
             ],
             type: "journal"
           },
@@ -285,6 +392,28 @@ const ExerciseModal = ({ exercise, onClose }) => {
               "Be kind to yourself when your mind wanders. This is part of the practice, not a failure.",
               "Try using a timer so you don't need to check the time during your practice."
             ],
+            resources: [
+              {
+                title: "Getting Started with Mindfulness | Mindful.org",
+                description: "Comprehensive beginner's guide to mindfulness meditation",
+                link: "https://www.mindful.org/meditation/mindfulness-getting-started/"
+              },
+              {
+                title: "How to Meditate | The New York Times",
+                description: "Well-respected guide for beginners from The New York Times",
+                link: "https://www.nytimes.com/guides/well/how-to-meditate"
+              },
+              {
+                title: "Body Scan Meditation | Guided Practice from UCLA",
+                description: "Free guided audio meditation from UCLA's Mindful Awareness Research Center",
+                link: "https://www.uclahealth.org/programs/marc/mindful-meditations"
+              },
+              {
+                title: "The Science of Mindfulness | Harvard Health",
+                description: "Research on the benefits of mindfulness meditation",
+                link: "https://www.health.harvard.edu/blog/mindfulness-meditation-may-ease-anxiety-mental-stress-201401086967"
+              }
+            ],
             type: "meditation"
           },
           
@@ -320,6 +449,28 @@ const ExerciseModal = ({ exercise, onClose }) => {
               "Regular physical exercise can help reduce overall stress and make anger management easier.",
               "If anger is a frequent issue that impacts your relationships or wellbeing, consider speaking with a mental health professional."
             ],
+            resources: [
+              {
+                title: "Controlling Anger Before It Controls You | American Psychological Association",
+                description: "Expert strategies for managing anger from the APA",
+                link: "https://www.apa.org/topics/anger/control"
+              },
+              {
+                title: "How to Control Anger: 25 Tips to Manage Your Anger | Healthline",
+                description: "Practical techniques for immediate and long-term anger management",
+                link: "https://www.healthline.com/health/mental-health/how-to-control-anger"
+              },
+              {
+                title: "Anger Management: 10 Tips to Tame Your Temper | Mayo Clinic",
+                description: "Evidence-based approaches to managing anger from medical experts",
+                link: "https://www.mayoclinic.org/healthy-lifestyle/adult-health/in-depth/anger-management/art-20045434"
+              },
+              {
+                title: "Strategies to Keep Anger at Bay | HelpGuide.org",
+                description: "Comprehensive guide with specific techniques for different situations",
+                link: "https://www.helpguide.org/articles/relationships-communication/anger-management.htm"
+              }
+            ],
             type: "coping"
           },
           
@@ -327,8 +478,8 @@ const ExerciseModal = ({ exercise, onClose }) => {
           'default': {
             title: exercise.title || "Mindfulness Exercise",
             description: exercise.description || "A guided exercise to help with your well-being.",
-      steps: [
-        {
+            steps: [
+              {
                 title: "Center",
                 content: "Find a comfortable position and take a few moments to center yourself."
               },
@@ -347,6 +498,125 @@ const ExerciseModal = ({ exercise, onClose }) => {
               "Even a few minutes of practice can be beneficial."
             ],
             type: "general"
+          },
+          'active-listening': {
+            title: "Active Listening Practice",
+            description: "Active listening is a powerful skill that strengthens relationships and improves understanding. This practice will help you develop your active listening abilities.",
+            steps: [
+              {
+                title: "Understanding Active Listening",
+                content: "Active listening means fully concentrating on what someone is saying, understanding their message, responding thoughtfully, and remembering key information. It's about being present rather than just waiting for your turn to speak."
+              },
+              {
+                title: "Key Components",
+                content: "Active listening involves several key behaviors: maintaining eye contact, giving verbal and non-verbal feedback, avoiding interruptions, asking clarifying questions, paraphrasing to confirm understanding, and responding thoughtfully."
+              },
+              {
+                title: "Practice Exercise",
+                content: "Next time you're in a conversation, try the RASA technique: Receive (pay attention), Appreciate (nod, say 'hmm'), Summarize ('So what you're saying is...'), and Ask questions to clarify or deepen understanding."
+              },
+              {
+                title: "Reflection",
+                content: "After practicing, reflect on: How did it feel to listen this way? What did you notice about the speaker's response? What was challenging? What insights did you gain that you might have missed otherwise?"
+              }
+            ],
+            resources: [
+              {
+                title: "The Power of Listening | William Ury | TEDxSanDiego",
+                description: "A compelling TED talk on the transformative power of listening",
+                link: "https://www.youtube.com/watch?v=saXfavo1OQo"
+              },
+              {
+                title: "10 Steps To Effective Listening - Forbes",
+                description: "Practical steps to improve your listening skills",
+                link: "https://www.forbes.com/sites/womensmedia/2012/11/09/10-steps-to-effective-listening/"
+              },
+              {
+                title: "Active Listening - Mind Tools",
+                description: "Comprehensive guide to active listening techniques",
+                link: "https://www.mindtools.com/CommSkll/ActiveListening.htm"
+              },
+              {
+                title: "Julian Treasure: 5 Ways To Listen Better | TED Talk",
+                description: "Learn how to listen consciously in this popular TED talk",
+                link: "https://www.ted.com/talks/julian_treasure_5_ways_to_listen_better"
+              }
+            ],
+            tips: [
+              "Focus completely on the speaker and remove distractions (put away your phone, turn off notifications).",
+              "Show that you're listening through your body language - face the person, maintain appropriate eye contact, and nod occasionally.",
+              "Avoid preparing your response while the other person is still talking.",
+              "Ask open-ended questions that encourage elaboration rather than yes/no answers.",
+              "Practice empathy by trying to understand the speaker's perspective, even if you disagree.",
+              "Provide feedback by paraphrasing ('What I'm hearing is...') to ensure you've understood correctly."
+            ],
+            exercises: [
+              {
+                title: "One-Minute Exercise",
+                description: "In your next conversation, try counting to 1 silently after the person stops speaking before you respond. This small pause ensures they're finished and gives you time to consider your response."
+              },
+              {
+                title: "Paraphrasing Practice",
+                description: "In your next three conversations, challenge yourself to paraphrase what the speaker has said before responding with your own thoughts."
+              },
+              {
+                title: "Emotion Recognition",
+                description: "During a conversation, try to identify the emotions behind what the person is saying, not just the content. You might note to yourself: 'They seem excited about this' or 'I sense frustration in their voice.'"
+              }
+            ],
+            type: "relationship"
+          },
+          'self-compassion': {
+            title: "Self-Compassion Practice",
+            description: "Learn to treat yourself with the same kindness and understanding you would offer to a good friend.",
+            steps: [
+              {
+                title: "Recognize Suffering",
+                content: "Notice when you're experiencing difficulty or emotional pain. Acknowledge it with phrases like 'This is a moment of suffering' or 'This is hard right now.'"
+              },
+              {
+                title: "Remember Common Humanity",
+                content: "Remind yourself that suffering is part of the shared human experience. Many others have felt what you're feeling. Try saying: 'Everyone struggles sometimes' or 'I'm not alone in this feeling.'"
+              },
+              {
+                title: "Offer Kindness",
+                content: "Speak to yourself with warmth and understanding. Place a hand on your heart if that feels comfortable. Ask: 'What do I need to hear right now?' Then offer those words to yourself."
+              },
+              {
+                title: "Physical Self-Compassion",
+                content: "Take a self-compassion break by giving yourself physical comfort. This might be a gentle hand on your cheek, a deep breath, or a moment of rest. Honor what your body needs right now."
+              }
+            ],
+            resources: [
+              {
+                title: "Self-Compassion Guided Practices and Exercises | Dr. Kristin Neff",
+                description: "Free resources from the leading researcher on self-compassion",
+                link: "https://self-compassion.org/category/exercises/"
+              },
+              {
+                title: "The Three Elements of Self-Compassion | Greater Good Magazine",
+                description: "Learn about the three components that make up self-compassion",
+                link: "https://greatergood.berkeley.edu/article/item/the_three_parts_of_self_compassion"
+              },
+              {
+                title: "Self-Compassion Break | Guided Audio Practice",
+                description: "Follow along with this 5-minute guided self-compassion exercise",
+                link: "https://self-compassion.org/wp-content/uploads/2015/12/self-compassion.break_.mp3"
+              },
+              {
+                title: "The Science of Self-Compassion | Stanford Medicine",
+                description: "Research on how self-compassion affects mental and physical health",
+                link: "https://med.stanford.edu/compassion/research.html"
+              }
+            ],
+            tips: [
+              "Try to use the same supportive tone you would use with a good friend going through a difficult time.",
+              "It's normal to feel resistance to self-compassion at first. Notice this without judgment.",
+              "Start with small moments of difficulty before tackling your biggest challenges.",
+              "Practice regularly, even when you're feeling good, to build the self-compassion habit.",
+              "Remember that self-compassion is not self-pity or self-indulgence—it's about honest kindness."
+            ],
+            type: "emotional"
           }
         };
         
@@ -570,8 +840,8 @@ const ExerciseModal = ({ exercise, onClose }) => {
                 Recommended duration: 5-10 minutes for beginners
               </p>
             </div>
-                </div>
-              )}
+          </div>
+        )}
         
         {/* Journal entry area for journal-type exercises */}
         {exerciseContent?.type === 'journal' && (
@@ -635,6 +905,52 @@ const ExerciseModal = ({ exercise, onClose }) => {
                   <li key={index} className="flex items-start">
                     <FaRegLightbulb className="text-yellow-400 mt-1 mr-2 flex-shrink-0" />
                     <span className="text-[#B8C7E0]">{tip}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        )}
+        
+        {/* External resources section */}
+        {exerciseContent?.resources && (
+          <div className="mb-6">
+            <h4 className="text-white font-medium mb-2">Recommended Resources</h4>
+            <div className="bg-[#0F172A] rounded-lg border border-[#2A3547] p-4">
+              <ul className="space-y-4">
+                {exerciseContent.resources.map((resource, index) => (
+                  <li key={index} className="border-b border-[#2A3547] last:border-0 pb-3 last:pb-0">
+                    <a 
+                      href={resource.link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-[#5983FC] hover:text-[#3E60C1] font-medium block mb-1"
+                    >
+                      {resource.title} <FaExternalLinkAlt className="inline-block ml-1 text-xs" />
+                    </a>
+                    <p className="text-[#B8C7E0] text-sm">{resource.description}</p>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        )}
+        
+        {/* Additional exercises section */}
+        {exerciseContent?.exercises && (
+          <div className="mb-6">
+            <h4 className="text-white font-medium mb-2">Try These Micro-Practices</h4>
+            <div className="bg-[#0F172A] rounded-lg border border-[#2A3547] p-4">
+              <ul className="space-y-3">
+                {exerciseContent.exercises.map((ex, index) => (
+                  <li key={index} className="flex items-start">
+                    <div className="bg-blue-500/20 p-2 rounded-full mt-1 mr-3">
+                      <FaRegLightbulb className="text-blue-400 text-xs" />
+                    </div>
+                    <div>
+                      <h5 className="text-white font-medium mb-1">{ex.title}</h5>
+                      <p className="text-[#B8C7E0] text-sm">{ex.description}</p>
+                    </div>
                   </li>
                 ))}
               </ul>
