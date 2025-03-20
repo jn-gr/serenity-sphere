@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom'
 import { FaPaperPlane, FaCheck, FaExclamationTriangle, FaRedo } from 'react-icons/fa'
 import { motion, AnimatePresence } from 'framer-motion'
 import { IoMdCheckmarkCircle, IoMdClose } from 'react-icons/io'
+import { fetchNotifications } from '../notifications/notificationSlice'
 
 // Toast notification component for errors
 const ErrorToast = ({ error, onDismiss }) => {
@@ -263,6 +264,9 @@ const JournalForm = () => {
             setTimeout(() => {
                 setShowSuccess(false);
             }, 3000);
+            
+            // After submission, fetch notifications to check for mood triggers
+            dispatch(fetchNotifications());
         } catch (err) {
             handleError({
                 ...err,

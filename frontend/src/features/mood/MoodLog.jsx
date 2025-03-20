@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { motion } from 'framer-motion';
 import { fetchMoodLogs, fetchMoodTrends } from './moodSlice';
+import { fetchNotifications } from '../notifications/notificationSlice';
 import {
   FaCalendarAlt,
   FaChartLine,
@@ -26,6 +27,9 @@ import MoodCalendarHeatmap from './components/MoodCalendarHeatmap';
 import MoodDistributionChart from './components/MoodDistributionChart';
 // Import the new MoodForecast component
 import MoodForecast from './components/MoodForecast';
+
+// Import the NotificationCenter component
+import NotificationCenter from '../notifications/NotificationCenter';
 
 // New component for mood recommendations
 const MoodRecommendation = ({ logs, selectedPeriod }) => {
@@ -109,6 +113,7 @@ const MoodRecommendation = ({ logs, selectedPeriod }) => {
   );
 };
 
+
 const MoodLog = () => {
   const dispatch = useDispatch();
   const { logs, status, error, trends } = useSelector(state => state.mood);
@@ -125,6 +130,17 @@ const MoodLog = () => {
     console.log("Dispatching fetch actions");
     dispatch(fetchMoodLogs());
     dispatch(fetchMoodTrends());
+    
+    dispatch(fetchNotifications());
+    
+    // Add this temporary testing code
+    fetch('/api/notifications/mood/')
+      .then(response => response.json())
+      .then(data => {
+        console.log("Notification API direct test:", data);
+        console.log("Number of notifications:", data.length || 0);
+      })
+      .catch(err => console.error("Error fetching notifications directly:", err));
   }, [dispatch]);
 
   const getMoodIcon = (mood) => {
@@ -263,6 +279,10 @@ const MoodLog = () => {
 
   return (
     <div className="min-h-screen bg-[#0F172A] ml-64">
+      <NotificationCenter />
+      {/* Remove this line that renders the ReduxDebug component */}
+      {/* <ReduxDebug /> */}
+      
       <div className="max-w-7xl mx-auto px-8 py-12">
         
         <div className="mb-10">

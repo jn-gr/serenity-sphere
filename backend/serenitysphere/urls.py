@@ -35,4 +35,7 @@ urlpatterns = [
     path('api/detect-emotions/', views.detect_emotions, name='detect_emotions'),
     path('api/journal-entries/', views.get_journal_entries, name='get_journal_entries'),
     path('api/mood-trends/', views.get_mood_trends, name='get_mood_trends'),
+    path('api/notifications/mood/', views.get_mood_notifications, name='mood-notifications'),
+    path('api/notifications/<int:notification_id>/dismiss/', views.dismiss_notification, name='dismiss-notification'),
+    path('api/mood/cause/', views.mood_cause_recommendation, name='record-mood-cause'),
 ]

@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.utils.translation import gettext_lazy as _
-from .models import CustomUser, JournalEntry, MoodLog
+from .models import CustomUser, JournalEntry, MoodLog, Notification, MoodCause, RecommendationCategory, Recommendation, UserRecommendation
 from django.utils import timezone
 from datetime import datetime, time
 from .ai_services import predict_emotions
@@ -268,3 +268,32 @@ class MoodLogAdmin(admin.ModelAdmin):
     )
     
     readonly_fields = ('created_at',)
+
+@admin.register(Notification)
+class NotificationAdmin(admin.ModelAdmin):
+    list_display = ('user', 'type', 'severity', 'is_read', 'created_at')
+    list_filter = ('type', 'severity', 'is_read', 'created_at')
+    search_fields = ('user__username', 'message')
+
+@admin.register(MoodCause)
+class MoodCauseAdmin(admin.ModelAdmin):
+    list_display = ('user', 'cause_type', 'created_at')
+    list_filter = ('cause_type', 'created_at')
+    search_fields = ('user__username', 'cause_type', 'notes')
+
+@admin.register(RecommendationCategory)
+class RecommendationCategoryAdmin(admin.ModelAdmin):
+    list_display = ('name',)
+    search_fields = ('name', 'description')
+
+@admin.register(Recommendation)
+class RecommendationAdmin(admin.ModelAdmin):
+    list_display = ('title', 'category', 'recommendation_type', 'is_active')
+    list_filter = ('category', 'recommendation_type', 'is_active')
+    search_fields = ('title', 'description')
+
+@admin.register(UserRecommendation)
+class UserRecommendationAdmin(admin.ModelAdmin):
+    list_display = ('user', 'recommendation', 'is_helpful', 'created_at')
+    list_filter = ('is_helpful', 'created_at')
+    search_fields = ('user__username', 'recommendation__title', 'feedback')

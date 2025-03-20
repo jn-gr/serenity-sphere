@@ -5,6 +5,7 @@ from django.utils import timezone
 from django.db.models import UniqueConstraint
 from django.db.models.functions import TruncDate
 from datetime import datetime
+from django.conf import settings
 
 class CustomUserManager(BaseUserManager):
     def create_user(self, email, username, password=None, **extra_fields):
@@ -98,3 +99,81 @@ class MoodLog(models.Model):
         
     def __str__(self):
         return f"{self.user.username}'s mood: {self.mood} ({self.date})"
+
+class Notification(models.Model):
+    NOTIFICATION_TYPES = [
+        ('mood_shift', 'Mood Shift'),
+        ('extended_sadness', 'Extended Sadness'),
+        ('inactivity', 'Inactivity'),
+    ]
+    
+    SEVERITY_LEVELS = [
+        ('low', 'Low'),
+        ('medium', 'Medium'),
+        ('high', 'High'),
+    ]
+    
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='notifications')
+    type = models.CharField(max_length=50, choices=NOTIFICATION_TYPES)
+    message = models.TextField()
+    severity = models.CharField(max_length=20, choices=SEVERITY_LEVELS, default='medium')
+    is_read = models.BooleanField(default=False)
+    is_dismissed = models.BooleanField(default=False)
+    created_at = models.DateTimeField(default=timezone.now)
+    
+    class Meta:
+        ordering = ['-created_at']
+    
+    def __str__(self):
+        return f"{self.user.username} - {self.type} - {self.created_at.strftime('%Y-%m-%d')}"
+
+
+class MoodCause(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='mood_causes')
+    notification = models.ForeignKey(Notification, on_delete=models.CASCADE, related_name='causes', null=True, blank=True)
+    cause_type = models.CharField(max_length=50)  # e.g., 'loss', 'stress', 'conflict'
+    notes = models.TextField(blank=True, null=True)  # Optional user notes
+    created_at = models.DateTimeField(default=timezone.now)
+    
+    def __str__(self):
+        return f"{self.user.username} - {self.cause_type} - {self.created_at.strftime('%Y-%m-%d')}"
+
+
+class RecommendationCategory(models.Model):
+    name = models.CharField(max_length=100)  # e.g., 'grief', 'stress', 'anger'
+    description = models.TextField(blank=True, null=True)
+    
+    def __str__(self):
+        return self.name
+
+
+class Recommendation(models.Model):
+    RECOMMENDATION_TYPES = [
+        ('exercise', 'Exercise'),
+        ('journaling', 'Journaling'),
+        ('meditation', 'Meditation'),
+        ('resource', 'Resource'),
+        ('strategy', 'Coping Strategy'),
+    ]
+    
+    title = models.CharField(max_length=200)
+    description = models.TextField()
+    recommendation_type = models.CharField(max_length=50, choices=RECOMMENDATION_TYPES)
+    category = models.ForeignKey(RecommendationCategory, on_delete=models.CASCADE, related_name='recommendations')
+    link = models.CharField(max_length=255, blank=True, null=True)  # Link to more information
+    is_active = models.BooleanField(default=True)
+    
+    def __str__(self):
+        return f"{self.title} ({self.category.name})"
+
+
+class UserRecommendation(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='recommendations')
+    recommendation = models.ForeignKey(Recommendation, on_delete=models.CASCADE)
+    mood_cause = models.ForeignKey(MoodCause, on_delete=models.CASCADE, related_name='recommendations', null=True, blank=True)
+    is_helpful = models.BooleanField(null=True, blank=True)  # User feedback
+    feedback = models.TextField(blank=True, null=True)  # Additional feedback
+    created_at = models.DateTimeField(default=timezone.now)
+    
+    def __str__(self):
+        return f"{self.user.username} - {self.recommendation.title}"

@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from django.contrib.auth.password_validation import validate_password
-from .models import CustomUser, JournalEntry, MoodLog
+from .models import CustomUser, JournalEntry, MoodLog, Notification, MoodCause, Recommendation, UserRecommendation, RecommendationCategory
 from django.utils import timezone
 
 User = get_user_model()
@@ -90,4 +90,31 @@ class MoodLogSerializer(serializers.ModelSerializer):
         # Ensure users can only link to their own journal entries
         if value and value.user != self.context['request'].user:
             raise serializers.ValidationError("You can only link to your own journal entries.")
-        return value 
+        return value
+
+class NotificationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Notification
+        fields = ['id', 'type', 'message', 'severity', 'is_read', 'created_at']
+
+
+class MoodCauseSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = MoodCause
+        fields = ['id', 'cause_type', 'notes', 'created_at']
+
+
+class RecommendationSerializer(serializers.ModelSerializer):
+    category_name = serializers.CharField(source='category.name', read_only=True)
+    
+    class Meta:
+        model = Recommendation
+        fields = ['id', 'title', 'description', 'recommendation_type', 'category_name', 'link']
+
+
+class UserRecommendationSerializer(serializers.ModelSerializer):
+    recommendation = RecommendationSerializer(read_only=True)
+    
+    class Meta:
+        model = UserRecommendation
+        fields = ['id', 'recommendation', 'is_helpful', 'feedback', 'created_at'] 

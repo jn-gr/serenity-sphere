@@ -11,6 +11,8 @@ from .ai_services import predict_emotions
 import logging
 from django.contrib.auth.hashers import check_password
 from django.utils import timezone
+from datetime import datetime, timedelta
+from django.shortcuts import get_object_or_404
 
 
 logger = logging.getLogger(__name__)
@@ -231,3 +233,92 @@ def get_mood_trends(request):
     
     serializer = MoodLogSerializer(mood_logs, many=True)
     return Response(serializer.data)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_mood_notifications(request):
+    # Your existing code for finding real notifications
+    notifications = []
+    
+    # Always add a test notification for development
+    notifications.append({
+        'id': 999,
+        'type': 'mood_shift',
+        'message': 'We noticed a significant change in your mood recently. Would you like to tell us what might be causing this?',
+        'severity': 'high',
+        'timestamp': timezone.now().isoformat()
+    })
+    
+    return Response(notifications)
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def dismiss_notification(request, notification_id):
+    """Mark a notification as dismissed"""
+    notification = get_object_or_404(Notification, id=notification_id, user=request.user)
+    notification.is_dismissed = True
+    notification.save()
+    
+    return Response({"status": "success"})
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def mood_cause_recommendation(request):
+    """Return personalized recommendations based on mood cause"""
+    cause = request.data.get('cause')
+    notification_type = request.data.get('notificationType')
+    
+    recommendations = []
+    
+    # Curated recommendations based on the cause
+    if cause == 'loss':
+        recommendations = [
+            {
+                "title": "Grief Journal Prompts",
+                "description": "Write about a favorite memory with your loved one, or describe how your grief has changed over time.",
+                "link": "/resources/grief-journaling"
+            },
+            {
+                "title": "Breathing Exercise: 4-7-8",
+                "description": "Breathe in for 4 seconds, hold for 7 seconds, exhale for 8 seconds. Repeat 4 times.",
+                "link": "/exercises/breathing"
+            },
+            {
+                "title": "Grief Support Groups",
+                "description": "Connecting with others who understand can help. Consider joining a support group.",
+                "link": "/resources/support-groups"
+            }
+        ]
+    elif cause == 'stress':
+        recommendations = [
+            {
+                "title": "5-Minute Mindfulness",
+                "description": "Take 5 minutes to focus on your breath and notice physical sensations without judgment.",
+                "link": "/exercises/mindfulness"
+            },
+            {
+                "title": "Stress Trigger Tracking",
+                "description": "Start noting what triggers your stress to identify patterns you can address.",
+                "link": "/tools/stress-tracker"
+            },
+            {
+                "title": "Progressive Muscle Relaxation",
+                "description": "Tense and release each muscle group to release physical tension.",
+                "link": "/exercises/muscle-relaxation"
+            }
+        ]
+    # Add more cause-specific recommendations here
+    
+    # Add more mood causes
+    elif cause == 'loneliness':
+        recommendations = [
+            {
+                "title": "Social Connection Exercise",
+                "description": "Reach out to one person today, even with a simple text message.",
+                "link": "/exercises/social-connection"
+            },
+            # More recommendations...
+        ]
+    # Other causes...
+    
+    return Response({"recommendations": recommendations})
