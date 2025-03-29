@@ -1553,7 +1553,7 @@ const MoodCausePrompt = ({ notification, onClose }) => {
     }
     else if (recommendation.title === "Appreciation Expression") {
       enhancedExercise.link = 'appreciation-expression';
-      enhancedExercise.type = 'journaling';
+      enhancedExercise.type = 'appreciation'; // <-- Changed from 'journaling' to 'appreciation'
     }
     else if (recommendation.title === "Perspective-Taking Practice") {
       enhancedExercise.link = 'perspective-taking';

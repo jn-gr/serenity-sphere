@@ -26,6 +26,18 @@ const ExerciseModal = ({ exercise, onClose }) => {
   });
   const [commonGround, setCommonGround] = useState('');
 
+  // Add these new state variables for the values exercise
+  const [valuesList, setValuesList] = useState([
+    { id: 1, value: '', rank: 1 },
+    { id: 2, value: '', rank: 2 },
+    { id: 3, value: '', rank: 3 },
+    { id: 4, value: '', rank: 4 },
+    { id: 5, value: '', rank: 5 }
+  ]);
+  const [draggedValue, setDraggedValue] = useState(null);
+  const [valueDefinition, setValueDefinition] = useState('');
+  const [actionPlan, setActionPlan] = useState('');
+
   const timerRef = useRef(null);
   const audioRef = useRef(null);
   
@@ -126,6 +138,7 @@ const ExerciseModal = ({ exercise, onClose }) => {
     
     return exerciseContent.type === 'journal' || 
            exerciseContent.type === 'journaling' ||
+           exerciseContent.type === 'appreciation' ||
            exerciseContent.type === 'meditation' || 
            exerciseContent.type === 'breathing' ||
            exerciseContent.type === 'reflection' ||
@@ -399,40 +412,63 @@ const ExerciseModal = ({ exercise, onClose }) => {
             <div className="mt-4">
               <div className="bg-[#0F172A] p-4 rounded-lg border border-[#2A3547] mb-3">
                 <h4 className="text-white text-sm font-medium mb-3">Values Tracker</h4>
+                <p className="text-[#B8C7E0] text-xs mb-3">Enter your values and drag to reorder by importance:</p>
                 
                 <div className="space-y-3 mb-4">
-                  {[1, 2, 3, 4, 5].map((num) => (
-                    <div key={num} className="flex items-center space-x-3">
-                      <div className="w-6 h-6 bg-[#3E60C1]/20 rounded-full flex items-center justify-center text-[#5983FC]">
-                        {num}
+                  {valuesList.map((item) => (
+                    <div 
+                      key={item.id} 
+                      className="flex items-center space-x-3 cursor-move p-2 rounded-lg hover:bg-[#1A2335]/50 transition-colors"
+                      draggable
+                      onDragStart={(e) => handleDragStart(e, item)}
+                      onDragEnd={handleDragEnd}
+                      onDragOver={handleDragOver}
+                      onDrop={(e) => handleDrop(e, item)}
+                    >
+                      <div 
+                        className="w-8 h-8 bg-[#3E60C1]/20 rounded-full flex items-center justify-center text-[#5983FC] flex-shrink-0"
+                      >
+                        {item.rank}
                       </div>
                       <input 
                         type="text"
+                        value={item.value}
+                        onChange={(e) => handleValueChange(item.id, e.target.value)}
                         className="flex-1 bg-[#1A2335] border border-[#2A3547] rounded-lg p-2 text-[#B8C7E0] text-sm focus:outline-none focus:border-[#5983FC]"
-                        placeholder={`Value #${num}...`}
+                        placeholder={`Value #${item.rank}...`}
                       />
-                      <select
-                        className="w-16 bg-[#1A2335] border border-[#2A3547] rounded-lg p-2 text-[#B8C7E0] text-sm focus:outline-none focus:border-[#5983FC]"
-                      >
-                        {[1, 2, 3, 4, 5].map((rank) => (
-                          <option key={rank} value={rank}>{rank}</option>
-                        ))}
-                      </select>
+                      <div className="flex-shrink-0 text-[#5983FC]">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                          <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                          <line x1="12" y1="22.08" x2="12" y2="12"></line>
+                        </svg>
+                      </div>
                     </div>
                   ))}
                 </div>
                 
-                <h4 className="text-white text-sm font-medium mb-2">Value Definition</h4>
+                <div className="mt-4 p-3 bg-[#1A2335]/50 rounded-lg border border-[#2A3547]">
+                  <div className="text-xs text-[#B8C7E0] mb-2">
+                    <span className="text-[#5983FC]">Drag & drop tip:</span> Drag values up or down to rearrange their priority order.
+                  </div>
+                </div>
+                
+                <h4 className="text-white text-sm font-medium mb-2 mt-4">Value Definition</h4>
                 <div className="mb-3">
                   <textarea
+                    value={valueDefinition}
+                    onChange={(e) => setValueDefinition(e.target.value)}
                     className="w-full h-16 bg-[#1A2335] border border-[#2A3547] rounded-lg p-2 text-[#B8C7E0] text-sm focus:outline-none focus:border-[#5983FC]"
-                    placeholder="Define what your top value means to you personally..."
+                    placeholder={`Define what your top value "${valuesList[0]?.value || 'value'}" means to you personally...`}
                   />
                 </div>
                 
                 <h4 className="text-white text-sm font-medium mb-2">Action Plan</h4>
                 <div>
                   <textarea
+                    value={actionPlan}
+                    onChange={(e) => setActionPlan(e.target.value)}
                     className="w-full h-16 bg-[#1A2335] border border-[#2A3547] rounded-lg p-2 text-[#B8C7E0] text-sm focus:outline-none focus:border-[#5983FC]"
                     placeholder="One specific way I'll honor this value this week..."
                   />
@@ -974,57 +1010,51 @@ const ExerciseModal = ({ exercise, onClose }) => {
           </div>
         );
 
-      case 'appreciation-expression':
+      case 'appreciation':
         return (
           <div className="mt-4">
             <div className="bg-[#0F172A] p-4 rounded-lg border border-[#2A3547] mb-3">
-              <h4 className="text-white text-sm font-medium mb-3">Appreciation Journal</h4>
+              <h4 className="text-white text-sm font-medium mb-3">Appreciation Exercise</h4>
               
-              <div className="mb-3">
-                <label className="text-[#5983FC] text-xs mb-1 block">Person I appreciate:</label>
+              <div className="mb-4">
+                <label className="text-[#5983FC] text-xs mb-1 block">Who would you like to appreciate?</label>
                 <input 
                   type="text"
                   className="w-full bg-[#1A2335] border border-[#2A3547] rounded-lg p-2 text-[#B8C7E0] text-sm focus:outline-none focus:border-[#5983FC]"
-                  placeholder="Name of person..."
+                  placeholder="Name or relationship (e.g., friend, partner, colleague)"
                 />
               </div>
               
-              <div className="space-y-3 mb-4">
+              <div className="space-y-4 mb-4">
                 {[1, 2, 3].map((num) => (
-                  <div key={num}>
-                    <label className="text-[#5983FC] text-xs mb-1 block">Quality/Action #{num} I appreciate:</label>
+                  <div key={num} className="bg-[#1A2335]/50 p-3 rounded-lg border border-[#2A3547]">
+                    <label className="text-[#5983FC] text-xs mb-1 block">Quality/Action #{num} you appreciate:</label>
                     <textarea
-                      className="w-full h-12 bg-[#1A2335] border border-[#2A3547] rounded-lg p-2 text-[#B8C7E0] text-sm focus:outline-none focus:border-[#5983FC]"
-                      placeholder={`Something specific I appreciate...`}
+                      className="w-full h-12 bg-[#1A2335] border border-[#2A3547] rounded-lg p-2 text-[#B8C7E0] text-sm focus:outline-none focus:border-[#5983FC] mb-2"
+                      placeholder="Describe a specific quality or action you appreciate..."
                     />
-                    <label className="text-[#5983FC] text-xs mt-2 mb-1 block">Why this matters to me:</label>
+                    <label className="text-[#5983FC] text-xs mb-1 block">Why this matters to you:</label>
                     <textarea
                       className="w-full h-12 bg-[#1A2335] border border-[#2A3547] rounded-lg p-2 text-[#B8C7E0] text-sm focus:outline-none focus:border-[#5983FC]"
-                      placeholder={`How this impacts me...`}
+                      placeholder="How has this impacted you or made a difference?"
                     />
                   </div>
                 ))}
               </div>
               
-              <h4 className="text-white text-sm font-medium mb-2">Expression Draft</h4>
-              <div>
+              <div className="bg-[#1A2335]/50 p-3 rounded-lg border border-[#2A3547]">
+                <h4 className="text-white text-sm font-medium mb-2">Practice Your Expression</h4>
+                <p className="text-[#B8C7E0] text-xs mb-2">Craft a message you could share with this person:</p>
                 <textarea
                   className="w-full h-24 bg-[#1A2335] border border-[#2A3547] rounded-lg p-2 text-[#B8C7E0] text-sm focus:outline-none focus:border-[#5983FC]"
-                  placeholder="Draft your appreciation message here..."
+                  placeholder="Dear [name], I want to express my appreciation for..."
                 />
-                <div className="flex justify-end mt-2">
-                  <button 
-                    className="flex items-center bg-[#3E60C1] text-white px-3 py-1 rounded-lg text-sm hover:bg-[#5983FC] transition-colors"
-                  >
-                    <FaSave className="mr-2" /> Save Draft
-                  </button>
-                </div>
               </div>
             </div>
             
             <div className="bg-[#0F172A]/70 p-3 rounded-lg border border-[#2A3547]">
               <h4 className="text-[#5983FC] text-sm font-medium mb-2 flex items-center">
-                <FaRegLightbulb className="mr-2" /> Effective Appreciation Tips:
+                <FaRegLightbulb className="mr-2" /> Tips for Effective Appreciation:
               </h4>
               <ul className="space-y-2">
                 <li className="text-[#B8C7E0] text-sm flex items-start">
@@ -1282,6 +1312,52 @@ const ExerciseModal = ({ exercise, onClose }) => {
       ...checklist,
       [index]: !checklist[index]
     });
+  };
+  
+  // Add this function to handle value input changes
+  const handleValueChange = (id, newValue) => {
+    setValuesList(valuesList.map(item => 
+      item.id === id ? { ...item, value: newValue } : item
+    ));
+  };
+  
+  // Add these drag and drop handlers
+  const handleDragStart = (e, value) => {
+    setDraggedValue(value);
+    e.target.style.opacity = '0.6';
+  };
+  
+  const handleDragEnd = (e) => {
+    e.target.style.opacity = '1';
+    setDraggedValue(null);
+  };
+  
+  const handleDragOver = (e) => {
+    e.preventDefault();
+  };
+  
+  const handleDrop = (e, targetValue) => {
+    e.preventDefault();
+    
+    // Don't do anything if dropping onto the same item
+    if (draggedValue.id === targetValue.id) return;
+    
+    // Reorder the list based on the drag and drop
+    const updatedList = [...valuesList];
+    
+    // Find indexes
+    const draggedIndex = updatedList.findIndex(item => item.id === draggedValue.id);
+    const targetIndex = updatedList.findIndex(item => item.id === targetValue.id);
+    
+    // Swap ranks
+    const draggedRank = updatedList[draggedIndex].rank;
+    updatedList[draggedIndex].rank = updatedList[targetIndex].rank;
+    updatedList[targetIndex].rank = draggedRank;
+    
+    // Sort by rank
+    updatedList.sort((a, b) => a.rank - b.rank);
+    
+    setValuesList(updatedList);
   };
   
   // All exercise content definitions
