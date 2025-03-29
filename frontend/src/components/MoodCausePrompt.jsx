@@ -12,8 +12,12 @@ const MoodCausePrompt = ({ notification, onClose }) => {
   const [dominantEmotion, setDominantEmotion] = useState('');
   const [activeExercise, setActiveExercise] = useState(null);
   const [isFalsePositive, setIsFalsePositive] = useState(false);
-  // Add state for positive reinforcement mode
   const [showPositiveReinforcement, setShowPositiveReinforcement] = useState(false);
+  
+  // Add these new states
+  const [showIssuePrompt, setShowIssuePrompt] = useState(false);
+  const [userIssue, setUserIssue] = useState('');
+  const [issueType, setIssueType] = useState('');
   
   // Enhanced emotion categorization based on your mood chart values
   const emotionCategories = {
@@ -587,294 +591,392 @@ const MoodCausePrompt = ({ notification, onClose }) => {
     }
   };
   
-  const handleSubmit = async () => {
-    if (!selectedCause) return;
+  // First define the exercise catalog as a constant 
+  const exerciseCatalog = {
+    'grief': [
+            {
+              title: "Grief Journaling Exercise",
+        description: "Spend 10 minutes writing about your feelings and memories. Focus on both the pain and the gratitude for what was.",
+        steps: ["Find a quiet space", "Write without judgment", "Express all emotions openly", "Include memories you treasure"]
+      },
+      {
+        title: "Memory Honor Ritual",
+        description: "Create a small ritual to honor what you've lost while acknowledging the need to move forward.",
+        steps: ["Choose a meaningful object or photo", "Find a quiet moment", "Reflect on its significance", "Express gratitude for its role in your life"]
+      }
+    ],
+    'anxiety': [
+      {
+        title: "5-4-3-2-1 Grounding Exercise",
+        description: "Use your senses to anchor yourself in the present moment and reduce anxiety.",
+        steps: ["Name 5 things you can see", "Name 4 things you can touch", "Name 3 things you can hear", "Name 2 things you can smell", "Name 1 thing you can taste"]
+      },
+      {
+        title: "Worry Time Practice",
+        description: "Schedule a dedicated 15-minute 'worry time' each day to contain anxiety.",
+        steps: ["Set a specific time for worrying", "During the day, postpone worries to this time", "During worry time, write all concerns", "After 15 minutes, end the session decisively"]
+      }
+    ],
+    'stress': [
+      {
+        title: "Progressive Muscle Relaxation",
+        description: "Systematically tense and release muscle groups to reduce physical stress.",
+        steps: ["Find a comfortable position", "Start with your feet and work upward", "Tense each muscle group for 5 seconds", "Release and notice the sensation", "Continue through all major muscle groups"]
+      },
+      {
+        title: "3-Minute Breathing Space",
+        description: "A mini-meditation to center yourself during stressful moments.",
+        steps: ["Minute 1: Acknowledge your current experience", "Minute 2: Focus attention on your breath", "Minute 3: Expand awareness to your whole body"]
+      }
+    ],
+    'anger': [
+      {
+        title: "STOP Technique for Anger",
+        description: "A quick method to interrupt anger before it escalates.",
+        steps: ["S - Stop what you're doing", "T - Take a step back", "O - Observe your thoughts and feelings", "P - Proceed mindfully"]
+      },
+      {
+        title: "Anger Letter Exercise",
+        description: "Write an uncensored letter expressing your anger (that you won't send).",
+        steps: ["Write without holding back", "Express exactly how you feel", "State what you wish would happen", "After writing, destroy or delete the letter as a symbolic release"]
+      }
+    ],
+    'relationship': [
+      {
+        title: "Perspective-Taking Practice",
+        description: "Strengthen empathy by consciously considering another viewpoint.",
+        steps: ["Identify the situation causing distress", "Imagine the other person's perspective in detail", "Consider their possible feelings and motivations", "Note insights that emerge"]
+      },
+      {
+        title: "Values Clarification",
+        description: "Identify what matters most to you in relationships to guide your responses.",
+        steps: ["List 5 values important to you in relationships", "Rank them in order of importance", "For each value, note one way you can express it", "Consider how these values apply to your current situation"]
+      }
+    ],
+    'work': [
+      {
+        title: "Work Boundaries Exercise",
+        description: "Establish healthy boundaries to manage work-related stress.",
+        steps: ["Identify specific work stressors", "Define what you can and cannot control", "Create clear start/end times for work", "Develop transition rituals between work and personal time"]
+      },
+      {
+        title: "Task Prioritization Method",
+        description: "Organize tasks to reduce overwhelm and increase productivity.",
+        steps: ["List all current tasks", "Categorize by urgency and importance", "Identify your top 3 priorities", "Schedule focused time for high-priority items"]
+      }
+    ],
+    'health': [
+      {
+        title: "Body Appreciation Practice",
+        description: "Shift focus from health concerns to gratitude for what your body can do.",
+        steps: ["Note 3 things your body did well today", "Send appreciation to different body parts", "Practice gentle movement that feels good", "Set one small health-supporting intention"]
+      },
+      {
+        title: "Health Anxiety Reduction",
+        description: "Reduce worry about health through structured reflection.",
+        steps: ["Write down specific health concerns", "Rate worry level from 1-10", "List evidence for and against each worry", "Create a balanced response to each concern"]
+      }
+    ],
+    'loss': [
+      {
+        title: "Loss Processing Exercise",
+        description: "Honor what's been lost while finding ways to move forward.",
+        steps: ["Write about what you miss most", "Identify lessons or gifts from what was lost", "Create a small symbolic ritual of acknowledgment", "Set an intention for gentle forward movement"]
+      },
+      {
+        title: "Meaning-Making Practice",
+        description: "Find meaning and growth potential in difficult experiences.",
+        steps: ["Reflect on how this loss has changed you", "Identify any values clarified by this experience", "Consider how this might connect you to others", "Imagine how this might inform your future choices"]
+      }
+    ],
+    'self-esteem': [
+      {
+        title: "Self-Compassion Break",
+        description: "Respond to self-criticism with kindness and common humanity.",
+        steps: ["Notice self-critical thoughts", "Place a hand on your heart", "Say: 'This is a moment of suffering'", "Say: 'May I be kind to myself in this moment'"]
+      },
+      {
+        title: "Strengths Inventory",
+        description: "Reconnect with your authentic strengths and positive qualities.",
+        steps: ["List 5 strengths you possess", "Recall specific examples of using each strength", "Consider how these strengths help you", "Plan to intentionally use one strength tomorrow"]
+      }
+    ],
+    'uncertainty': [
+      {
+        title: "Uncertainty Tolerance Practice",
+        description: "Build comfort with not knowing through mindful awareness.",
+        steps: ["Notice physical sensations of uncertainty", "Observe thoughts without judgment", "Remind yourself that uncertainty is universal", "Focus on what you can control right now"]
+      },
+      {
+        title: "Future Visualization",
+        description: "Reduce uncertainty anxiety by imagining positive possibilities.",
+        steps: ["Breathe deeply to center yourself", "Imagine 3 positive potential outcomes", "Visualize yourself coping effectively with each", "Note resources available to help you navigate change"]
+      }
+    ],
+    'mindfulness': [
+      {
+        title: "Mindful Observation Practice",
+        description: "Calm your mind by fully observing an object for 5 minutes.",
+        steps: ["Choose any natural object", "Focus all attention on it", "Explore every aspect of its appearance", "When your mind wanders, gently return focus to the object"]
+      },
+      {
+        title: "Body Scan Meditation",
+        description: "Systematically bring awareness to each part of your body to reduce tension.",
+        steps: ["Lie down in a comfortable position", "Start at your toes and work upward", "Notice sensations without judgment", "Spend 20-30 seconds on each body part"]
+      }
+    ]
+  };
+  
+  // Replace the getRecommendations function with this improved version
+  const getRecommendations = (emotion, cause, issueType, userIssue) => {
+    // First prioritize the user's selected issue type
+    let recommendedExercises = [];
     
-    setIsLoading(true);
-    try {
-      console.log("Submitting cause:", selectedCause);
-      console.log("Dominant emotion:", dominantEmotion);
-      console.log("Emotional change type:", 
-        emotionalChange.isPositive ? "positive" : 
-        emotionalChange.isNeutral ? "neutral" : 
-        emotionalChange.isTransition ? "transition to negative" :
-        emotionalChange.isSustained ? "sustained negative" : "negative");
+    // If user has selected a specific issue type, prioritize that above all
+    const normalizedIssueType = issueType ? issueType.toLowerCase() : '';
+    if (normalizedIssueType && exerciseCatalog[normalizedIssueType]) {
+      recommendedExercises = [...exerciseCatalog[normalizedIssueType]];
+    }
+    
+    // Only look at emotion/cause categories if we need more recommendations
+    if (recommendedExercises.length < 2) {
+      // Map emotions to recommended categories
+      const emotionToCategoryMap = {
+        // Very positive emotions
+        'happy': ['joy', 'gratitude'],
+        'excited': ['joy', 'creative'],
+        'loving': ['relationship', 'gratitude'],
+        'optimistic': ['optimism', 'achievement'],
+        'proud': ['achievement', 'optimism'],
+        'grateful': ['gratitude', 'joy'],
+        'relieved': ['stress', 'health'],
+        'amused': ['joy'],
+        
+        // Neutral emotions
+        'neutral': ['transition', 'confusion'],
+        'confused': ['confusion', 'transition'],
+        
+        // Negative emotions
+        'anxious': ['anxiety', 'stress'],
+        'nervous': ['anxiety', 'stress'],
+        'embarrassed': ['disappointment'],
+        'disappointed': ['disappointment', 'transition'],
+        'annoyed': ['anger', 'stress'],
+        'disapproving': ['relationship', 'anger'],
+        'sad': ['grief', 'disappointment'],
+        
+        // Very negative emotions
+        'angry': ['anger', 'stress'],
+        'grieving': ['grief', 'loss'],
+        'disgusted': ['anger'],
+        'remorseful': ['grief', 'disappointment']
+      };
+      
+      // Map causes to categories for recommendations
+      const causeToCategoryMap = {
+        // Negative causes
+        'loss': 'grief',
+        'stress': 'stress',
+        'relationship': 'relationship',
+        'work': 'work',
+        'health': 'health',
+        'loneliness': 'loneliness',
+        'financial': 'financial',
+        'disappointment': 'disappointment',
+        'other_negative': 'stress',
+      };
       
       // Determine recommended categories
       const recommendedCategories = [];
       
-      // Special handling for transitions from positive to negative
-      if (emotionalChange.isTransition && emotionalChange.fromPositive) {
-        recommendedCategories.push('transition', 'disappointment');
-        
-        // Add more targeted categories based on the selected cause
-        if (selectedCause === 'loss') {
-          recommendedCategories.push('grief');
-        } else if (selectedCause === 'stress') {
-          recommendedCategories.push('stress', 'anxiety');
-        } else if (selectedCause === 'disappointment') {
-          recommendedCategories.push('disappointment');
-        } else if (selectedCause === 'relationship') {
-          recommendedCategories.push('relationship');
-        } else if (selectedCause === 'health') {
-          recommendedCategories.push('health');
-        }
-      }
-      
       // Add emotion-based categories
-      if (dominantEmotion && emotionToCategoryMap[dominantEmotion]) {
-        recommendedCategories.push(...emotionToCategoryMap[dominantEmotion]);
-      } else if (!dominantEmotion && !emotionalChange.isPositive) {
-        // If no dominant emotion detected but we know it's negative
-        recommendedCategories.push('grief', 'disappointment');
+      if (emotion && emotionToCategoryMap[emotion]) {
+        recommendedCategories.push(...emotionToCategoryMap[emotion]);
       }
       
       // Add cause-based category
-      if (causeToCategoryMap[selectedCause]) {
-        recommendedCategories.push(causeToCategoryMap[selectedCause]);
+      if (cause && causeToCategoryMap[cause]) {
+        recommendedCategories.push(causeToCategoryMap[cause]);
       }
       
-      // Remove duplicates
+      // Default categories if nothing specific found
+      if (recommendedCategories.length === 0) {
+        recommendedCategories.push('stress', 'mindfulness');
+      }
+      
+      // Ensure unique categories
       const uniqueCategories = [...new Set(recommendedCategories)];
       
-      console.log("Recommended categories:", uniqueCategories);
-      
-      // Enhanced API call with transition information
-      const response = await axios.post('/api/mood/cause/', {
-        notificationId: notification.id,
-        cause: selectedCause,
-        notificationType: notification.type,
-        emotionalDirection: emotionalChange.isPositive ? 'positive' : 
-                           emotionalChange.isNeutral ? 'neutral' : 
-                           emotionalChange.isTransition ? 'transition_to_negative' : 'negative',
-        dominantEmotion: dominantEmotion || undefined,
-        isTransition: emotionalChange.isTransition || false,
-        fromPositive: emotionalChange.fromPositive || false,
-        recommendedCategories: uniqueCategories
+      // Collect exercises from relevant categories
+      uniqueCategories.forEach(category => {
+        // Skip categories that are too different from the user's selected issue
+        if (normalizedIssueType && 
+            !areRelatedCategories(normalizedIssueType, category)) {
+          return;
+        }
+        
+        if (exerciseCatalog[category]) {
+          recommendedExercises = [...recommendedExercises, ...exerciseCatalog[category]];
+        }
       });
-      
-      console.log("Recommendations response:", response.data);
-      
-      // Get recommendations from response
-      setRecommendations(response.data.recommendations || []);
-      setShowRecommendations(true);
-    } catch (error) {
-      console.error('Error getting recommendations:', error);
-      
-      // Provide personalized fallback recommendations
-      let fallbackRecommendations = [];
-      
-      // Determine recommended category based on emotion and cause
-      const targetCategory = causeToCategoryMap[selectedCause] || 
-                          (dominantEmotion && emotionToCategoryMap[dominantEmotion]?.[0]) || 
-                          (emotionalChange.isPositive ? 'joy' : 
-                           emotionalChange.isNeutral ? 'transition' : 'stress');
-      
-      console.log("Fallback category:", targetCategory);
-      
-      // Create fallback recommendations based on the determined category
-      switch(targetCategory) {
-        case 'grief':
-          fallbackRecommendations = [
-            {
-              title: "Grief Journaling Exercise",
-              description: "Spend 10 minutes writing about a memory with your loved one. Focus on the emotions this memory brings up.",
-              link: "/exercises/grief-journal"
-            },
-            {
-              title: "Breathing Technique: 4-7-8",
-              description: "Breathe in for 4 seconds, hold for 7 seconds, exhale for 8 seconds. Repeat 4 times.",
-              link: "/exercises/breathing"
-            }
-          ];
-          break;
-          
-        case 'stress':
-          fallbackRecommendations = [
-            {
-              title: "Progressive Muscle Relaxation",
-              description: "Tense and then release each muscle group to release physical tension.",
-              link: "/exercises/muscle-relaxation"
-            },
-            {
-              title: "5-Minute Mindfulness Practice",
-              description: "Take 5 minutes to focus on your breath and notice physical sensations without judgment.",
-              link: "/exercises/mindfulness"
-            }
-          ];
-          break;
-          
-        case 'anxiety':
-          fallbackRecommendations = [
-            {
-              title: "5-4-3-2-1 Grounding Exercise",
-              description: "Focus on 5 things you can see, 4 things you can touch, 3 things you can hear, 2 things you can smell, and 1 thing you can taste.",
-              link: "/exercises/grounding"
-            },
-            {
-              title: "Worry Time Technique",
-              description: "Schedule a dedicated 15-minute 'worry time' each day to contain anxiety to a specific period.",
-              link: "/exercises/mindfulness"
-            }
-          ];
-          break;
-          
-        case 'anger':
-          fallbackRecommendations = [
-            {
-              title: "Anger Cooling Technique",
-              description: "When anger arises, count to 10 while taking deep breaths before responding.",
-              link: "/exercises/breathing"
-            },
-            {
-              title: "Physical Release",
-              description: "Channel anger physically through exercise, like a brisk walk or punching a pillow.",
-              link: "/exercises/default"
-            }
-          ];
-          break;
-          
-        case 'gratitude':
-          fallbackRecommendations = [
-            {
-              title: "Three Good Things Practice",
-              description: "Write down three things you're grateful for each day, including why they happened and how they made you feel.",
-              link: "/exercises/three-good-things"
-            },
-            {
-              title: "Gratitude Letter",
-              description: "Write a letter expressing thanks to someone who has positively impacted your life.",
-              link: "/exercises/gratitude"
-            }
-          ];
-          break;
-          
-        case 'joy':
-          fallbackRecommendations = [
-            {
-              title: "Joy Collection",
-              description: "Create a physical or digital collection of things that bring you joy to revisit when needed.",
-              link: "/exercises/gratitude"
-            },
-            {
-              title: "Flow Activity",
-              description: "Engage in an activity that fully absorbs you and brings a sense of timelessness.",
-              link: "/exercises/mindfulness"
-            }
-          ];
-          break;
-          
-        case 'achievement':
-          fallbackRecommendations = [
-            {
-              title: "Achievement Journal",
-              description: "Document your accomplishments, big and small, to build confidence and motivation.",
-              link: "/exercises/gratitude"
-            },
-            {
-              title: "Celebration Ritual",
-              description: "Create a personal ritual to mark achievements and reinforce positive emotions.",
-              link: "/exercises/mindfulness"
-            }
-          ];
-          break;
-          
-        case 'relationship':
-          fallbackRecommendations = [
-            {
-              title: "Active Listening Exercise",
-              description: "Learn to truly hear what others are saying through active listening techniques that strengthen relationships.",
-              link: "/exercises/active-listening"
-            },
-            {
-              title: "Appreciation Practice",
-              description: "Share one specific thing you appreciate about someone in your life.",
-              link: "/exercises/gratitude"
-            }
-          ];
-          break;
-          
-        case 'confusion':
-          fallbackRecommendations = [
-            {
-              title: "Mind Map Clarity Exercise",
-              description: "Create a mind map of your thoughts to organize them visually and find connections.",
-              link: "/exercises/mindfulness"
-            },
-            {
-              title: "Question Refinement",
-              description: "Transform vague confusion into specific questions to make challenges more approachable.",
-              link: "/exercises/default"
-            }
-          ];
-          break;
-          
-        case 'transition':
-          fallbackRecommendations = [
-            {
-              title: "Transition Bridge Visualization",
-              description: "Visualize yourself walking across a bridge from your past to your future, acknowledging both what you're leaving behind and what lies ahead.",
-              link: "/exercises/mindfulness"
-            },
-            {
-              title: "One Small Step",
-              description: "Identify one small, manageable action you can take today to move forward in your transition.",
-              link: "/exercises/default"
-            }
-          ];
-          break;
-          
-        case 'disappointment':
-          fallbackRecommendations = [
-            {
-              title: "Self-Compassion Practice",
-              description: "Learn to respond to disappointment with kindness rather than harsh self-criticism.",
-              link: "/exercises/self-compassion"
-            },
-            {
-              title: "Disappointment Reflection",
-              description: "Transform disappointment into growth through structured reflection.",
-              link: "/exercises/three-good-things"
-            }
-          ];
-          break;
-          
-        default:
-          fallbackRecommendations = [
-            {
-              title: "Self-Care Activity",
-              description: "Take some time for yourself today with a simple self-care activity.",
-              link: "/exercises/default"
-            },
-            {
-              title: "Basic Mindfulness Practice",
-              description: "Find a quiet place to sit and focus on your breath for a few minutes.",
-              link: "/exercises/mindfulness"
-            }
-          ];
+    }
+    
+    // If we have a custom user issue, craft a personalized exercise
+    if (userIssue && userIssue.trim().length > 0) {
+      const personalizedExercise = createPersonalizedExercise(
+        userIssue, 
+        normalizedIssueType || 'default'
+      );
+      recommendedExercises = [personalizedExercise, ...recommendedExercises];
+    }
+    
+    // Ensure uniqueness
+    const uniqueExercises = [];
+    recommendedExercises.forEach(exercise => {
+      if (!uniqueExercises.some(ex => ex.title === exercise.title)) {
+        uniqueExercises.push(exercise);
       }
-      
-      // Update fallback recommendations for transitions
-      if (emotionalChange.isTransition && emotionalChange.fromPositive) {
-        fallbackRecommendations = [
-          {
-            title: "Coping with Mood Shifts",
-            description: "Remember that emotions naturally fluctuate. Try accepting your current feelings without judgment.",
-            link: "/exercises/mindfulness"
-          },
-          {
-            title: "Emotional Weather Journal",
-            description: "Record how your emotions change throughout the day, noting triggers and patterns.",
-            link: "/exercises/default"
-          }
-        ];
+    });
+    
+    // If we still don't have enough, add default mindfulness exercises
+    if (uniqueExercises.length < 2 && exerciseCatalog['mindfulness']) {
+      uniqueExercises.push(...exerciseCatalog['mindfulness']);
+    }
+    
+    return uniqueExercises.slice(0, 4);
+  };
+  
+  // Add this helper function to check if categories are related
+  const areRelatedCategories = (category1, category2) => {
+    // Define groups of related categories
+    const relatedGroups = [
+      ['work', 'stress', 'anxiety'], // Work-related
+      ['relationship', 'loneliness'], // Relationship-related
+      ['grief', 'loss'], // Loss-related
+      ['health', 'stress'], // Health-related
+      ['anxiety', 'stress', 'uncertainty'], // Anxiety-related
+      ['anger', 'stress'], // Anger-related
+      ['self-esteem', 'disappointment'] // Self-related
+    ];
+    
+    // Check if both categories are in the same group
+    return relatedGroups.some(group => 
+      group.includes(category1) && group.includes(category2)
+    ) || category2 === 'mindfulness'; // Mindfulness is always relevant
+  };
+  
+  // Add a function to create a personalized exercise based on user's issue
+  const createPersonalizedExercise = (issue, category) => {
+    // Base templates for different categories
+    const templates = {
+      'relationship': {
+        title: "Personalized Relationship Reflection",
+        description: `Reflect on your specific situation: "${issue.substring(0, 50)}${issue.length > 50 ? '...' : ''}"`,
+        steps: [
+          "Write down exactly what's bothering you about this relationship",
+          "Identify your needs that aren't being met",
+          "Consider what might be happening from the other person's perspective",
+          "Brainstorm one small step toward improvement"
+        ]
+      },
+      'work': {
+        title: "Work Stress Management",
+        description: `Address your work challenge: "${issue.substring(0, 50)}${issue.length > 50 ? '...' : ''}"`,
+        steps: [
+          "Define the specific aspect that's most stressful",
+          "Rate the importance of this issue on a scale of 1-10",
+          "Identify one aspect you can control",
+          "Create a boundary or solution for that aspect"
+        ]
+      },
+      'anxiety': {
+        title: "Targeted Anxiety Relief",
+        description: `Focus on your specific worry: "${issue.substring(0, 50)}${issue.length > 50 ? '...' : ''}"`,
+        steps: [
+          "Notice where you feel this anxiety in your body",
+          "Take 5 deep breaths focusing on that area",
+          "Ask yourself what's the worst that could happen, and how you'd cope",
+          "Identify one small action to take despite the anxiety"
+        ]
+      },
+      'default': {
+        title: "Personal Reflection Exercise",
+        description: `Explore your situation: "${issue.substring(0, 50)}${issue.length > 50 ? '...' : ''}"`,
+        steps: [
+          "Write exactly what you're experiencing",
+          "Note how this situation affects your emotions and body",
+          "Consider what this experience might be teaching you",
+          "Identify one small step toward self-care"
+        ]
       }
-      
-      setRecommendations(fallbackRecommendations);
+    };
+    
+    return templates[category] || templates.default;
+  };
+  
+  // Update the handleSubmit function
+  const handleSubmit = () => {
+    if (!selectedCause) return;
+    
+    // Instead of immediately showing recommendations, show the issue prompt
+    setShowIssuePrompt(true);
+  };
+  
+  // Update handleIssueSubmit function
+  const handleIssueSubmit = () => {
+    if (!issueType) return;
+    
+    setIsLoading(true);
+    
+    // Use setTimeout to simulate API call but ensure it always completes
+    setTimeout(() => {
+      try {
+        // Use dominant emotion or notification mood
+        const currentEmotion = dominantEmotion || notification?.currentMood;
+        console.log("Getting recommendations for:", currentEmotion, selectedCause, issueType, userIssue);
+        
+        // Get personalized recommendations
+        const exerciseOptions = getRecommendations(currentEmotion, selectedCause, issueType, userIssue);
+        
+        // If we didn't get any recommendations, add a fallback
+        if (!exerciseOptions || exerciseOptions.length === 0) {
+          console.log("No recommendations found, using fallback");
+          setRecommendations([{
+            title: "Mindful Breathing Exercise",
+            description: "A simple practice to center yourself when feeling overwhelmed.",
+            steps: [
+              "Find a comfortable seated position",
+              "Close your eyes or soften your gaze",
+              "Breathe deeply for 10 breaths, focusing solely on the sensation",
+              "Notice how you feel afterward"
+            ]
+          }]);
+        } else {
+          setRecommendations(exerciseOptions);
+        }
+        
+        // Always move to recommendations screen
+        setShowIssuePrompt(false);
+        setShowRecommendations(true);
+      } catch (error) {
+        console.error("Error generating recommendations:", error);
+        // Show simple fallback recommendation
+        setRecommendations([{
+          title: "Simple Breathing Exercise",
+          description: "Take a moment to breathe and center yourself.",
+          steps: [
+            "Breathe in for 4 counts",
+            "Hold for 2 counts",
+            "Exhale for 6 counts",
+            "Repeat 5 times"
+          ]
+        }]);
+        setShowIssuePrompt(false);
       setShowRecommendations(true);
     } finally {
       setIsLoading(false);
     }
+    }, 600); // Reduced from 800ms for better UX
   };
   
   // Handle recommendation click
@@ -978,6 +1080,104 @@ const MoodCausePrompt = ({ notification, onClose }) => {
     };
     
     return headers[dominantEmotion] || headers.default;
+  };
+
+  // Add this new function to determine shift type
+  const getShiftType = (currentMood, previousMood) => {
+    const positiveMoods = ['happy', 'excited', 'optimistic'];
+    const neutralMoods = ['neutral', 'calm'];
+    
+    if (positiveMoods.includes(previousMood) && !positiveMoods.includes(currentMood)) {
+      return 'positive_to_negative';
+    }
+    if (neutralMoods.includes(previousMood) && !neutralMoods.includes(currentMood)) {
+      return 'neutral_to_negative';
+    }
+    return 'general_negative';
+  };
+
+  const shiftType = getShiftType(notification.currentMood, notification.previousMood);
+  const [selectedExercise, setSelectedExercise] = useState(null);
+
+  // Render the intermediate issue prompt screen
+  const renderIssuePrompt = () => {
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1 }}
+      >
+        <h4 className="text-white font-medium mb-3">What specifically are you dealing with?</h4>
+        <p className="text-[#B8C7E0] mb-4">
+          Sharing more details will help us provide targeted exercises.
+        </p>
+        
+        <div className="space-y-3 mb-4">
+          <div className="grid grid-cols-2 gap-2">
+            {['Relationship', 'Work', 'Health', 'Anxiety', 'Loss', 'Self-esteem', 'Uncertainty', 'Other'].map((type) => (
+              <div
+                key={type}
+                onClick={() => setIssueType(type)}
+                className={`p-3 rounded-lg border cursor-pointer transition-all text-center ${
+                  issueType === type
+                    ? `${theme.selected} text-white`
+                    : 'bg-[#0F172A]/70 border-[#2A3547] text-[#B8C7E0] hover:border-[#3E60C1]'
+                }`}
+              >
+                {type}
+              </div>
+            ))}
+          </div>
+        </div>
+        
+        <div className="mb-4">
+          <textarea
+            value={userIssue}
+            onChange={(e) => setUserIssue(e.target.value)}
+            placeholder="Describe what you're experiencing... (optional)"
+            className="w-full bg-[#0F172A] border border-[#2A3547] rounded-lg p-3 text-[#B8C7E0] focus:outline-none focus:border-[#5983FC] min-h-[100px]"
+          ></textarea>
+        </div>
+        
+        <div className="flex justify-end space-x-3">
+          <button
+            onClick={() => {
+              setShowIssuePrompt(false);
+              // Go directly to recommendations with default options
+              const exerciseOptions = getRecommendations(notification.currentMood, selectedCause);
+              setRecommendations(exerciseOptions);
+              setShowRecommendations(true);
+            }}
+            className="px-4 py-2 rounded-lg text-[#B8C7E0] hover:text-white transition-colors flex items-center"
+          >
+            Skip
+          </button>
+          <button
+            onClick={handleIssueSubmit}
+            disabled={!issueType || isLoading}
+            className={`px-6 py-2 rounded-lg flex items-center shadow-md ${
+              issueType && !isLoading
+                ? `${theme.primary} text-white ${theme.hover}`
+                : 'bg-[#2A3547] text-[#B8C7E0] cursor-not-allowed'
+            } transition-colors`}
+          >
+            {isLoading ? (
+              <>
+                <svg className="animate-spin h-4 w-4 mr-2 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Processing
+              </>
+            ) : (
+              <>
+                Get Recommendations <FaChevronRight className="ml-2" />
+              </>
+            )}
+          </button>
+        </div>
+      </motion.div>
+    );
   };
 
   return (
@@ -1086,7 +1286,7 @@ const MoodCausePrompt = ({ notification, onClose }) => {
                 Got it, thanks!
               </button>
             </motion.div>
-          ) : !showRecommendations ? (
+          ) : !showIssuePrompt && !showRecommendations ? (
             // Mood change cause selection UI
             <motion.div
               initial={{ opacity: 0, y: 10 }}
@@ -1188,8 +1388,11 @@ const MoodCausePrompt = ({ notification, onClose }) => {
                 </button>
               </div>
             </motion.div>
+          ) : showIssuePrompt ? (
+            // New issue prompt UI
+            renderIssuePrompt()
           ) : (
-            // Recommendations UI with enhanced styling
+            // Recommendations UI 
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}

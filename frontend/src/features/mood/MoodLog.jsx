@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { motion } from 'framer-motion';
 import { fetchMoodLogs, fetchMoodTrends } from './moodSlice';
-import { fetchNotifications } from '../notifications/notificationSlice';
+import { fetchNotifications, addPositiveReinforcement } from '../notifications/notificationSlice';
 import {
   FaCalendarAlt,
   FaChartLine,
@@ -30,6 +30,9 @@ import MoodForecast from './components/MoodForecast';
 
 // Import the NotificationCenter component
 import NotificationCenter from '../notifications/NotificationCenter';
+import PositiveReinforcement from '../../components/PositiveReinforcement';
+import MoodCausePrompt from '../../components/MoodCausePrompt';
+import { useLocation } from 'react-router-dom';
 
 // New component for mood recommendations
 const MoodRecommendation = ({ logs, selectedPeriod }) => {
@@ -113,14 +116,91 @@ const MoodRecommendation = ({ logs, selectedPeriod }) => {
   );
 };
 
+// Update the analyzeMoodTrend function
+const analyzeMoodTrend = (logs) => {
+  if (logs.length < 3) return null;
+  
+  const moodCategories = {
+    positive: ['happy', 'excited', 'optimistic', 'calm'],
+    neutral: ['neutral'],
+    negative: ['anxious', 'sad', 'angry']
+  };
+
+  const getCategory = (mood) => {
+    for (const [category, moods] of Object.entries(moodCategories)) {
+      if (moods.includes(mood)) return category;
+    }
+    return 'neutral';
+  };
+
+  const currentMood = logs[logs.length-1].mood;
+  const previousMood = logs[logs.length-2]?.mood;
+  const currentCategory = getCategory(currentMood);
+  const previousCategory = getCategory(previousMood);
+
+  // Only consider numerical trend if category changed
+  const moodValues = { positive: 1, neutral: 0, negative: -1 };
+  const trend = moodValues[currentCategory] - moodValues[previousCategory];
+
+  return {
+    trend,
+    currentMood,
+    previousMood,
+    currentCategory,
+    previousCategory
+  };
+};
+
+// Add this function after analyzeMoodTrend
+const detectNegativeTrend = (logs) => {
+  if (!logs || logs.length < 5) return false;
+  
+  // Get the latest 5 mood entries (including most recent 3 negatives)
+  const recentLogs = logs.slice(-5);
+  
+  // Define the mood values directly from your MoodChart
+  const moodValues = {
+    // Very positive moods (8-10)
+    'happy': 9, 'excited': 9, 'loving': 9, 'optimistic': 8,
+    'proud': 8, 'grateful': 8, 'relieved': 8, 'amused': 8,
+    
+    // Positive moods (6-7)
+    'calm': 7, 'caring': 7, 'surprised': 6, 'curious': 6,
+    
+    // Neutral moods (4-5)
+    'neutral': 5, 'confused': 4,
+    
+    // Negative moods (2-3)
+    'anxious': 3, 'nervous': 3, 'embarrassed': 3, 'disappointed': 3,
+    'annoyed': 3, 'disapproving': 2, 'sad': 2,
+    
+    // Very negative moods (0-1)
+    'angry': 1, 'grieving': 1, 'disgusted': 1, 'remorseful': 1
+  };
+  
+  // Check if the 3 most recent entries are negative
+  const recentNegative = recentLogs.slice(-3).every(log => 
+    (moodValues[log.mood] || 5) < 4
+  );
+  
+  // Check if there were positive entries before the negative ones
+  const hadPositive = recentLogs.slice(0, 2).some(log => 
+    (moodValues[log.mood] || 5) >= 6
+  );
+  
+  // Return true if we had positive entries followed by negative ones
+  return recentNegative && hadPositive;
+};
 
 const MoodLog = () => {
   const dispatch = useDispatch();
+  const location = useLocation();
   const { logs, status, error, trends } = useSelector(state => state.mood);
   const [selectedPeriod, setSelectedPeriod] = useState('month');
   const [moodFilter, setMoodFilter] = useState('all');
   const [selectedView, setSelectedView] = useState('chart');
   const [selectedChart, setSelectedChart] = useState('line');
+  const [activeNotification, setActiveNotification] = useState(null);
 
   // Debug log - this will help see if we're even getting to this component
   console.log("MoodLog rendering, status:", status, "logs:", logs?.length || 0);
@@ -130,8 +210,10 @@ const MoodLog = () => {
     console.log("Dispatching fetch actions");
     dispatch(fetchMoodLogs());
     dispatch(fetchMoodTrends());
-    
     dispatch(fetchNotifications());
+    
+    // Reset notification cooldown to ensure notifications appear
+    localStorage.removeItem('lastNegativeNotification');
     
     // Add this temporary testing code
     fetch('/api/notifications/mood/')
@@ -142,6 +224,32 @@ const MoodLog = () => {
       })
       .catch(err => console.error("Error fetching notifications directly:", err));
   }, [dispatch]);
+
+  useEffect(() => {
+    if (logs?.length > 4) {
+      // Check if we have a negative trend after positive moods 
+      if (detectNegativeTrend(logs)) {
+        const lastNegative = parseInt(localStorage.getItem('lastNegativeNotification') || 0);
+        
+        // Show notification if we haven't shown one in the last 12 hours
+        if (Date.now() - lastNegative > 43200000) {
+          setActiveNotification({
+            type: 'negative',
+            currentMood: logs[logs.length-1].mood,
+            previousMood: logs[logs.length-4].mood
+          });
+          localStorage.setItem('lastNegativeNotification', Date.now());
+          
+          // Add a notification to the notification center too
+          dispatch(addPositiveReinforcement({
+            mood: logs[logs.length-1].mood,
+            message: "We've detected a shift in your mood. Would you like to tell us more?",
+            type: 'mood_shift'
+          }));
+        }
+      }
+    }
+  }, [logs, dispatch]);
 
   const getMoodIcon = (mood) => {
     const positiveMoods = ['happy', 'excited', 'loving', 'optimistic', 'proud', 'grateful', 'relieved', 'amused', 'calm', 'caring'];
@@ -255,6 +363,81 @@ const MoodLog = () => {
     return (sum / filteredLogs.length).toFixed(1);
   };
 
+  // Replace the isLatestMoodPositive function with this corrected version
+  const isLatestMoodPositive = () => {
+    if (!logs || logs.length === 0) return false;
+    
+    // Get just the latest mood entry
+    const latestLog = logs[logs.length - 1];
+    const latestMood = latestLog.mood;
+    
+    // Get the mood values from MoodChart
+    const moodValues = {
+      // Very positive moods (8-10)
+      'happy': 9, 'excited': 9, 'loving': 9, 'optimistic': 8,
+      'proud': 8, 'grateful': 8, 'relieved': 8, 'amused': 8,
+      
+      // Positive moods (6-7)
+      'calm': 7, 'caring': 7, 'surprised': 6, 'curious': 6,
+      
+      // Neutral moods (4-5)
+      'neutral': 5, 'confused': 4,
+      
+      // Negative moods (2-3)
+      'anxious': 3, 'nervous': 3, 'embarrassed': 3, 'disappointed': 3,
+      'annoyed': 3, 'disapproving': 2, 'sad': 2,
+      
+      // Very negative moods (0-1)
+      'angry': 1, 'grieving': 1, 'disgusted': 1, 'remorseful': 1
+    };
+    
+    // Debug the mood detection
+    console.log("Latest mood:", latestMood, "Value:", moodValues[latestMood] || 0);
+    
+    // Check if latest mood is positive (score >= 6)
+    // Using strict comparison and a fallback of 0 instead of 5
+    return (moodValues[latestMood] || 0) >= 6;
+  };
+
+  // Update the useEffect that shows positive reinforcement
+  useEffect(() => {
+    if (status === 'succeeded' && logs && logs.length > 0) {
+      const latestPositive = isLatestMoodPositive();
+      console.log("Is latest mood positive?", latestPositive);
+      
+      if (latestPositive) {
+        const latestMood = logs[logs.length - 1].mood;
+        const message = getPositiveMessage(latestMood);
+        
+        // Add a cooldown check to prevent spam
+        const lastShown = localStorage.getItem('lastPositiveShown');
+        const now = Date.now();
+        if (!lastShown || (now - parseInt(lastShown)) > 60000) { // 1 minute cooldown
+          dispatch(addPositiveReinforcement({
+            mood: latestMood,
+            message
+          }));
+          localStorage.setItem('lastPositiveShown', now);
+        }
+      }
+    }
+  }, [status, location.pathname]); // Trigger when location changes or status is succeeded
+  
+  // Function to get personalized positive message
+  const getPositiveMessage = (mood) => {
+    const messages = {
+      'happy': "You're feeling happy today - that's wonderful!",
+      'excited': "Your excitement is energizing! Keep that positive energy flowing.",
+      'loving': "Your loving mood brings warmth to your day.",
+      'optimistic': "Your optimistic outlook helps you see possibilities!",
+      'proud': "You're feeling proud - take a moment to celebrate yourself!",
+      'grateful': "Gratitude is a powerful emotion - enjoy this positive state.",
+      'default': "You're in a positive state right now - wonderful!"
+    };
+    
+    return messages[mood] || messages.default;
+  };
+
   // Handle loading state with clear message
   if (status === 'loading') {
     return (
@@ -297,10 +480,28 @@ const MoodLog = () => {
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-4">
             <div className="flex flex-wrap items-center gap-2">
               <button
-                onClick={() => setSelectedView('chart')}
-                className={`px-4 py-2 rounded-lg transition-colors flex items-center gap-2 ${selectedView === 'chart'
-                  ? 'bg-[#3E60C1] text-white'
-                  : 'bg-[#0F172A] text-[#B8C7E0] hover:bg-[#2A3547]'}`}
+                onClick={() => {
+                  setSelectedView('chart');
+                  if (logs?.length > 0) {
+                    // Only check the latest mood entry with improved detection
+                    const latestPositive = isLatestMoodPositive();
+                    console.log("Charts view - Latest mood positive?", latestPositive);
+                    
+                    if (latestPositive) {
+                      const latestMood = logs[logs.length - 1].mood;
+                      // Dispatch a positive notification
+                      dispatch(addPositiveReinforcement({
+                        mood: latestMood,
+                        message: `Great job maintaining a positive ${latestMood} state!`,
+                      }));
+                    }
+                  }
+                }}
+                className={`px-4 py-2 rounded-lg transition-colors flex items-center gap-2 ${
+                  selectedView === 'chart'
+                    ? 'bg-[#3E60C1] text-white'
+                    : 'bg-[#0F172A] text-[#B8C7E0] hover:bg-[#2A3547]'
+                }`}
               >
                 <FaChartLine className="inline mr-1" /> Charts
               </button>
@@ -579,6 +780,20 @@ const MoodLog = () => {
           )}
         </div>
       </div>
+      
+      {activeNotification?.type === 'positive' && (
+        <PositiveReinforcement
+          notification={activeNotification}
+          onClose={() => setActiveNotification(null)}
+        />
+      )}
+      
+      {activeNotification?.type === 'negative' && (
+        <MoodCausePrompt
+          notification={activeNotification}
+          onClose={() => setActiveNotification(null)}
+        />
+      )}
     </div>
   );
 };

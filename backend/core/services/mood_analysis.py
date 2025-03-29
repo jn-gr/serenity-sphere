@@ -13,109 +13,74 @@ class MoodAnalysisService:
         """Analyze a user's mood data and generate appropriate notifications"""
         notifications = []
         
-        # Get recent mood logs
+        # Get mood logs from last 7 days
+        one_week_ago = timezone.now() - timedelta(days=7)
         recent_logs = MoodLog.objects.filter(
-            user=user
-        ).order_by('-date')[:10]
+            user=user,
+            date__gte=one_week_ago
+        ).order_by('date')
         
-        # Check for drastic mood changes
-        if len(recent_logs) >= 2:
-            latest_log = recent_logs[0]
-            previous_log = recent_logs[1]
-            
-            # Map moods to numerical values
-            mood_scores = {
-                # Positive emotions
-                'joy': 0.9,
-                'excitement': 0.8,
-                'love': 0.8,
-                'optimism': 0.7,
-                'pride': 0.6,
-                'gratitude': 0.6,
-                'relief': 0.5,
-                'admiration': 0.7,
-                'amusement': 0.6,
-                'approval': 0.5,
-                'caring': 0.5,
-                
-                # Neutral emotions
-                'neutral': 0.0,
-                'surprise': 0.1,
-                'curiosity': 0.2,
-                'realization': 0.2,
-                'desire': 0.3,
-                'confusion': -0.1,
-                'nervousness': -0.2,
-                
-                # Negative emotions
-                'anger': -0.8,
-                'annoyance': -0.5,
-                'disappointment': -0.6,
-                'disapproval': -0.5,
-                'disgust': -0.7,
-                'embarrassment': -0.4,
-                'fear': -0.7,
-                'grief': -0.9,
-                'remorse': -0.6,
-                'sadness': -0.8
-            }
-            
-            # Calculate mood shift magnitude
-            latest_score = mood_scores.get(latest_log.mood, 0) * (latest_log.intensity / 10)
-            previous_score = mood_scores.get(previous_log.mood, 0) * (previous_log.intensity / 10)
-            mood_shift = abs(latest_score - previous_score)
-            
-            # If significant shift (0.5 is a threshold that can be tuned)
-            if mood_shift > 0.5:
-                # Check if we already have a recent notification for the same shift
-                recent_notification = Notification.objects.filter(
-                    user=user,
-                    type='mood_shift',
-                    created_at__gte=timezone.now() - timedelta(hours=24)
-                ).first()
-                
-                if not recent_notification:
-                    # Create a notification about the mood shift
-                    notification = Notification.objects.create(
+        if len(recent_logs) < 3:
+            return notifications
+        
+        # Calculate mood scores with weights
+        mood_weights = {
+            # Positive emotions
+            'happy': 1.0, 'excited': 0.9, 'loving': 0.9, 'optimistic': 0.85,
+            'proud': 0.8, 'grateful': 0.8, 'relieved': 0.75, 'amused': 0.7,
+            'calm': 0.6, 'caring': 0.6, 'surprised': 0.5, 'curious': 0.5,
+            # Neutral
+            'neutral': 0.0, 'confused': -0.1,
+            # Negative emotions
+            'anxious': -0.8, 'nervous': -0.7, 'embarrassed': -0.6,
+            'disappointed': -0.7, 'annoyed': -0.6, 'disapproving': -0.65,
+            'sad': -0.8, 'angry': -0.9, 'grieving': -0.95, 'disgusted': -0.85,
+            'remorseful': -0.75
+        }
+        
+        # Calculate trend metrics
+        trend_window = min(5, len(recent_logs))
+        recent_scores = [mood_weights[log.mood] * (log.intensity/10) for log in recent_logs[-trend_window:]]
+        previous_scores = [mood_weights[log.mood] * (log.intensity/10) for log in recent_logs[-trend_window*2:-trend_window]]
+        
+        avg_current = sum(recent_scores) / len(recent_scores)
+        avg_previous = sum(previous_scores) / len(previous_scores) if previous_scores else 0
+        
+        # Determine trend type
+        trend_type = 'stable'
+        if avg_current - avg_previous >= 0.3:
+            trend_type = 'positive'
+        elif avg_current - avg_previous <= -0.3:
+            trend_type = 'negative'
+        
+        # Generate appropriate notifications
+        if trend_type == 'positive':
+            if not Notification.objects.filter(
+                user=user,
+                type='positive_reinforcement',
+                created_at__gte=timezone.now() - timedelta(days=1)
+            ).exists():
+                notifications.append(
+                    Notification.objects.create(
+                        user=user,
+                        type='positive_reinforcement',
+                        message=f"Your mood has shown consistent improvement!",
+                        severity='low'
+                    )
+                )
+        elif trend_type == 'negative':
+            if not Notification.objects.filter(
+                user=user,
+                type='mood_shift',
+                created_at__gte=timezone.now() - timedelta(hours=12)
+            ).exists():
+                notifications.append(
+                    Notification.objects.create(
                         user=user,
                         type='mood_shift',
-                        message=f"We noticed a significant change in your mood from {previous_log.mood} to {latest_log.mood}.",
-                        severity='high' if mood_shift > 0.8 else 'medium'
+                        message=f"We noticed a significant mood shift",
+                        severity='high'
                     )
-                    notifications.append(notification)
-        
-        # Check for extended sadness
-        one_week_ago = timezone.now() - timedelta(days=7)
-        sad_moods = ['sadness', 'grief', 'disappointment', 'remorse']
-        
-        sad_count = MoodLog.objects.filter(
-            user=user,
-            mood__in=sad_moods,
-            date__gte=one_week_ago
-        ).count()
-        
-        total_count = MoodLog.objects.filter(
-            user=user,
-            date__gte=one_week_ago
-        ).count()
-        
-        # If more than 60% of recent moods are sad and at least 3 entries
-        if sad_count >= 3 and (total_count > 0 and sad_count / total_count >= 0.6):
-            # Check if we already have a recent notification for extended sadness
-            recent_notification = Notification.objects.filter(
-                user=user,
-                type='extended_sadness',
-                created_at__gte=timezone.now() - timedelta(days=3)
-            ).first()
-            
-            if not recent_notification:
-                # Create a notification about extended sadness
-                notification = Notification.objects.create(
-                    user=user,
-                    type='extended_sadness',
-                    message="You've been experiencing sadness for several days. Would you like to explore some coping strategies?",
-                    severity='medium'
                 )
-                notifications.append(notification)
         
         return notifications 
