@@ -1559,6 +1559,12 @@ const MoodCausePrompt = ({ notification, onClose }) => {
       enhancedExercise.link = 'perspective-taking';
       enhancedExercise.type = 'reflection';
     }
+    // In the handleRecommendationClick function
+    // Add specific handling for Work Boundaries Exercise
+    else if (recommendation.title === "Work Boundaries Exercise") {
+      enhancedExercise.link = 'work-boundaries';
+      enhancedExercise.type = 'work';
+    }
     
     // Ensure resources are available
     if (!enhancedExercise.resources || enhancedExercise.resources.length === 0) {
@@ -1589,6 +1595,23 @@ const MoodCausePrompt = ({ notification, onClose }) => {
             title: "The Science of Empathy",
             description: "Research on perspective-taking from Greater Good Science Center",
             url: "https://greatergood.berkeley.edu/topic/empathy/definition"
+          }
+        ];
+      }
+      // Also add resources in the resources section
+      else if (recommendation.title === "Work Boundaries Exercise") {
+        enhancedExercise.resources = [
+          {
+            type: "article",
+            title: "Setting Healthy Boundaries at Work",
+            description: "Harvard Business Review guide to professional boundaries",
+            url: "https://hbr.org/2021/02/how-to-set-boundaries-in-the-age-of-digital-distraction"
+          },
+          {
+            type: "video",
+            title: "How to Set and Maintain Professional Boundaries",
+            description: "Practical techniques for work-life balance",
+            url: "https://www.youtube.com/watch?v=6NxB6c6d39A"
           }
         ];
       }

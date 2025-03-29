@@ -38,6 +38,14 @@ const ExerciseModal = ({ exercise, onClose }) => {
   const [valueDefinition, setValueDefinition] = useState('');
   const [actionPlan, setActionPlan] = useState('');
 
+  // Add these state variables at the top of the component with other state variables
+  const [workHours, setWorkHours] = useState('');
+  const [actualHours, setActualHours] = useState('');
+  const [boundaryIssues, setBoundaryIssues] = useState(['', '', '']);
+  const [boundaryStatements, setBoundaryStatements] = useState(['', '', '']);
+  const [obstacles, setObstacles] = useState(['', '', '']);
+  const [selectedBoundary, setSelectedBoundary] = useState('');
+
   const timerRef = useRef(null);
   const audioRef = useRef(null);
   
@@ -918,47 +926,161 @@ const ExerciseModal = ({ exercise, onClose }) => {
       case 'work':
         return (
           <div className="mt-4">
-            <div className="bg-[#0F172A] p-4 rounded-lg border border-[#2A3547] mb-3">
-              <h4 className="text-white text-sm font-medium mb-3">Priority Matrix</h4>
+            <div className="bg-[#0F172A] p-4 rounded-lg border border-[#2A3547] mb-4">
+              <h4 className="text-white text-sm font-medium mb-3">Current Work Pattern</h4>
               
-              <div className="grid grid-cols-2 gap-2 mb-4">
-                <div className="p-3 rounded-lg bg-[#3E60C1]/20 border border-[#5983FC]/30">
-                  <div className="text-[#5983FC] text-xs mb-1">Urgent & Important</div>
+              <div className="grid grid-cols-1 gap-3 mb-4">
+                <div>
+                  <label className="text-[#5983FC] text-xs mb-1 block">My Official Work Hours:</label>
                   <textarea
-                    className="w-full h-16 bg-[#1A2335] border border-[#2A3547] rounded-lg p-2 text-[#B8C7E0] text-xs focus:outline-none focus:border-[#5983FC]"
-                    placeholder="Tasks to do immediately..."
+                    value={workHours}
+                    onChange={(e) => setWorkHours(e.target.value)}
+                    className="w-full h-16 bg-[#1A2335] border border-[#2A3547] rounded-lg p-2 text-[#B8C7E0] text-sm focus:outline-none focus:border-[#5983FC]"
+                    placeholder="E.g., Monday-Friday, 9am-5pm"
                   />
                 </div>
-                <div className="p-3 rounded-lg bg-[#3E60C1]/10 border border-[#5983FC]/20">
-                  <div className="text-[#5983FC] text-xs mb-1">Important, Not Urgent</div>
+                
+                <div>
+                  <label className="text-[#5983FC] text-xs mb-1 block">When Work Actually Happens:</label>
                   <textarea
-                    className="w-full h-16 bg-[#1A2335] border border-[#2A3547] rounded-lg p-2 text-[#B8C7E0] text-xs focus:outline-none focus:border-[#5983FC]"
-                    placeholder="Tasks to schedule..."
-                  />
-                </div>
-                <div className="p-3 rounded-lg bg-[#0F172A] border border-[#2A3547]">
-                  <div className="text-[#B8C7E0] text-xs mb-1">Urgent, Not Important</div>
-                  <textarea
-                    className="w-full h-16 bg-[#1A2335] border border-[#2A3547] rounded-lg p-2 text-[#B8C7E0] text-xs focus:outline-none focus:border-[#5983FC]"
-                    placeholder="Tasks to delegate..."
-                  />
-                </div>
-                <div className="p-3 rounded-lg bg-[#0F172A] border border-[#2A3547]">
-                  <div className="text-[#B8C7E0] text-xs mb-1">Neither Urgent nor Important</div>
-                  <textarea
-                    className="w-full h-16 bg-[#1A2335] border border-[#2A3547] rounded-lg p-2 text-[#B8C7E0] text-xs focus:outline-none focus:border-[#5983FC]"
-                    placeholder="Tasks to eliminate..."
+                    value={actualHours}
+                    onChange={(e) => setActualHours(e.target.value)}
+                    className="w-full h-16 bg-[#1A2335] border border-[#2A3547] rounded-lg p-2 text-[#B8C7E0] text-sm focus:outline-none focus:border-[#5983FC]"
+                    placeholder="E.g., Check emails at 7am, work until 7pm, weekend calls..."
                   />
                 </div>
               </div>
               
-              <h4 className="text-white text-sm font-medium mb-2">Focus for Today</h4>
-              <div className="p-3 rounded-lg border border-[#5983FC]/20 bg-[#3E60C1]/10">
-                <textarea
-                  className="w-full h-12 bg-[#1A2335] border border-[#2A3547] rounded-lg p-2 text-[#B8C7E0] text-sm focus:outline-none focus:border-[#5983FC]"
-                  placeholder="Top 3 priorities for today..."
-                />
+              {/* Time visualization */}
+              <div className="mb-4 p-3 bg-[#1A2335]/50 rounded-lg">
+                <h5 className="text-white text-xs font-medium mb-2">Work-Life Time Visualization</h5>
+                <div className="h-6 bg-[#0F172A] rounded-full overflow-hidden mb-1">
+                  <div className="h-full bg-gradient-to-r from-green-500 to-yellow-500 rounded-full" style={{width: '60%'}}></div>
+                </div>
+                <div className="flex justify-between text-xs text-[#B8C7E0]">
+                  <span>12am</span>
+                  <span>6am</span>
+                  <span>12pm</span>
+                  <span>6pm</span>
+                  <span>12am</span>
+                </div>
+                <div className="text-xs text-[#B8C7E0] mt-1">
+                  <span className="inline-block w-3 h-3 bg-green-500 rounded-sm mr-1"></span>
+                  <span className="mr-3">Official Hours</span>
+                  <span className="inline-block w-3 h-3 bg-yellow-500 rounded-sm mr-1"></span>
+                  <span>Actual Hours</span>
+                </div>
               </div>
+            </div>
+            
+            <div className="bg-[#0F172A] p-4 rounded-lg border border-[#2A3547] mb-4">
+              <h4 className="text-white text-sm font-medium mb-3">Boundary Issues & Solutions</h4>
+              
+              <div className="space-y-4">
+                {[0, 1, 2].map((index) => (
+                  <div key={index} className="p-3 bg-[#1A2335]/50 rounded-lg border border-[#2A3547]">
+                    <h5 className="text-white text-xs font-medium mb-2">Issue #{index + 1}</h5>
+                    
+                    <div className="mb-3">
+                      <label className="text-[#5983FC] text-xs mb-1 block">Specific Boundary Issue:</label>
+                      <textarea
+                        value={boundaryIssues[index]}
+                        onChange={(e) => updateArrayAt(setBoundaryIssues, boundaryIssues, index, e.target.value)}
+                        className="w-full h-12 bg-[#1A2335] border border-[#2A3547] rounded-lg p-2 text-[#B8C7E0] text-sm focus:outline-none focus:border-[#5983FC]"
+                        placeholder="E.g., After-hours work emails, lunch breaks interrupted..."
+                      />
+                    </div>
+                    
+                    <div className="mb-3">
+                      <label className="text-[#5983FC] text-xs mb-1 block">Boundary Statement:</label>
+                      <textarea
+                        value={boundaryStatements[index]}
+                        onChange={(e) => updateArrayAt(setBoundaryStatements, boundaryStatements, index, e.target.value)}
+                        className="w-full h-12 bg-[#1A2335] border border-[#2A3547] rounded-lg p-2 text-[#B8C7E0] text-sm focus:outline-none focus:border-[#5983FC]"
+                        placeholder="E.g., I will not check email after 7pm..."
+                      />
+                    </div>
+                    
+                    <div>
+                      <label className="text-[#5983FC] text-xs mb-1 block">Potential Obstacles:</label>
+                      <textarea
+                        value={obstacles[index]}
+                        onChange={(e) => updateArrayAt(setObstacles, obstacles, index, e.target.value)}
+                        className="w-full h-12 bg-[#1A2335] border border-[#2A3547] rounded-lg p-2 text-[#B8C7E0] text-sm focus:outline-none focus:border-[#5983FC]"
+                        placeholder="E.g., Manager expectations, habit of checking phone..."
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+            
+            <div className="bg-[#0F172A] p-4 rounded-lg border border-[#2A3547] mb-4">
+              <h4 className="text-white text-sm font-medium mb-3">Implementation Plan</h4>
+              
+              <p className="text-[#B8C7E0] text-sm mb-3">Select one boundary to implement first:</p>
+              
+              <div className="space-y-2 mb-4">
+                {boundaryStatements.map((statement, index) => (
+                  statement && (
+                    <div 
+                      key={index}
+                      onClick={() => setSelectedBoundary(statement)}
+                      className={`p-3 rounded-lg cursor-pointer ${
+                        selectedBoundary === statement
+                          ? 'bg-[#3E60C1]/20 border-[#5983FC]/50 border'
+                          : 'bg-[#1A2335] border border-[#2A3547] hover:border-[#3E60C1]/50'
+                      }`}
+                    >
+                      <div className="flex items-center">
+                        <div className={`w-4 h-4 rounded-full mr-3 flex items-center justify-center ${
+                          selectedBoundary === statement
+                            ? 'border-[#5983FC] bg-[#5983FC]/10 border-2'
+                            : 'border border-[#3E60C1]'
+                        }`}>
+                          {selectedBoundary === statement && (
+                            <div className="w-2 h-2 rounded-full bg-[#5983FC]"></div>
+                          )}
+                        </div>
+                        <span className="text-[#B8C7E0] text-sm">{statement}</span>
+                      </div>
+                    </div>
+                  )
+                ))}
+              </div>
+              
+              {selectedBoundary && (
+                <div className="p-3 bg-[#1A2335]/50 rounded-lg">
+                  <h5 className="text-white text-xs font-medium mb-2">Next Steps for Implementation</h5>
+                  <ol className="list-decimal pl-5 text-[#B8C7E0] text-sm space-y-1">
+                    <li>Communicate this boundary to necessary colleagues</li>
+                    <li>Modify technology to support this boundary (e.g., turn off notifications)</li>
+                    <li>Plan how you'll respond if the boundary is crossed</li>
+                    <li>Practice saying "no" or redirecting requests that violate this boundary</li>
+                    <li>Schedule a review in 1 week to assess how it's working</li>
+                  </ol>
+                </div>
+              )}
+            </div>
+            
+            <div className="bg-[#0F172A]/70 p-3 rounded-lg border border-[#2A3547]">
+              <h4 className="text-[#5983FC] text-sm font-medium mb-2 flex items-center">
+                <FaRegLightbulb className="mr-2" /> Tips for Setting Work Boundaries:
+              </h4>
+              <ul className="space-y-2">
+                <li className="text-[#B8C7E0] text-sm flex items-start">
+                  <span className="text-[#5983FC] mr-2">•</span>
+                  <span>Start with one small, achievable boundary</span>
+                </li>
+                <li className="text-[#B8C7E0] text-sm flex items-start">
+                  <span className="text-[#5983FC] mr-2">•</span>
+                  <span>Use clear, direct language when communicating boundaries</span>
+                </li>
+                <li className="text-[#B8C7E0] text-sm flex items-start">
+                  <span className="text-[#5983FC] mr-2">•</span>
+                  <span>Remember that setting boundaries improves your productivity and wellbeing</span>
+                </li>
+              </ul>
             </div>
           </div>
         );
@@ -1021,7 +1143,7 @@ const ExerciseModal = ({ exercise, onClose }) => {
                 <input 
                   type="text"
                   className="w-full bg-[#1A2335] border border-[#2A3547] rounded-lg p-2 text-[#B8C7E0] text-sm focus:outline-none focus:border-[#5983FC]"
-                  placeholder="Name or relationship (e.g., friend, partner, colleague)"
+                  placeholder="Name or relationship (e.g., friend, partner, family member, or colleague)"
                 />
               </div>
               
@@ -1172,6 +1294,10 @@ const ExerciseModal = ({ exercise, onClose }) => {
     
     // First check if there's a direct link
     if (exercise.link && typeof exercise.link === 'string') {
+      if (exercise.link === 'work-boundaries') {
+        return 'work-boundaries';
+      }
+      
       // Check for direct match with the link value
       if (exerciseContents[exercise.link]) {
         return exercise.link;
@@ -2449,6 +2575,60 @@ const ExerciseModal = ({ exercise, onClose }) => {
           description: "Understanding different ways people express and receive appreciation",
           url: "https://www.5lovelanguages.com/book/the-5-love-languages/"
         }
+      ]
+    },
+
+    'work-boundaries': {
+      title: "Work Boundaries Exercise",
+      description: "Establish healthy boundaries to manage work-related stress.",
+      steps: [
+        {
+          title: "Current Boundary Assessment",
+          content: "Make two columns: 'My Work Hours' (when you're officially supposed to work) and 'When Work Actually Happens' (including early mornings, evenings, weekends). Note the discrepancies."
+        },
+        {
+          title: "Identify Boundary Issues",
+          content: "List 2-3 specific boundary issues you face (e.g., after-hours emails, lunch breaks interrupted, difficulty saying no to extra tasks)."
+        },
+        {
+          title: "Create Boundary Statements",
+          content: "For each issue, write an ideal boundary statement. For example: 'I will not check email after 7pm' or 'I will take a full lunch break away from my desk each day.'"
+        },
+        {
+          title: "Anticipate Challenges",
+          content: "For each boundary, list potential obstacles or resistance you might face. What might make it difficult to maintain this boundary?"
+        },
+        {
+          title: "Implementation Plan",
+          content: "Create specific steps for implementing each boundary. Include any communication needed with colleagues, changes to technology, or personal habits to modify."
+        },
+        {
+          title: "Select One Boundary",
+          content: "Choose one boundary to implement this week. Start small with something you feel confident you can maintain."
+        }
+      ],
+      resources: [
+        {
+          type: "article",
+          title: "How to Set Boundaries at Work | Harvard Business Review",
+          description: "Professional strategies for establishing effective work boundaries",
+          url: "https://hbr.org/2021/02/how-to-set-boundaries-in-the-age-of-digital-distraction"
+        },
+        {
+          type: "video",
+          title: "Setting Boundaries | The Muse",
+          description: "Practical tips for establishing and maintaining healthy work boundaries",
+          url: "https://www.themuse.com/advice/setting-boundaries-at-work-expert-advice"
+        }
+      ],
+      type: "work",
+      checkItems: [
+        "I've identified my current work hour patterns",
+        "I've listed 2-3 specific boundary issues",
+        "I've created clear boundary statements",
+        "I've anticipated potential obstacles",
+        "I've developed an implementation plan",
+        "I've selected one boundary to start with"
       ]
     }
   };
