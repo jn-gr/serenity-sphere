@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
-import { FaTimes, FaLightbulb, FaExternalLinkAlt, FaRegSmileBeam, FaRegSadTear, FaRegMeh, FaHeartbeat, FaStar, FaChevronRight, FaChevronLeft } from 'react-icons/fa';
+import { FaTimes, FaLightbulb, FaExternalLinkAlt, FaRegSmileBeam, FaRegSadTear, FaRegMeh, FaHeartbeat, FaStar, FaChevronRight, FaChevronLeft, FaClock } from 'react-icons/fa';
 import ExerciseModal from './ExerciseModal';
 
 const MoodCausePrompt = ({ notification, onClose }) => {
@@ -591,138 +591,687 @@ const MoodCausePrompt = ({ notification, onClose }) => {
     }
   };
   
-  // First define the exercise catalog as a constant 
+  // Replace the exerciseCatalog with this enhanced version
   const exerciseCatalog = {
     'grief': [
-            {
-              title: "Grief Journaling Exercise",
-        description: "Spend 10 minutes writing about your feelings and memories. Focus on both the pain and the gratitude for what was.",
-        steps: ["Find a quiet space", "Write without judgment", "Express all emotions openly", "Include memories you treasure"]
+      {
+        title: "Grief Journaling Exercise",
+        description: "Express your feelings about your loss through structured writing.",
+        steps: [
+          "Find a quiet space free from distractions",
+          "Write continuously for 15 minutes about your feelings",
+          "Focus on both difficult emotions and positive memories",
+          "Conclude by noting one thing you appreciate despite the loss"
+        ],
+        duration: "15-20 minutes",
+        benefits: "Helps process emotions, create meaning, and find closure",
+        type: "journaling",
+        reflectionPrompts: [
+          "What is most difficult for me about this loss?",
+          "What do I wish I could say to what I've lost?",
+          "What positive memories or aspects can I hold onto?"
+        ],
+        resources: [
+          {
+            type: "article",
+            title: "The Healing Power of Journaling",
+            description: "Harvard Health Publishing",
+            url: "https://www.health.harvard.edu/healthbeat/writing-about-emotions-may-ease-stress-and-trauma"
+          },
+          {
+            type: "video",
+            title: "How to Journal Through Grief",
+            description: "Mayo Clinic",
+            url: "https://www.youtube.com/watch?v=FSWKGRYrTO4"
+          }
+        ]
       },
       {
         title: "Memory Honor Ritual",
         description: "Create a small ritual to honor what you've lost while acknowledging the need to move forward.",
-        steps: ["Choose a meaningful object or photo", "Find a quiet moment", "Reflect on its significance", "Express gratitude for its role in your life"]
+        steps: [
+          "Select a meaningful object or photo connected to your loss",
+          "Create a dedicated space for reflection",
+          "Light a candle and set an intention for your ritual",
+          "Speak or write words of acknowledgment and gratitude",
+          "Close the ritual with a gesture of moving forward"
+        ],
+        duration: "10-15 minutes",
+        benefits: "Provides closure, honors connections, facilitates transition",
+        type: "ritual",
+        resources: [
+          {
+            type: "article",
+            title: "Creating Grief Rituals",
+            description: "American Counseling Association",
+            url: "https://www.counseling.org/docs/default-source/Private/loss-grief-bereavement/grief-rituals.pdf"
+          },
+          {
+            type: "website",
+            title: "Rituals for Healing Grief",
+            description: "Center for Loss & Life Transition",
+            url: "https://www.centerforloss.com/grief/rituals-for-grief/"
+          }
+        ]
+      },
+      {
+        title: "Letter of Release",
+        description: "Write a letter expressing unresolved feelings toward what you've lost.",
+        steps: [
+          "Begin with 'Dear...' addressing what you've lost",
+          "Express everything you wish you could say",
+          "Include what you'll miss and what you're grateful for",
+          "End with words of farewell and release",
+          "Decide whether to keep, bury, or burn the letter as a symbolic act"
+        ],
+        duration: "20-30 minutes",
+        benefits: "Provides emotional release and fosters acceptance"
       }
     ],
+    
     'anxiety': [
       {
         title: "5-4-3-2-1 Grounding Exercise",
         description: "Use your senses to anchor yourself in the present moment and reduce anxiety.",
-        steps: ["Name 5 things you can see", "Name 4 things you can touch", "Name 3 things you can hear", "Name 2 things you can smell", "Name 1 thing you can taste"]
+        steps: [
+          "Acknowledge 5 things you can SEE around you",
+          "Notice 4 things you can TOUCH or FEEL",
+          "Listen for 3 things you can HEAR right now",
+          "Identify 2 things you can SMELL (or like the smell of)",
+          "Note 1 thing you can TASTE (or like the taste of)",
+          "Take a deep breath and notice how you feel"
+        ],
+        duration: "3-5 minutes",
+        benefits: "Interrupts anxiety cycle, brings awareness to present moment",
+        type: "grounding",
+        resources: [
+          {
+            type: "video",
+            title: "5-4-3-2-1 Grounding Technique",
+            description: "Guided exercise by a licensed therapist",
+            url: "https://www.youtube.com/watch?v=30VMIEmA114"
+          },
+          {
+            type: "article",
+            title: "Grounding Techniques for Anxiety",
+            description: "Psychology Today",
+            url: "https://www.psychologytoday.com/us/blog/mindful-anger/201708/grounding-techniques-managing-intense-emotions"
+          }
+        ]
       },
       {
-        title: "Worry Time Practice",
-        description: "Schedule a dedicated 15-minute 'worry time' each day to contain anxiety.",
-        steps: ["Set a specific time for worrying", "During the day, postpone worries to this time", "During worry time, write all concerns", "After 15 minutes, end the session decisively"]
+        title: "Breathing Exercise for Anxiety",
+        description: "Slow, deep breathing to activate your parasympathetic nervous system.",
+        steps: [
+          "Find a comfortable seated position",
+          "Place one hand on your chest and one on your belly",
+          "Breathe in slowly through your nose for 4 counts",
+          "Hold for 2 counts",
+          "Exhale slowly through your mouth for 6 counts",
+          "Repeat for 5-10 cycles"
+        ],
+        duration: "5 minutes",
+        benefits: "Reduces physiological symptoms of anxiety, slows heart rate",
+        type: "breathing",
+        audioUrl: "/exercises/breathing-guide.mp3", // You would need to add these audio files
+        resources: [
+          {
+            type: "video",
+            title: "Diaphragmatic Breathing Technique",
+            description: "University of Michigan Health",
+            url: "https://www.youtube.com/watch?v=8VbOPUWpFZs"
+          },
+          {
+            type: "article",
+            title: "Breathing Exercises for Anxiety",
+            description: "NHS - Every Mind Matters",
+            url: "https://www.nhs.uk/mental-health/self-help/guides-tools-and-activities/breathing-exercises-for-stress/"
+          }
+        ]
+      },
+      {
+        title: "Anxious Thought Reframing",
+        description: "Challenge and restructure anxious thinking patterns.",
+        steps: [
+          "Identify a specific anxious thought",
+          "Rate your belief in this thought (0-100%)",
+          "List evidence that supports and contradicts this thought",
+          "Create a more balanced alternative thought",
+          "Rate how much you believe the new perspective"
+        ],
+        duration: "10-15 minutes",
+        benefits: "Develops cognitive flexibility and reduces catastrophic thinking"
       }
     ],
+    
     'stress': [
-      {
-        title: "Progressive Muscle Relaxation",
-        description: "Systematically tense and release muscle groups to reduce physical stress.",
-        steps: ["Find a comfortable position", "Start with your feet and work upward", "Tense each muscle group for 5 seconds", "Release and notice the sensation", "Continue through all major muscle groups"]
+            {
+              title: "Progressive Muscle Relaxation",
+        description: "Systematically tense and release muscle groups to reduce physical tension.",
+        steps: [
+          "Find a comfortable seated or lying position",
+          "Begin with your feet: tense the muscles for 5 seconds",
+          "Release and notice the sensation of relaxation for 10 seconds",
+          "Move upward through your body (calves, thighs, abdomen, etc.)",
+          "Focus on the contrast between tension and relaxation",
+          "End with a few deep breaths, enjoying the state of relaxation"
+        ],
+        duration: "10-15 minutes",
+        benefits: "Relieves physical stress, improves body awareness, promotes relaxation"
       },
       {
         title: "3-Minute Breathing Space",
-        description: "A mini-meditation to center yourself during stressful moments.",
-        steps: ["Minute 1: Acknowledge your current experience", "Minute 2: Focus attention on your breath", "Minute 3: Expand awareness to your whole body"]
+        description: "A micro-meditation to center yourself during stressful moments.",
+        steps: [
+          "Minute 1: AWARENESS - Notice thoughts, feelings, and sensations",
+          "Minute 2: GATHERING - Gently focus attention on your breath",
+          "Minute 3: EXPANDING - Broaden awareness to include your whole body",
+          "Return to your activities with refreshed awareness"
+        ],
+        duration: "3 minutes",
+        benefits: "Creates mental space, breaks stress cycle, accessible in busy moments"
+      },
+      {
+        title: "Stress Inventory & Action Plan",
+        description: "Identify stress sources and develop specific responses.",
+        steps: [
+          "List all current sources of stress in your life",
+          "Categorize each as: Controllable, Partially Controllable, or Uncontrollable",
+          "For Controllable stressors: list one action step to reduce each",
+          "For Partially Controllable: identify what aspect you can influence",
+          "For Uncontrollable: develop a coping strategy to manage your response",
+          "Choose one action step to implement today"
+        ],
+        duration: "15-20 minutes",
+        benefits: "Increases sense of control, promotes proactive stress management"
       }
     ],
+    
     'anger': [
       {
         title: "STOP Technique for Anger",
         description: "A quick method to interrupt anger before it escalates.",
-        steps: ["S - Stop what you're doing", "T - Take a step back", "O - Observe your thoughts and feelings", "P - Proceed mindfully"]
+        steps: [
+          "S - STOP what you're doing when you notice anger rising",
+          "T - TAKE a step back physically or mentally",
+          "O - OBSERVE what's happening in your body and mind",
+          "P - PROCEED mindfully, choosing your response",
+          "Take 3 deep breaths before responding to the situation"
+        ],
+        duration: "1-2 minutes",
+        benefits: "Creates space between trigger and response, prevents regrettable reactions"
       },
       {
         title: "Anger Letter Exercise",
         description: "Write an uncensored letter expressing your anger (that you won't send).",
-        steps: ["Write without holding back", "Express exactly how you feel", "State what you wish would happen", "After writing, destroy or delete the letter as a symbolic release"]
+        steps: [
+          "Write without filtering or censoring your thoughts",
+          "Express exactly how you feel and why",
+          "Detail the impact of the situation on you",
+          "Include what you wish would happen",
+          "After writing, destroy or delete the letter as a symbolic release"
+        ],
+        duration: "15-20 minutes",
+        benefits: "Provides emotional catharsis without damaging relationships"
+      },
+      {
+        title: "Root Cause Anger Analysis",
+        description: "Identify the deeper needs and values behind your anger.",
+        steps: [
+          "Describe the situation that triggered your anger",
+          "Note your immediate thoughts about the situation",
+          "Ask: 'What was threatened or violated?' (values, needs, expectations)",
+          "Ask: 'What am I really afraid of in this situation?'",
+          "Identify what you truly need in this situation"
+        ],
+        duration: "10-15 minutes",
+        benefits: "Transforms reactive anger into constructive understanding"
       }
     ],
+    
     'relationship': [
       {
         title: "Perspective-Taking Practice",
         description: "Strengthen empathy by consciously considering another viewpoint.",
-        steps: ["Identify the situation causing distress", "Imagine the other person's perspective in detail", "Consider their possible feelings and motivations", "Note insights that emerge"]
+        steps: [
+          "Identify a specific relationship challenge",
+          "Write down your perspective and feelings about it",
+          "Imagine being the other person - their thoughts and feelings",
+          "Consider their background, values, and current stressors",
+          "Note any new insights or understanding that emerges",
+          "Identify one way to incorporate this understanding"
+        ],
+        duration: "15 minutes",
+        benefits: "Builds empathy, reduces judgment, improves communication"
       },
       {
         title: "Values Clarification",
         description: "Identify what matters most to you in relationships to guide your responses.",
-        steps: ["List 5 values important to you in relationships", "Rank them in order of importance", "For each value, note one way you can express it", "Consider how these values apply to your current situation"]
+        steps: [
+          "List 5-7 values important to you in relationships (e.g., honesty, respect)",
+          "Rank them in order of importance to you",
+          "For each value, note one specific way you can express it",
+          "Identify which values might be compromised in current challenges",
+          "Create a plan to realign your actions with your top values"
+        ],
+        duration: "20 minutes",
+        benefits: "Clarifies priorities, promotes value-aligned behavior"
+      },
+      {
+        title: "Appreciation Expression",
+        description: "Strengthen connection through deliberate appreciation.",
+        steps: [
+          "Think of someone significant in your life",
+          "List 3 specific things you appreciate about them",
+          "For each item, note why it matters to you personally",
+          "Choose one appreciation to express to them",
+          "Practice expressing it clearly and specifically",
+          "Share your appreciation verbally or in writing"
+        ],
+        duration: "10 minutes + expression time",
+        benefits: "Cultivates gratitude, strengthens bonds, shifts focus to positives"
       }
     ],
+    
     'work': [
       {
         title: "Work Boundaries Exercise",
         description: "Establish healthy boundaries to manage work-related stress.",
-        steps: ["Identify specific work stressors", "Define what you can and cannot control", "Create clear start/end times for work", "Develop transition rituals between work and personal time"]
+        steps: [
+          "List your current work hours and when work actually happens",
+          "Identify 2-3 specific boundary issues (e.g., after-hours emails)",
+          "For each issue, write an ideal boundary statement",
+          "Identify potential obstacles to maintaining these boundaries",
+          "Create implementation steps for each boundary",
+          "Select one boundary to implement this week"
+        ],
+        duration: "20 minutes",
+        benefits: "Reduces burnout, improves work/life balance"
       },
       {
         title: "Task Prioritization Method",
         description: "Organize tasks to reduce overwhelm and increase productivity.",
-        steps: ["List all current tasks", "Categorize by urgency and importance", "Identify your top 3 priorities", "Schedule focused time for high-priority items"]
+        steps: [
+          "List all current tasks and commitments",
+          "Categorize each as: Urgent & Important, Important but Not Urgent, Urgent but Not Important, or Neither",
+          "Schedule Important tasks first, then address Urgent items",
+          "Identify at least one task that can be delegated or eliminated",
+          "Create a focused plan for your top 3 priorities",
+          "Schedule specific time blocks for important work"
+        ],
+        duration: "15-20 minutes",
+        benefits: "Reduces overwhelm, improves focus, aligns efforts with priorities"
+      },
+      {
+        title: "Values-Based Work Reflection",
+        description: "Reconnect your daily work with deeper meaning and purpose.",
+        steps: [
+          "List 3-5 core values that matter to you in your work",
+          "Rate how well your current role aligns with each value (1-10)",
+          "For each value, identify one aspect of your work that honors it",
+          "Note one way you could bring more meaning to daily tasks",
+          "Create a personal mission statement for your work",
+          "Post it where you'll see it during your workday"
+        ],
+        duration: "20-30 minutes",
+        benefits: "Increases engagement and satisfaction, clarifies purpose"
       }
     ],
+    
     'health': [
       {
         title: "Body Appreciation Practice",
-        description: "Shift focus from health concerns to gratitude for what your body can do.",
-        steps: ["Note 3 things your body did well today", "Send appreciation to different body parts", "Practice gentle movement that feels good", "Set one small health-supporting intention"]
+        description: "Shift focus from health concerns to gratitude for your body's capacities.",
+        steps: [
+          "Find a comfortable position and take three deep breaths",
+          "Scan your body from head to toe, noting what's working well",
+          "Identify 5 things your body did for you today",
+          "Express gratitude to specific body parts (e.g., 'Thank you, legs, for carrying me today')",
+          "Set one small intention to honor your body today"
+        ],
+        duration: "10 minutes",
+        benefits: "Counters health anxiety, promotes positive body relationship"
       },
       {
-        title: "Health Anxiety Reduction",
-        description: "Reduce worry about health through structured reflection.",
-        steps: ["Write down specific health concerns", "Rate worry level from 1-10", "List evidence for and against each worry", "Create a balanced response to each concern"]
+        title: "Health Worry Examination",
+        description: "Reduce health anxiety through structured reflection.",
+        steps: [
+          "Write down your specific health concern in detail",
+          "Rate your worry level from 1-10",
+          "List evidence supporting this worry",
+          "List evidence that contradicts or moderates this worry",
+          "Note what percentage of this worry is in your control",
+          "Create one reasonable action step for the controllable aspect"
+        ],
+        duration: "15 minutes",
+        benefits: "Reduces catastrophizing, promotes balanced perspective"
+      },
+      {
+        title: "Mindful Body Scan",
+        description: "Connect with your body through systematic awareness.",
+        steps: [
+          "Lie down in a comfortable position",
+          "Bring attention to your breath for several cycles",
+          "Slowly move your awareness from toes to head",
+          "Notice sensations without judgment (tension, relaxation, etc.)",
+          "When your mind wanders, gently return focus to your body",
+          "Conclude with gratitude for your body's continuous work"
+        ],
+        duration: "15-20 minutes",
+        benefits: "Increases body awareness, reduces physical tension"
       }
     ],
+    
     'loss': [
       {
         title: "Loss Processing Exercise",
         description: "Honor what's been lost while finding ways to move forward.",
-        steps: ["Write about what you miss most", "Identify lessons or gifts from what was lost", "Create a small symbolic ritual of acknowledgment", "Set an intention for gentle forward movement"]
+        steps: [
+          "Create a list of what specifically you've lost",
+          "Acknowledge both tangible and intangible losses",
+          "Write about what you miss most and why",
+          "Identify what remains despite this loss",
+          "Note any positive aspects that could emerge from this loss",
+          "Set one small step toward adaptation"
+        ],
+        duration: "20 minutes",
+        benefits: "Facilitates grief process, supports meaning-making"
       },
       {
         title: "Meaning-Making Practice",
         description: "Find meaning and growth potential in difficult experiences.",
-        steps: ["Reflect on how this loss has changed you", "Identify any values clarified by this experience", "Consider how this might connect you to others", "Imagine how this might inform your future choices"]
+        steps: [
+          "Describe how this loss has changed your perspective",
+          "Note any values or priorities that have shifted",
+          "Identify any new strengths or capabilities you've developed",
+          "Consider how this experience connects you to others",
+          "Reflect on how this might inform your future choices",
+          "Write a brief statement of meaning about this experience"
+        ],
+        duration: "20-30 minutes",
+        benefits: "Supports post-traumatic growth, creates narrative coherence"
+      },
+      {
+        title: "Continuing Bonds Reflection",
+        description: "Maintain a healthy connection with what's been lost.",
+        steps: [
+          "Choose a quiet moment to reflect on your loss",
+          "Consider positive qualities or aspects of what's been lost",
+          "Identify ways these qualities continue in your life",
+          "Create a small ritual to honor this continuing connection",
+          "Consider how you might incorporate aspects into your identity",
+          "Write a brief message expressing your ongoing relationship"
+        ],
+        duration: "15-20 minutes",
+        benefits: "Provides comfort, maintains connection while allowing adaptation"
       }
     ],
+    
     'self-esteem': [
       {
         title: "Self-Compassion Break",
         description: "Respond to self-criticism with kindness and common humanity.",
-        steps: ["Notice self-critical thoughts", "Place a hand on your heart", "Say: 'This is a moment of suffering'", "Say: 'May I be kind to myself in this moment'"]
+        steps: [
+          "Notice when you're being self-critical or feeling inadequate",
+          "Place a hand on your heart or another soothing gesture",
+          "Say to yourself: 'This is a moment of suffering'",
+          "Say: 'Suffering is part of being human'",
+          "Say: 'May I be kind to myself in this moment'",
+          "Offer yourself specific words of kindness you need to hear"
+        ],
+        duration: "3-5 minutes",
+        benefits: "Counters harsh self-judgment, provides emotional support"
       },
       {
         title: "Strengths Inventory",
         description: "Reconnect with your authentic strengths and positive qualities.",
-        steps: ["List 5 strengths you possess", "Recall specific examples of using each strength", "Consider how these strengths help you", "Plan to intentionally use one strength tomorrow"]
+        steps: [
+          "List at least 7 strengths or positive qualities you possess",
+          "For each strength, write a specific example of when you've used it",
+          "Note how each strength has helped you or others",
+          "Choose 3 key strengths that feel most authentic to you",
+          "Plan how to intentionally use one strength tomorrow",
+          "Create a 'strengths mantra' to remind yourself of these qualities"
+        ],
+        duration: "20 minutes",
+        benefits: "Builds confidence, counters negative self-perception"
+      },
+      {
+        title: "Inner Critic Dialogue",
+        description: "Transform self-criticism into constructive inner dialogue.",
+        steps: [
+          "Identify a common self-critical thought",
+          "Write down exactly what your inner critic says",
+          "Note how this criticism affects your feelings and behaviors",
+          "Imagine what a compassionate mentor might say instead",
+          "Create a balanced response that acknowledges challenges while being supportive",
+          "Practice responding to your critic with this new voice"
+        ],
+        duration: "15-20 minutes",
+        benefits: "Improves self-talk, reduces shame, builds resilience"
       }
     ],
+    
     'uncertainty': [
       {
         title: "Uncertainty Tolerance Practice",
         description: "Build comfort with not knowing through mindful awareness.",
-        steps: ["Notice physical sensations of uncertainty", "Observe thoughts without judgment", "Remind yourself that uncertainty is universal", "Focus on what you can control right now"]
+        steps: [
+          "Identify a current situation involving uncertainty",
+          "Notice physical sensations that arise when thinking about it",
+          "Observe your thoughts without judging them as good or bad",
+          "Remind yourself: 'Uncertainty is a natural part of life'",
+          "Consider: 'What is still within my control right now?'",
+          "Set one small action step within your control"
+        ],
+        duration: "10 minutes",
+        benefits: "Reduces anxiety about unknowns, builds tolerance for ambiguity"
       },
       {
-        title: "Future Visualization",
-        description: "Reduce uncertainty anxiety by imagining positive possibilities.",
-        steps: ["Breathe deeply to center yourself", "Imagine 3 positive potential outcomes", "Visualize yourself coping effectively with each", "Note resources available to help you navigate change"]
+        title: "Future Possibilities Visualization",
+        description: "Reduce uncertainty anxiety by exploring potential outcomes.",
+        steps: [
+          "Choose a situation with an uncertain outcome",
+          "Visualize three different possible scenarios (positive, neutral, challenging)",
+          "For each scenario, imagine how you would cope effectively",
+          "Note resources and strengths available to help you navigate each outcome",
+          "Recognize your capacity to handle different possibilities",
+          "Bring awareness back to the present moment"
+        ],
+        duration: "15 minutes",
+        benefits: "Builds confidence in coping abilities, reduces fear of unknown"
+      },
+      {
+        title: "Anchoring in the Present",
+        description: "Ground yourself in the present when uncertain futures create anxiety.",
+        steps: [
+          "Notice when worry about uncertainties arises",
+          "Take three slow, deep breaths",
+          "Name 5 things you know to be true right now",
+          "Identify what you can do today that matters",
+          "Choose one small meaningful action to take now",
+          "Remind yourself: 'I can only live in this moment'"
+        ],
+        duration: "5-10 minutes",
+        benefits: "Shifts focus from future worries to present agency"
       }
     ],
+    
+    'financial': [
+      {
+        title: "Financial Worry Containment",
+        description: "Manage financial anxiety through structured reflection.",
+        steps: [
+          "List specific financial concerns currently on your mind",
+          "Categorize each as: Immediate Action Needed, Future Planning, or Outside Your Control",
+          "For Immediate concerns: note one specific action step",
+          "For Future concerns: schedule a specific time to address planning",
+          "For Outside Control: practice acceptance and focus elsewhere",
+          "Commit to one action step today"
+        ],
+        duration: "15 minutes",
+        benefits: "Reduces overwhelm, promotes practical problem-solving"
+      },
+      {
+        title: "Values-Based Resource Reflection",
+        description: "Reconnect with non-financial resources and values.",
+        steps: [
+          "List 5-7 non-financial resources you possess (skills, relationships, etc.)",
+          "Identify ways these resources support your wellbeing",
+          "Reflect on times these resources helped you through challenges",
+          "Consider how these resources align with your core values",
+          "Note one way to leverage these resources in current circumstances"
+        ],
+        duration: "10-15 minutes",
+        benefits: "Expands sense of security beyond financial measures"
+      },
+      {
+        title: "Financial Mindfulness Practice",
+        description: "Bring awareness to money relationships and patterns.",
+        steps: [
+          "Reflect on messages about money from your childhood",
+          "Note how these messages influence your current relationship with money",
+          "Consider your authentic values around material resources",
+          "Identify one pattern that doesn't serve your wellbeing",
+          "Create a new intention aligned with your values",
+          "Practice mindful awareness during one financial transaction today"
+        ],
+        duration: "20 minutes",
+        benefits: "Transforms unconscious patterns, reduces emotional reactivity"
+      }
+    ],
+    
+    'disappointment': [
+      {
+        title: "Expectation Examination",
+        description: "Explore the gap between expectations and reality to process disappointment.",
+        steps: [
+          "Clearly describe what you expected to happen",
+          "Describe what actually happened",
+          "Reflect on where your expectations originated",
+          "Consider if these expectations were realistic",
+          "Identify any lessons from this experience",
+          "Formulate more flexible expectations going forward"
+        ],
+        duration: "15 minutes",
+        benefits: "Promotes realistic thinking, facilitates learning from setbacks"
+      },
+      {
+        title: "Growth Perspective Exercise",
+        description: "Reframe disappointment as an opportunity for growth and learning.",
+        steps: [
+          "Acknowledge the disappointment fully without minimizing it",
+          "List three things this experience can teach you",
+          "Identify one strength or quality revealed by this challenge",
+          "Consider how this experience might benefit you in the future",
+          "Write a brief statement reframing this experience as part of your journey"
+        ],
+        duration: "15-20 minutes",
+        benefits: "Transforms setbacks into growth opportunities, builds resilience"
+      },
+      {
+        title: "Compassionate Disappointment Letter",
+        description: "Process disappointment through self-compassionate writing.",
+        steps: [
+          "Write a letter to yourself from the perspective of a compassionate friend",
+          "Acknowledge the pain of the disappointment",
+          "Offer understanding and validation for your feelings",
+          "Gently suggest a broader perspective on the situation",
+          "Include encouraging words about moving forward",
+          "Read the letter to yourself whenever disappointment resurfaces"
+        ],
+        duration: "20 minutes",
+        benefits: "Provides emotional support, facilitates self-compassion"
+      }
+    ],
+    
     'mindfulness': [
       {
         title: "Mindful Observation Practice",
         description: "Calm your mind by fully observing an object for 5 minutes.",
-        steps: ["Choose any natural object", "Focus all attention on it", "Explore every aspect of its appearance", "When your mind wanders, gently return focus to the object"]
+        steps: [
+          "Choose any natural object and place it in front of you",
+          "Focus all your attention on this object",
+          "Observe its color, texture, shape, and any unique features",
+          "When your mind wanders, gently return focus to the object",
+          "Notice details you didn't see at first",
+          "Conclude by noting how your attention feels now"
+        ],
+        duration: "5 minutes",
+        benefits: "Trains attention, cultivates present-moment awareness"
       },
       {
         title: "Body Scan Meditation",
-        description: "Systematically bring awareness to each part of your body to reduce tension.",
-        steps: ["Lie down in a comfortable position", "Start at your toes and work upward", "Notice sensations without judgment", "Spend 20-30 seconds on each body part"]
+        description: "Systematically bring awareness to each part of your body.",
+        steps: [
+          "Lie down in a comfortable position",
+          "Starting at your toes, bring awareness to each body part",
+          "Notice sensations without judgment (heaviness, tingling, etc.)",
+          "If you notice tension, breathe into that area and imagine it softening",
+          "Continue gradually moving upward through your entire body",
+          "End with awareness of your body as a whole"
+        ],
+        duration: "15-20 minutes",
+        benefits: "Reduces physical tension, improves body awareness"
+      },
+      {
+        title: "Five-Breath Awareness Practice",
+        description: "A quick mindfulness technique for busy moments.",
+        steps: [
+          "Pause whatever you're doing",
+          "Sit or stand with an upright, dignified posture",
+          "Take five slow, conscious breaths",
+          "Feel the sensation of the breath entering and leaving your body",
+          "Notice how your mind and body feel after these breaths",
+          "Continue your activities with refreshed awareness"
+        ],
+        duration: "1-2 minutes",
+        benefits: "Creates mental space, accessible even in busy moments"
+      }
+    ],
+    
+    'loneliness': [
+      {
+        title: "Connection Inventory",
+        description: "Recognize and strengthen your existing social connections.",
+        steps: [
+          "List all your current social connections (friends, family, acquaintances)",
+          "Note the quality and frequency of each connection",
+          "Identify which connections feel most nourishing",
+          "Choose one connection you'd like to strengthen",
+          "Plan a specific action to nurture this relationship",
+          "Schedule this connection activity in your calendar"
+        ],
+        duration: "15-20 minutes",
+        benefits: "Counters isolation perception, promotes social activation"
+      },
+      {
+        title: "Self-Connection Practice",
+        description: "Develop a stronger sense of connection with yourself.",
+        steps: [
+          "Create a comfortable, quiet space for self-reflection",
+          "Ask yourself: 'What do I need right now?'",
+          "Write down whatever arises without judgment",
+          "Consider how you might meet one of these needs",
+          "Express appreciation to yourself for this time together",
+          "Schedule regular check-ins with yourself"
+        ],
+        duration: "10-15 minutes",
+        benefits: "Strengthens internal resources, reduces dependence on external validation"
+      },
+      {
+        title: "Belonging Expansion",
+        description: "Cultivate a broader sense of human connection and belonging.",
+        steps: [
+          "Sit comfortably and bring awareness to your breath",
+          "Visualize yourself as part of ever-widening circles of connection",
+          "Start with close relationships, then community, then humanity",
+          "Reflect on your shared humanity with others around you",
+          "Consider: 'What values or experiences do I share with others?'",
+          "Notice how this perspective affects your sense of isolation"
+        ],
+        duration: "10 minutes",
+        benefits: "Expands sense of belonging, reduces perceived isolation"
       }
     ]
   };
@@ -981,7 +1530,71 @@ const MoodCausePrompt = ({ notification, onClose }) => {
   
   // Handle recommendation click
   const handleRecommendationClick = (recommendation) => {
-    setActiveExercise(recommendation);
+    // Add any specific properties needed for the interactive experience
+    let enhancedExercise = { ...recommendation };
+    
+    // Add specific enhancements based on exercise type or title
+    if (recommendation.title.toLowerCase().includes('journal') || 
+        recommendation.description.toLowerCase().includes('writ')) {
+      enhancedExercise.type = enhancedExercise.type || 'journaling';
+    } 
+    else if (recommendation.title.toLowerCase().includes('breath') || 
+             recommendation.description.toLowerCase().includes('breath')) {
+      enhancedExercise.type = enhancedExercise.type || 'breathing';
+    }
+    else if (recommendation.title.toLowerCase().includes('meditat') || 
+             recommendation.description.toLowerCase().includes('meditat')) {
+      enhancedExercise.type = enhancedExercise.type || 'meditation';
+    }
+    // Add specific links for our implemented exercises
+    else if (recommendation.title === "Values Clarification") {
+      enhancedExercise.link = 'values-clarification';
+      enhancedExercise.type = 'reflection';
+    }
+    else if (recommendation.title === "Appreciation Expression") {
+      enhancedExercise.link = 'appreciation-expression';
+      enhancedExercise.type = 'journaling';
+    }
+    else if (recommendation.title === "Perspective-Taking Practice") {
+      enhancedExercise.link = 'perspective-taking';
+      enhancedExercise.type = 'reflection';
+    }
+    
+    // Ensure resources are available
+    if (!enhancedExercise.resources || enhancedExercise.resources.length === 0) {
+      if (recommendation.title === "Values Clarification") {
+        enhancedExercise.resources = [
+          {
+            type: "article",
+            title: "How Personal Values Shape Your Life",
+            description: "Psychology Today's research on values and relationships",
+            url: "https://www.psychologytoday.com/us/blog/click-here-happiness/202101/what-are-personal-values"
+          }
+        ];
+      }
+      else if (recommendation.title === "Appreciation Expression") {
+        enhancedExercise.resources = [
+          {
+            type: "article",
+            title: "The Science of Gratitude in Relationships",
+            description: "Research from Greater Good Science Center",
+            url: "https://greatergood.berkeley.edu/article/item/how_gratitude_strengthens_relationships"
+          }
+        ];
+      }
+      else if (recommendation.title === "Perspective-Taking Practice") {
+        enhancedExercise.resources = [
+          {
+            type: "article",
+            title: "The Science of Empathy",
+            description: "Research on perspective-taking from Greater Good Science Center",
+            url: "https://greatergood.berkeley.edu/topic/empathy/definition"
+          }
+        ];
+      }
+    }
+    
+    setActiveExercise(enhancedExercise);
   };
   
   // Add a function to let the user indicate this is a false positive
@@ -1423,14 +2036,36 @@ const MoodCausePrompt = ({ notification, onClose }) => {
                         <div className="flex-1">
                           <h4 className="text-white font-medium mb-2">{rec.title}</h4>
                           <p className="text-[#B8C7E0] text-sm mb-3">{rec.description}</p>
-                          {rec.link && (
+                          
+                          {/* Simplified display - just duration and benefits */}
+                          <div className="flex items-center justify-between mb-2">
+                            {rec.duration && (
+                              <div className="flex items-center text-[#B8C7E0] text-xs">
+                                <FaClock className="text-[#5983FC] mr-1" /> 
+                                <span>{rec.duration}</span>
+                              </div>
+                            )}
+                            {rec.type && (
+                              <div className="bg-[#0F172A] px-2 py-0.5 rounded-full text-[#B8C7E0] text-xs">
+                                {rec.type}
+                              </div>
+                            )}
+                          </div>
+                          
+                          {/* Benefits summary */}
+                          {rec.benefits && (
+                            <div className="text-xs text-[#B8C7E0] mb-3">
+                              <span className="text-emerald-400 font-medium">Benefits:</span> 
+                              <span className="ml-1">{rec.benefits}</span>
+                            </div>
+                          )}
+                          
                             <button 
                               onClick={() => handleRecommendationClick(rec)}
-                              className={`flex items-center ${theme.text} hover:underline text-sm group`}
+                            className={`flex items-center ${theme.text} hover:underline text-sm mt-2 group`}
                             >
                               Try this exercise <FaExternalLinkAlt className="ml-1 text-xs group-hover:translate-x-1 transition-transform" />
                             </button>
-                          )}
                         </div>
                       </div>
                     </motion.div>

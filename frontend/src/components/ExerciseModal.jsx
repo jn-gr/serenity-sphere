@@ -1,658 +1,1257 @@
-import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { FaTimes, FaSave, FaRegLightbulb, FaCheck, FaArrowRight, FaArrowLeft, FaPlay, FaPause, FaExternalLinkAlt } from 'react-icons/fa';
+import React, { useState, useRef, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { FaTimes, FaSave, FaRegLightbulb, FaCheck, FaArrowRight, FaArrowLeft, FaPlay, FaPause, FaExternalLinkAlt, FaVolumeMute, FaVolumeUp, FaStopwatch, FaLink, FaYoutube, FaFileAlt, FaBook } from 'react-icons/fa';
 
 const ExerciseModal = ({ exercise, onClose }) => {
   const [journalEntry, setJournalEntry] = useState('');
   const [saved, setSaved] = useState(false);
-  const [step, setStep] = useState(1);
+  const [step, setStep] = useState(0);
+  const [completed, setCompleted] = useState(false);
   const [exerciseContent, setExerciseContent] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setIsLoading] = useState(true);
   const [timerActive, setTimerActive] = useState(false);
-  const [seconds, setSeconds] = useState(0);
+  const [timeElapsed, setTimeElapsed] = useState(0);
+  const [showResources, setShowResources] = useState(false);
   const [checklist, setChecklist] = useState({});
+  const [activePerspective, setActivePerspective] = useState('your');
+  const [yourViewData, setYourViewData] = useState({
+    situation: '',
+    feelings: '',
+    needs: ''
+  });
+  const [theirViewData, setTheirViewData] = useState({
+    feelings: '',
+    needs: '',
+    context: ''
+  });
+  const [commonGround, setCommonGround] = useState('');
 
-  useEffect(() => {
-    // Timer for breathing exercises
-    let interval = null;
-    if (timerActive) {
-      interval = setInterval(() => {
-        setSeconds(seconds => seconds + 1);
-      }, 1000);
-    } else if (!timerActive && seconds !== 0) {
-      clearInterval(interval);
+  const timerRef = useRef(null);
+  const audioRef = useRef(null);
+  
+  // Extract duration in seconds from exercise duration string if available
+  const getDurationInSeconds = () => {
+    if (!exercise.duration) return 300; // Default 5 minutes
+    
+    const durationMatch = exercise.duration.match(/(\d+)[-–]?(\d+)?\s+minute/i);
+    if (durationMatch) {
+      const minDuration = parseInt(durationMatch[1], 10);
+      const maxDuration = durationMatch[2] ? parseInt(durationMatch[2], 10) : minDuration;
+      return Math.max(minDuration, maxDuration) * 60;
     }
-    return () => clearInterval(interval);
-  }, [timerActive, seconds]);
+    
+    return 300; // Default 5 minutes
+  };
+  
+  const totalDuration = getDurationInSeconds();
+  
+  // Timer controls
+  const startTimer = () => {
+    if (!timerActive) {
+      setTimerActive(true);
+      timerRef.current = setInterval(() => {
+        setTimeElapsed(prev => {
+          if (prev >= totalDuration) {
+            clearInterval(timerRef.current);
+            return totalDuration;
+          }
+          return prev + 1;
+        });
+      }, 1000);
+    }
+  };
+  
+  const pauseTimer = () => {
+    setTimerActive(false);
+    clearInterval(timerRef.current);
+  };
+  
+  const resetTimer = () => {
+    pauseTimer();
+    setTimeElapsed(0);
+  };
+  
+  // Audio controls
+  const toggleAudio = () => {
+    if (audioRef.current) {
+      if (audioRef.current.paused) {
+        audioRef.current.play();
+      } else {
+        audioRef.current.pause();
+      }
+    }
+  };
+  
+  // Clean up on unmount
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+      }
+      if (audioRef.current) {
+        audioRef.current.pause();
+      }
+    };
+  }, []);
+  
+  // Format time display (MM:SS)
+  const formatTime = (seconds) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  };
+  
+  // Get the current step content
+  const getCurrentStep = () => {
+    if (!exerciseContent?.steps || exerciseContent.steps.length === 0) {
+      return "No steps available for this exercise.";
+    }
+    
+    if (step < exerciseContent.steps.length) {
+      return exerciseContent.steps[step].content;
+    }
+    
+    return "Complete! How do you feel now?";
+  };
+  
+  // Handle completing the exercise
+  const handleComplete = () => {
+    pauseTimer();
+    setCompleted(true);
+  };
+  
+  // Determine if this exercise has an interactive component
+  const hasInteractiveComponent = () => {
+    if (!exerciseContent) return false;
+    
+    return exerciseContent.type === 'journal' || 
+           exerciseContent.type === 'journaling' ||
+           exerciseContent.type === 'meditation' || 
+           exerciseContent.type === 'breathing' ||
+           exerciseContent.type === 'reflection' ||
+           exerciseContent.type === 'checklist' ||
+           exerciseContent.type === 'sensory' ||
+           exerciseContent.type === 'coping' ||
+           exerciseContent.type === 'physical' ||
+           exerciseContent.type === 'relationship' ||
+           exerciseContent.type === 'work';
+  };
+  
+  // Render the appropriate interactive component based on exercise type
+  const renderInteractiveComponent = () => {
+    if (!exerciseContent) return null;
+    
+    switch (exerciseContent.type) {
+      case 'journal':
+      case 'journaling':
+        return (
+          <div className="mt-4">
+            <h4 className="text-white text-sm mb-2">Your Journal Entry:</h4>
+            <div className="mb-3 flex items-center justify-between">
+              <div className="flex space-x-2">
+                {['😢', '😔', '😐', '🙂', '😊'].map((emoji, idx) => (
+                  <button 
+                    key={idx}
+                    onClick={() => setJournalEntry(prev => `${prev}\nFeeling: ${emoji}\n\n`)}
+                    className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-[#3E60C1]/20 transition-colors"
+                  >
+                    {emoji}
+                  </button>
+                ))}
+              </div>
+              <div className="text-xs text-[#B8C7E0]">Track your mood</div>
+            </div>
+            <textarea
+              value={journalEntry}
+              onChange={(e) => setJournalEntry(e.target.value)}
+              className="w-full h-32 bg-[#0F172A] border border-[#2A3547] rounded-lg p-3 text-[#B8C7E0] focus:outline-none focus:border-[#5983FC]"
+              placeholder="Start writing here..."
+            />
+            <div className="flex justify-between mt-2">
+              <button 
+                onClick={() => {
+                  const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+                  recognition.onresult = (event) => {
+                    const transcript = event.results[0][0].transcript;
+                    setJournalEntry(prev => prev ? `${prev}\n${transcript}` : transcript);
+                  };
+                  recognition.start();
+                }}
+                className="flex items-center bg-[#2A3547] text-[#B8C7E0] px-3 py-1 rounded-lg text-sm hover:bg-[#3E60C1]/30 transition-colors"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="mr-2">
+                  <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path>
+                  <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                  <line x1="12" x2="12" y1="19" y2="22"></line>
+                </svg>
+                Voice Input
+              </button>
+              <button 
+                onClick={() => {
+                  setSaved(true);
+                  setTimeout(() => setSaved(false), 2000);
+                }}
+                className="flex items-center bg-[#3E60C1] text-white px-3 py-1 rounded-lg text-sm hover:bg-[#5983FC] transition-colors"
+              >
+                <FaSave className="mr-2" /> {saved ? "Saved!" : "Save Entry"}
+              </button>
+            </div>
+            
+            {exerciseContent.prompts && (
+              <div className="mt-4">
+                <h4 className="text-white text-sm mb-2">Journaling Prompts:</h4>
+                <div className="space-y-2">
+                  {exerciseContent.prompts.map((prompt, idx) => (
+                    <div 
+                      key={idx} 
+                      className="bg-[#0F172A] p-3 rounded-lg border border-[#2A3547] text-[#B8C7E0] text-sm cursor-pointer hover:border-[#5983FC] transition-colors"
+                      onClick={() => setJournalEntry(prev => prev ? `${prev}\n\n${prompt}:\n` : `${prompt}:\n`)}
+                    >
+                      {prompt}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        );
+        
+      case 'breathing':
+        return (
+          <div className="mt-4">
+            <div className="flex flex-col items-center">
+              {/* Timer display */}
+              <div className="text-2xl font-semibold text-white mb-3">
+                {formatTime(timeElapsed)} / {formatTime(totalDuration)}
+              </div>
+              
+              {/* Visual breathing guide */}
+              <div className="relative w-32 h-32 mb-6">
+                <div 
+                  className={`absolute inset-0 rounded-full border-2 border-[#5983FC] ${
+                    timerActive ? 'animate-pulse-slow' : ''
+                  }`}
+                ></div>
+                <div 
+                  className={`absolute inset-0 bg-[#5983FC]/20 rounded-full transform transition-all duration-4000 ${
+                    timerActive && timeElapsed % 8 < 4 
+                      ? 'scale-100' 
+                      : 'scale-50'
+                  }`}
+                ></div>
+                <div className="absolute inset-0 flex items-center justify-center text-white">
+                  {timerActive && timeElapsed % 12 < 4 
+                    ? "Inhale" 
+                    : timerActive && timeElapsed % 12 < 7 
+                      ? "Hold" 
+                      : "Exhale"}
+                </div>
+              </div>
+              
+              {/* Progress bar */}
+              <div className="w-full bg-[#0F172A] h-2 rounded-full mb-4">
+                <div 
+                  className="bg-gradient-to-r from-[#3E60C1] to-[#5983FC] h-2 rounded-full"
+                  style={{ width: `${(timeElapsed / totalDuration) * 100}%` }}
+                ></div>
+              </div>
+              
+              {/* Controls */}
+              <div className="flex items-center space-x-4">
+                {timerActive ? (
+                  <button 
+                    onClick={pauseTimer}
+                    className="bg-[#0F172A] p-3 rounded-full text-[#B8C7E0] hover:text-white transition-colors"
+                  >
+                    <FaPause />
+                  </button>
+                ) : (
+                  <button 
+                    onClick={startTimer}
+                    className="bg-[#0F172A] p-3 rounded-full text-[#B8C7E0] hover:text-white transition-colors"
+                  >
+                    <FaPlay />
+                  </button>
+                )}
+                
+                <div className="flex space-x-2">
+                  {['🌧️', '🌊', '🌳', '🔥'].map((sound, idx) => (
+                    <button 
+                      key={idx}
+                      onClick={() => {
+                        if (audioRef.current) {
+                          audioRef.current.src = `/sounds/${['rain', 'ocean', 'forest', 'fire'][idx]}.mp3`;
+                          if (!audioRef.current.paused) audioRef.current.play();
+                        }
+                      }}
+                      className="w-8 h-8 flex items-center justify-center rounded-full bg-[#0F172A] hover:bg-[#2A3547] transition-colors"
+                    >
+                      {sound}
+                    </button>
+                  ))}
+                </div>
+                
+                {exerciseContent.audioUrl && (
+                  <button 
+                    onClick={toggleAudio}
+                    className="bg-[#0F172A] p-3 rounded-full text-[#B8C7E0] hover:text-white transition-colors"
+                  >
+                    {audioRef.current?.paused ? <FaVolumeUp /> : <FaVolumeMute />}
+                  </button>
+                )}
+              </div>
+              
+              {/* Hidden audio element */}
+              <audio ref={audioRef} src={exerciseContent.audioUrl} loop />
+            </div>
+          </div>
+        );
+        
+      case 'meditation':
+        return (
+          <div className="mt-4">
+            <div className="flex flex-col items-center">
+              {/* Timer display */}
+              <div className="text-2xl font-semibold text-white mb-3">
+                {formatTime(timeElapsed)} / {formatTime(totalDuration)}
+              </div>
+              
+              {/* Body scan visualization */}
+              <div className="w-full max-w-[200px] relative mb-6">
+                <svg viewBox="0 0 100 220" className="w-full">
+                  <path d="M50,10 Q65,30 50,50 Q35,70 50,90 Q65,110 50,140 Q35,160 50,180 Q65,200 50,220" 
+                    fill="none" 
+                    stroke="#5983FC" 
+                    strokeWidth="1.5"
+                    strokeDasharray="5,5"
+                  />
+                  <circle 
+                    cx="50" 
+                    cy={10 + (timeElapsed % 30) * 7} 
+                    r="5" 
+                    fill="#5983FC" 
+                    className={timerActive ? "animate-pulse" : ""}
+                  />
+                  <rect x="30" y="30" width="40" height="60" rx="20" fill="none" stroke="#5983FC" strokeWidth="0.5" />
+                  <rect x="35" y="90" width="30" height="60" rx="5" fill="none" stroke="#5983FC" strokeWidth="0.5" />
+                  <rect x="40" y="150" width="20" height="70" rx="5" fill="none" stroke="#5983FC" strokeWidth="0.5" />
+                </svg>
+                <div className="text-[#B8C7E0] text-xs text-center mt-2">
+                  Focus on your {
+                    timerActive && timeElapsed % 30 < 5 ? "head" :
+                    timerActive && timeElapsed % 30 < 10 ? "shoulders" :
+                    timerActive && timeElapsed % 30 < 15 ? "chest" :
+                    timerActive && timeElapsed % 30 < 20 ? "abdomen" :
+                    timerActive && timeElapsed % 30 < 25 ? "legs" : "feet"
+                  }
+                </div>
+              </div>
+              
+              {/* Progress bar */}
+              <div className="w-full bg-[#0F172A] h-2 rounded-full mb-4">
+                <div 
+                  className="bg-gradient-to-r from-[#3E60C1] to-[#5983FC] h-2 rounded-full"
+                  style={{ width: `${(timeElapsed / totalDuration) * 100}%` }}
+                ></div>
+              </div>
+              
+              {/* Controls */}
+              <div className="flex items-center space-x-4">
+                {timerActive ? (
+                  <button 
+                    onClick={pauseTimer}
+                    className="bg-[#0F172A] p-3 rounded-full text-[#B8C7E0] hover:text-white transition-colors"
+                  >
+                    <FaPause />
+                  </button>
+                ) : (
+                  <button 
+                    onClick={startTimer}
+                    className="bg-[#0F172A] p-3 rounded-full text-[#B8C7E0] hover:text-white transition-colors"
+                  >
+                    <FaPlay />
+                  </button>
+                )}
+                
+                <button 
+                  onClick={resetTimer}
+                  className="bg-[#0F172A] p-3 rounded-full text-[#B8C7E0] hover:text-white transition-colors"
+                >
+                  <FaArrowLeft />
+                </button>
+                
+                {exerciseContent.audioUrl && (
+                  <button 
+                    onClick={toggleAudio}
+                    className="bg-[#0F172A] p-3 rounded-full text-[#B8C7E0] hover:text-white transition-colors"
+                  >
+                    {audioRef.current?.paused ? <FaVolumeUp /> : <FaVolumeMute />}
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+        );
+        
+      case 'reflection':
+        if (exerciseContent.title?.toLowerCase().includes('values clarification')) {
+          return (
+            <div className="mt-4">
+              <div className="bg-[#0F172A] p-4 rounded-lg border border-[#2A3547] mb-3">
+                <h4 className="text-white text-sm font-medium mb-3">Values Tracker</h4>
+                
+                <div className="space-y-3 mb-4">
+                  {[1, 2, 3, 4, 5].map((num) => (
+                    <div key={num} className="flex items-center space-x-3">
+                      <div className="w-6 h-6 bg-[#3E60C1]/20 rounded-full flex items-center justify-center text-[#5983FC]">
+                        {num}
+                      </div>
+                      <input 
+                        type="text"
+                        className="flex-1 bg-[#1A2335] border border-[#2A3547] rounded-lg p-2 text-[#B8C7E0] text-sm focus:outline-none focus:border-[#5983FC]"
+                        placeholder={`Value #${num}...`}
+                      />
+                      <select
+                        className="w-16 bg-[#1A2335] border border-[#2A3547] rounded-lg p-2 text-[#B8C7E0] text-sm focus:outline-none focus:border-[#5983FC]"
+                      >
+                        {[1, 2, 3, 4, 5].map((rank) => (
+                          <option key={rank} value={rank}>{rank}</option>
+                        ))}
+                      </select>
+                    </div>
+                  ))}
+                </div>
+                
+                <h4 className="text-white text-sm font-medium mb-2">Value Definition</h4>
+                <div className="mb-3">
+                  <textarea
+                    className="w-full h-16 bg-[#1A2335] border border-[#2A3547] rounded-lg p-2 text-[#B8C7E0] text-sm focus:outline-none focus:border-[#5983FC]"
+                    placeholder="Define what your top value means to you personally..."
+                  />
+                </div>
+                
+                <h4 className="text-white text-sm font-medium mb-2">Action Plan</h4>
+                <div>
+                  <textarea
+                    className="w-full h-16 bg-[#1A2335] border border-[#2A3547] rounded-lg p-2 text-[#B8C7E0] text-sm focus:outline-none focus:border-[#5983FC]"
+                    placeholder="One specific way I'll honor this value this week..."
+                  />
+                </div>
+              </div>
+            </div>
+          );
+        } else if (exerciseContent.title?.toLowerCase().includes('perspective-taking')) {
+          return (
+            <div className="mt-4">
+              <div className="bg-[#0F172A] p-4 rounded-lg border border-[#2A3547] mb-3">
+                <div className="flex mb-4">
+                  <button 
+                    onClick={() => setActivePerspective('your')}
+                    className={`flex-1 py-2 ${
+                      activePerspective === 'your' 
+                        ? 'bg-[#3E60C1] text-white rounded-l-lg' 
+                        : 'bg-[#1A2335] text-[#B8C7E0] rounded-l-lg hover:bg-[#2A3547]'
+                    } transition-colors`}
+                  >
+                    Your View
+                  </button>
+                  <button 
+                    onClick={() => setActivePerspective('their')}
+                    className={`flex-1 py-2 ${
+                      activePerspective === 'their' 
+                        ? 'bg-[#3E60C1] text-white rounded-r-lg' 
+                        : 'bg-[#1A2335] text-[#B8C7E0] rounded-r-lg hover:bg-[#2A3547]'
+                    } transition-colors`}
+                  >
+                    Their View
+                  </button>
+                </div>
+                
+                {activePerspective === 'your' ? (
+                  <div className="space-y-3">
+                    <div>
+                      <label className="text-[#5983FC] text-xs mb-1 block">Describe the situation briefly:</label>
+                      <textarea
+                        value={yourViewData.situation}
+                        onChange={(e) => setYourViewData({...yourViewData, situation: e.target.value})}
+                        className="w-full h-16 bg-[#1A2335] border border-[#2A3547] rounded-lg p-2 text-[#B8C7E0] text-sm focus:outline-none focus:border-[#5983FC]"
+                        placeholder="What happened? Who was involved?"
+                      />
+                    </div>
+                    
+                    <div>
+                      <label className="text-[#5983FC] text-xs mb-1 block">How did you feel about it?</label>
+                      <textarea
+                        value={yourViewData.feelings}
+                        onChange={(e) => setYourViewData({...yourViewData, feelings: e.target.value})}
+                        className="w-full h-16 bg-[#1A2335] border border-[#2A3547] rounded-lg p-2 text-[#B8C7E0] text-sm focus:outline-none focus:border-[#5983FC]"
+                        placeholder="Your emotions and reactions..."
+                      />
+                    </div>
+                    
+                    <div>
+                      <label className="text-[#5983FC] text-xs mb-1 block">What did you want or need in this situation?</label>
+                      <textarea
+                        value={yourViewData.needs}
+                        onChange={(e) => setYourViewData({...yourViewData, needs: e.target.value})}
+                        className="w-full h-16 bg-[#1A2335] border border-[#2A3547] rounded-lg p-2 text-[#B8C7E0] text-sm focus:outline-none focus:border-[#5983FC]"
+                        placeholder="Your goals, needs, or desires..."
+                      />
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    <div>
+                      <label className="text-[#5983FC] text-xs mb-1 block">How might they have felt about it?</label>
+                      <textarea
+                        value={theirViewData.feelings}
+                        onChange={(e) => setTheirViewData({...theirViewData, feelings: e.target.value})}
+                        className="w-full h-16 bg-[#1A2335] border border-[#2A3547] rounded-lg p-2 text-[#B8C7E0] text-sm focus:outline-none focus:border-[#5983FC]"
+                        placeholder="Try to imagine their emotions and reactions..."
+                      />
+                    </div>
+                    
+                    <div>
+                      <label className="text-[#5983FC] text-xs mb-1 block">What might they have wanted or needed?</label>
+                      <textarea
+                        value={theirViewData.needs}
+                        onChange={(e) => setTheirViewData({...theirViewData, needs: e.target.value})}
+                        className="w-full h-16 bg-[#1A2335] border border-[#2A3547] rounded-lg p-2 text-[#B8C7E0] text-sm focus:outline-none focus:border-[#5983FC]"
+                        placeholder="Their possible goals, needs, or concerns..."
+                      />
+                    </div>
+                    
+                    <div>
+                      <label className="text-[#5983FC] text-xs mb-1 block">What context or background might influence their perspective?</label>
+                      <textarea
+                        value={theirViewData.context}
+                        onChange={(e) => setTheirViewData({...theirViewData, context: e.target.value})}
+                        className="w-full h-16 bg-[#1A2335] border border-[#2A3547] rounded-lg p-2 text-[#B8C7E0] text-sm focus:outline-none focus:border-[#5983FC]"
+                        placeholder="Their history, values, current stressors..."
+                      />
+                    </div>
+                  </div>
+                )}
+                
+                {/* Common ground section always visible */}
+                <div className="mt-4 pt-4 border-t border-[#2A3547]">
+                  <label className="text-[#5983FC] text-xs mb-1 block">Possible common ground:</label>
+                  <textarea
+                    value={commonGround}
+                    onChange={(e) => setCommonGround(e.target.value)}
+                    className="w-full h-16 bg-[#1A2335] border border-[#2A3547] rounded-lg p-2 text-[#B8C7E0] text-sm focus:outline-none focus:border-[#5983FC]"
+                    placeholder="What shared concerns, values, or goals might you both have?"
+                  />
+                </div>
+                
+                {/* Summary section with insights */}
+                {(yourViewData.needs || theirViewData.needs) && (
+                  <div className="mt-4 pt-4 border-t border-[#2A3547]">
+                    <h4 className="text-white text-sm font-medium mb-2">Exercise Insights</h4>
+                    <div className="bg-[#0F172A]/50 p-3 rounded-lg text-sm text-[#B8C7E0]">
+                      {yourViewData.needs && theirViewData.needs ? (
+                        <p>You've explored both perspectives - this is a powerful way to build empathy and understanding in difficult situations.</p>
+                      ) : yourViewData.needs ? (
+                        <p>Great start! Now try to shift to their perspective to gain deeper understanding.</p>
+                      ) : (
+                        <p>Interesting! You've started with their perspective - now consider your own needs as well.</p>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          );
+        } else {
+          return (
+            <div className="mt-4 space-y-3">
+              {exerciseContent.reflectionPrompts?.map((prompt, index) => (
+                <div key={index} className="bg-[#0F172A] p-3 rounded-lg border border-[#2A3547]">
+                  <p className="text-[#B8C7E0] mb-2">{prompt}</p>
+                  <textarea
+                    className="w-full h-16 bg-[#1A2335] border border-[#2A3547] rounded-lg p-2 text-[#B8C7E0] focus:outline-none focus:border-[#5983FC]"
+                    placeholder="Your thoughts..."
+                  />
+                  <div className="flex justify-end mt-2">
+                    <div className="flex space-x-1">
+                      {['🤔', '💡', '❤️', '👍', '👎'].map((reaction, idx) => (
+                        <button 
+                          key={idx}
+                          className="w-6 h-6 flex items-center justify-center rounded-full hover:bg-[#3E60C1]/20 transition-colors text-xs"
+                        >
+                          {reaction}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          );
+        }
+        
+      case 'checklist':
+        return (
+          <div className="mt-4 space-y-2">
+            {exerciseContent.checkItems?.map((item, index) => (
+              <div 
+                key={index} 
+                className={`flex items-start p-3 rounded-lg border ${
+                  checklist[index] 
+                    ? 'bg-[#3E60C1]/10 border-[#5983FC]/30'
+                    : 'bg-[#0F172A] border-[#2A3547]'
+                } transition-colors`}
+              >
+                <div 
+                  className={`w-5 h-5 rounded border mr-3 cursor-pointer flex-shrink-0 mt-0.5 ${
+                    checklist[index]
+                      ? 'border-[#5983FC] bg-[#5983FC]/10'
+                      : 'border-[#2A3547]'
+                  } transition-colors`}
+                  onClick={() => toggleCheckItem(index)}
+                >
+                  {checklist[index] && <FaCheck className="text-[#5983FC] text-xs m-auto" />}
+                </div>
+                <div className="flex-1">
+                  <p className={`text-sm ${checklist[index] ? 'text-[#5983FC]' : 'text-[#B8C7E0]'}`}>{item}</p>
+                  {checklist[index] && (
+                    <div className="mt-2 text-xs text-[#B8C7E0]">
+                      <span className="text-emerald-400">✓</span> Completed {new Date().toLocaleTimeString()}
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
+            <div className="pt-2 flex justify-between items-center">
+              <div className="text-xs text-[#B8C7E0]">
+                {Object.values(checklist).filter(Boolean).length} of {exerciseContent.checkItems?.length || 0} completed
+              </div>
+              {Object.values(checklist).filter(Boolean).length === (exerciseContent.checkItems?.length || 0) && (
+                <div className="text-sm text-emerald-400 flex items-center">
+                  <FaCheck className="mr-1" /> All done!
+                </div>
+              )}
+            </div>
+          </div>
+        );
+        
+      case 'sensory':
+        return (
+          <div className="mt-4">
+            <div className="bg-[#0F172A] p-4 rounded-lg border border-[#2A3547] mb-3">
+              <div className="grid grid-cols-5 gap-1 mb-4">
+                {['👁️', '👂', '👃', '👅', '👐'].map((icon, idx) => (
+                  <button
+                    key={idx}
+                    className={`p-2 flex flex-col items-center justify-center rounded-lg border ${
+                      step % 5 === idx 
+                        ? 'border-[#5983FC] bg-[#3E60C1]/10 text-white' 
+                        : 'border-[#2A3547] text-[#B8C7E0]'
+                    }`}
+                    onClick={() => setStep(idx)}
+                  >
+                    <span className="text-xl">{icon}</span>
+                    <span className="text-xs mt-1">{
+                      idx === 0 ? "See" :
+                      idx === 1 ? "Hear" :
+                      idx === 2 ? "Smell" :
+                      idx === 3 ? "Taste" : "Touch"
+                    }</span>
+                  </button>
+                ))}
+              </div>
+              
+              <h4 className="text-white text-sm font-medium mb-2">
+                {step % 5 === 0 ? "What do you SEE?" :
+                 step % 5 === 1 ? "What do you HEAR?" :
+                 step % 5 === 2 ? "What can you SMELL?" :
+                 step % 5 === 3 ? "What do you TASTE?" :
+                 "What can you FEEL?"}
+              </h4>
+              
+              <div className="space-y-2">
+                {[1, 2, 3, 4, 5].slice(0, 5 - step % 5).map((num) => (
+                  <div key={num} className="flex items-center">
+                    <div className="w-6 h-6 bg-[#3E60C1]/20 rounded-full flex items-center justify-center text-[#5983FC] mr-2">
+                      {num}
+                    </div>
+                    <input 
+                      type="text"
+                      className="flex-1 bg-[#1A2335] border border-[#2A3547] rounded-lg p-2 text-[#B8C7E0] text-sm focus:outline-none focus:border-[#5983FC]"
+                      placeholder={`Enter something you can ${
+                        step % 5 === 0 ? "see" :
+                        step % 5 === 1 ? "hear" :
+                        step % 5 === 2 ? "smell" :
+                        step % 5 === 3 ? "taste" : "feel"
+                      }...`}
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        );
+
+      case 'coping':
+        return (
+          <div className="mt-4">
+            <div className="bg-[#0F172A] p-4 rounded-lg border border-[#2A3547] mb-3">
+              <h4 className="text-white text-sm font-medium mb-3">Emotion Intensity</h4>
+              <div className="flex items-center mb-6">
+                <span className="text-[#B8C7E0] text-sm mr-3">Low</span>
+                <input 
+                  type="range" 
+                  min="1" 
+                  max="10" 
+                  className="w-full h-2 bg-gradient-to-r from-green-500 via-yellow-500 to-red-500 rounded-lg appearance-none cursor-pointer"
+                />
+                <span className="text-[#B8C7E0] text-sm ml-3">High</span>
+              </div>
+              
+              <h4 className="text-white text-sm font-medium mb-2">Thought Reframing</h4>
+              <div className="space-y-3 mb-4">
+                <div>
+                  <label className="text-[#5983FC] text-xs mb-1 block">Triggering thought:</label>
+                  <textarea
+                    className="w-full h-10 bg-[#1A2335] border border-[#2A3547] rounded-lg p-2 text-[#B8C7E0] text-sm focus:outline-none focus:border-[#5983FC]"
+                    placeholder="What thought is causing distress..."
+                  />
+                </div>
+                <div>
+                  <label className="text-[#5983FC] text-xs mb-1 block">Evidence for this thought:</label>
+                  <textarea
+                    className="w-full h-10 bg-[#1A2335] border border-[#2A3547] rounded-lg p-2 text-[#B8C7E0] text-sm focus:outline-none focus:border-[#5983FC]"
+                    placeholder="Facts that support this thought..."
+                  />
+                </div>
+                <div>
+                  <label className="text-[#5983FC] text-xs mb-1 block">Evidence against this thought:</label>
+                  <textarea
+                    className="w-full h-10 bg-[#1A2335] border border-[#2A3547] rounded-lg p-2 text-[#B8C7E0] text-sm focus:outline-none focus:border-[#5983FC]"
+                    placeholder="Facts that contradict this thought..."
+                  />
+                </div>
+                <div>
+                  <label className="text-[#5983FC] text-xs mb-1 block">Alternative perspective:</label>
+                  <textarea
+                    className="w-full h-10 bg-[#1A2335] border border-[#2A3547] rounded-lg p-2 text-[#B8C7E0] text-sm focus:outline-none focus:border-[#5983FC]"
+                    placeholder="A more balanced thought..."
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+        
+      case 'physical':
+        return (
+          <div className="mt-4">
+            <div className="flex flex-col items-center">
+              {/* Timer for physical exercises */}
+              <div className="text-xl font-semibold text-white mb-3">
+                {formatTime(timeElapsed)} / {formatTime(totalDuration)}
+              </div>
+              
+              {/* Body parts highlight */}
+              <div className="w-full max-w-[200px] relative mb-4">
+                <svg viewBox="0 0 100 220" className="w-full">
+                  <rect x="30" y="30" width="40" height="60" rx="20" 
+                    fill={timeElapsed % 35 < 5 ? "#5983FC33" : "none"} 
+                    stroke="#5983FC" strokeWidth="0.5" 
+                  />
+                  <rect x="35" y="90" width="30" height="60" rx="5" 
+                    fill={timeElapsed % 35 >= 5 && timeElapsed % 35 < 15 ? "#5983FC33" : "none"} 
+                    stroke="#5983FC" strokeWidth="0.5" 
+                  />
+                  <rect x="40" y="150" width="20" height="70" rx="5" 
+                    fill={timeElapsed % 35 >= 15 && timeElapsed % 35 < 25 ? "#5983FC33" : "none"} 
+                    stroke="#5983FC" strokeWidth="0.5" 
+                  />
+                  <circle cx="50" cy="15" r="10" 
+                    fill={timeElapsed % 35 >= 25 ? "#5983FC33" : "none"} 
+                    stroke="#5983FC" strokeWidth="0.5" 
+                  />
+                </svg>
+              </div>
+              
+              {/* Visual guide for tension/release cycles */}
+              <div className="w-full bg-[#0F172A] h-6 rounded-full mb-4 overflow-hidden relative">
+                <div 
+                  className={`h-6 ${
+                    timerActive && timeElapsed % 10 < 5 
+                      ? "bg-amber-500 transition-all duration-500" 
+                      : "bg-[#5983FC] transition-all duration-500"
+                  }`}
+                  style={{ 
+                    width: `${(timeElapsed / totalDuration) * 100}%`,
+                  }}
+                ></div>
+                <div className="absolute inset-0 flex items-center justify-center text-white text-sm">
+                  {timerActive && timeElapsed % 10 < 5 
+                    ? "TENSE" 
+                    : "RELEASE"}
+                </div>
+              </div>
+              
+              <div className="text-[#B8C7E0] text-sm mb-3">
+                {timerActive && timeElapsed % 35 < 5 
+                  ? "Focus on your FACE & JAW" 
+                  : timerActive && timeElapsed % 35 < 15 
+                  ? "Focus on your SHOULDERS & ARMS" 
+                  : timerActive && timeElapsed % 35 < 25 
+                  ? "Focus on your LEGS & FEET"
+                  : "Focus on your ABDOMEN & CHEST"}
+              </div>
+              
+              <div className="flex items-center space-x-4">
+                {timerActive ? (
+                  <button 
+                    onClick={pauseTimer}
+                    className="bg-[#0F172A] p-3 rounded-full text-[#B8C7E0] hover:text-white transition-colors"
+                  >
+                    <FaPause />
+                  </button>
+                ) : (
+                  <button 
+                    onClick={startTimer}
+                    className="bg-[#0F172A] p-3 rounded-full text-[#B8C7E0] hover:text-white transition-colors"
+                  >
+                    <FaPlay />
+                  </button>
+                )}
+                
+                <button 
+                  onClick={resetTimer}
+                  className="bg-[#0F172A] p-3 rounded-full text-[#B8C7E0] hover:text-white transition-colors"
+                >
+                  <FaArrowLeft />
+                </button>
+              </div>
+            </div>
+          </div>
+        );
+        
+      case 'relationship':
+        return (
+          <div className="mt-4">
+            <div className="bg-[#0F172A] p-4 rounded-lg border border-[#2A3547] mb-3">
+              <h4 className="text-white text-sm font-medium mb-3">Perspective Switcher</h4>
+              
+              <div className="flex mb-4">
+                <button 
+                  className="flex-1 py-2 rounded-l-lg bg-[#3E60C1] text-white"
+                >
+                  Your View
+                </button>
+                <button 
+                  className="flex-1 py-2 rounded-r-lg bg-[#1A2335] text-[#B8C7E0]"
+                >
+                  Their View
+                </button>
+              </div>
+              
+              <div className="space-y-3">
+                <div>
+                  <label className="text-[#5983FC] text-xs mb-1 block">What I want or need:</label>
+                  <textarea
+                    className="w-full h-16 bg-[#1A2335] border border-[#2A3547] rounded-lg p-2 text-[#B8C7E0] text-sm focus:outline-none focus:border-[#5983FC]"
+                    placeholder="Describe what you want from this situation or relationship..."
+                  />
+                </div>
+                
+                <div>
+                  <label className="text-[#5983FC] text-xs mb-1 block">What they might want or need:</label>
+                  <textarea
+                    className="w-full h-16 bg-[#1A2335] border border-[#2A3547] rounded-lg p-2 text-[#B8C7E0] text-sm focus:outline-none focus:border-[#5983FC]"
+                    placeholder="Consider what the other person might want..."
+                  />
+                </div>
+                
+                <div>
+                  <label className="text-[#5983FC] text-xs mb-1 block">Common ground:</label>
+                  <textarea
+                    className="w-full h-16 bg-[#1A2335] border border-[#2A3547] rounded-lg p-2 text-[#B8C7E0] text-sm focus:outline-none focus:border-[#5983FC]"
+                    placeholder="What shared interests or values might you have?"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+        
+      case 'work':
+        return (
+          <div className="mt-4">
+            <div className="bg-[#0F172A] p-4 rounded-lg border border-[#2A3547] mb-3">
+              <h4 className="text-white text-sm font-medium mb-3">Priority Matrix</h4>
+              
+              <div className="grid grid-cols-2 gap-2 mb-4">
+                <div className="p-3 rounded-lg bg-[#3E60C1]/20 border border-[#5983FC]/30">
+                  <div className="text-[#5983FC] text-xs mb-1">Urgent & Important</div>
+                  <textarea
+                    className="w-full h-16 bg-[#1A2335] border border-[#2A3547] rounded-lg p-2 text-[#B8C7E0] text-xs focus:outline-none focus:border-[#5983FC]"
+                    placeholder="Tasks to do immediately..."
+                  />
+                </div>
+                <div className="p-3 rounded-lg bg-[#3E60C1]/10 border border-[#5983FC]/20">
+                  <div className="text-[#5983FC] text-xs mb-1">Important, Not Urgent</div>
+                  <textarea
+                    className="w-full h-16 bg-[#1A2335] border border-[#2A3547] rounded-lg p-2 text-[#B8C7E0] text-xs focus:outline-none focus:border-[#5983FC]"
+                    placeholder="Tasks to schedule..."
+                  />
+                </div>
+                <div className="p-3 rounded-lg bg-[#0F172A] border border-[#2A3547]">
+                  <div className="text-[#B8C7E0] text-xs mb-1">Urgent, Not Important</div>
+                  <textarea
+                    className="w-full h-16 bg-[#1A2335] border border-[#2A3547] rounded-lg p-2 text-[#B8C7E0] text-xs focus:outline-none focus:border-[#5983FC]"
+                    placeholder="Tasks to delegate..."
+                  />
+                </div>
+                <div className="p-3 rounded-lg bg-[#0F172A] border border-[#2A3547]">
+                  <div className="text-[#B8C7E0] text-xs mb-1">Neither Urgent nor Important</div>
+                  <textarea
+                    className="w-full h-16 bg-[#1A2335] border border-[#2A3547] rounded-lg p-2 text-[#B8C7E0] text-xs focus:outline-none focus:border-[#5983FC]"
+                    placeholder="Tasks to eliminate..."
+                  />
+                </div>
+              </div>
+              
+              <h4 className="text-white text-sm font-medium mb-2">Focus for Today</h4>
+              <div className="p-3 rounded-lg border border-[#5983FC]/20 bg-[#3E60C1]/10">
+                <textarea
+                  className="w-full h-12 bg-[#1A2335] border border-[#2A3547] rounded-lg p-2 text-[#B8C7E0] text-sm focus:outline-none focus:border-[#5983FC]"
+                  placeholder="Top 3 priorities for today..."
+                />
+              </div>
+            </div>
+          </div>
+        );
+        
+      case 'values-clarification':
+        return (
+          <div className="mt-4">
+            <div className="bg-[#0F172A] p-4 rounded-lg border border-[#2A3547] mb-3">
+              <h4 className="text-white text-sm font-medium mb-3">Values Tracker</h4>
+              
+              <div className="space-y-3 mb-4">
+                {[1, 2, 3, 4, 5].map((num) => (
+                  <div key={num} className="flex items-center space-x-3">
+                    <div className="w-6 h-6 bg-[#3E60C1]/20 rounded-full flex items-center justify-center text-[#5983FC]">
+                      {num}
+                    </div>
+                    <input 
+                      type="text"
+                      className="flex-1 bg-[#1A2335] border border-[#2A3547] rounded-lg p-2 text-[#B8C7E0] text-sm focus:outline-none focus:border-[#5983FC]"
+                      placeholder={`Value #${num}...`}
+                    />
+                    <select
+                      className="w-16 bg-[#1A2335] border border-[#2A3547] rounded-lg p-2 text-[#B8C7E0] text-sm focus:outline-none focus:border-[#5983FC]"
+                    >
+                      {[1, 2, 3, 4, 5].map((rank) => (
+                        <option key={rank} value={rank}>{rank}</option>
+                      ))}
+                    </select>
+                  </div>
+                ))}
+              </div>
+              
+              <h4 className="text-white text-sm font-medium mb-2">Value Definition</h4>
+              <div className="mb-3">
+                <textarea
+                  className="w-full h-16 bg-[#1A2335] border border-[#2A3547] rounded-lg p-2 text-[#B8C7E0] text-sm focus:outline-none focus:border-[#5983FC]"
+                  placeholder="Define what your top value means to you personally..."
+                />
+              </div>
+              
+              <h4 className="text-white text-sm font-medium mb-2">Action Plan</h4>
+              <div>
+                <textarea
+                  className="w-full h-16 bg-[#1A2335] border border-[#2A3547] rounded-lg p-2 text-[#B8C7E0] text-sm focus:outline-none focus:border-[#5983FC]"
+                  placeholder="One specific way I'll honor this value this week..."
+                />
+              </div>
+            </div>
+          </div>
+        );
+
+      case 'appreciation-expression':
+        return (
+          <div className="mt-4">
+            <div className="bg-[#0F172A] p-4 rounded-lg border border-[#2A3547] mb-3">
+              <h4 className="text-white text-sm font-medium mb-3">Appreciation Journal</h4>
+              
+              <div className="mb-3">
+                <label className="text-[#5983FC] text-xs mb-1 block">Person I appreciate:</label>
+                <input 
+                  type="text"
+                  className="w-full bg-[#1A2335] border border-[#2A3547] rounded-lg p-2 text-[#B8C7E0] text-sm focus:outline-none focus:border-[#5983FC]"
+                  placeholder="Name of person..."
+                />
+              </div>
+              
+              <div className="space-y-3 mb-4">
+                {[1, 2, 3].map((num) => (
+                  <div key={num}>
+                    <label className="text-[#5983FC] text-xs mb-1 block">Quality/Action #{num} I appreciate:</label>
+                    <textarea
+                      className="w-full h-12 bg-[#1A2335] border border-[#2A3547] rounded-lg p-2 text-[#B8C7E0] text-sm focus:outline-none focus:border-[#5983FC]"
+                      placeholder={`Something specific I appreciate...`}
+                    />
+                    <label className="text-[#5983FC] text-xs mt-2 mb-1 block">Why this matters to me:</label>
+                    <textarea
+                      className="w-full h-12 bg-[#1A2335] border border-[#2A3547] rounded-lg p-2 text-[#B8C7E0] text-sm focus:outline-none focus:border-[#5983FC]"
+                      placeholder={`How this impacts me...`}
+                    />
+                  </div>
+                ))}
+              </div>
+              
+              <h4 className="text-white text-sm font-medium mb-2">Expression Draft</h4>
+              <div>
+                <textarea
+                  className="w-full h-24 bg-[#1A2335] border border-[#2A3547] rounded-lg p-2 text-[#B8C7E0] text-sm focus:outline-none focus:border-[#5983FC]"
+                  placeholder="Draft your appreciation message here..."
+                />
+                <div className="flex justify-end mt-2">
+                  <button 
+                    className="flex items-center bg-[#3E60C1] text-white px-3 py-1 rounded-lg text-sm hover:bg-[#5983FC] transition-colors"
+                  >
+                    <FaSave className="mr-2" /> Save Draft
+                  </button>
+                </div>
+              </div>
+            </div>
+            
+            <div className="bg-[#0F172A]/70 p-3 rounded-lg border border-[#2A3547]">
+              <h4 className="text-[#5983FC] text-sm font-medium mb-2 flex items-center">
+                <FaRegLightbulb className="mr-2" /> Effective Appreciation Tips:
+              </h4>
+              <ul className="space-y-2">
+                <li className="text-[#B8C7E0] text-sm flex items-start">
+                  <span className="text-[#5983FC] mr-2">•</span>
+                  <span>Be specific about what they did and its impact</span>
+                </li>
+                <li className="text-[#B8C7E0] text-sm flex items-start">
+                  <span className="text-[#5983FC] mr-2">•</span>
+                  <span>Express genuine emotion rather than just saying "thanks"</span>
+                </li>
+                <li className="text-[#B8C7E0] text-sm flex items-start">
+                  <span className="text-[#5983FC] mr-2">•</span>
+                  <span>Avoid adding criticism or requests to your appreciation</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        );
+        
+      case 'perspective-taking':
+        return (
+          <div className="mt-4">
+            <div className="bg-[#0F172A] p-4 rounded-lg border border-[#2A3547] mb-3">
+              <h4 className="text-white text-sm font-medium mb-3">Perspective-Taking Practice</h4>
+              
+              <div className="space-y-3 mb-4">
+                <div>
+                  <label className="text-[#5983FC] text-xs mb-1 block">Describe the situation:</label>
+                  <textarea
+                    className="w-full h-10 bg-[#1A2335] border border-[#2A3547] rounded-lg p-2 text-[#B8C7E0] text-sm focus:outline-none focus:border-[#5983FC]"
+                    placeholder="Briefly describe the situation or conflict..."
+                  />
+                </div>
+                
+                <div>
+                  <label className="text-[#5983FC] text-xs mb-1 block">Your perspective:</label>
+                  <textarea
+                    className="w-full h-10 bg-[#1A2335] border border-[#2A3547] rounded-lg p-2 text-[#B8C7E0] text-sm focus:outline-none focus:border-[#5983FC]"
+                    placeholder="Write down your perspective on the situation..."
+                  />
+                </div>
+                
+                <div>
+                  <label className="text-[#5983FC] text-xs mb-1 block">Their perspective:</label>
+                  <textarea
+                    className="w-full h-10 bg-[#1A2335] border border-[#2A3547] rounded-lg p-2 text-[#B8C7E0] text-sm focus:outline-none focus:border-[#5983FC]"
+                    placeholder="Consider what the other person might think or feel about the situation..."
+                  />
+                </div>
+              </div>
+            </div>
+            
+            <div className="bg-[#0F172A]/70 p-3 rounded-lg border border-[#2A3547]">
+              <h4 className="text-[#5983FC] text-sm font-medium mb-2 flex items-center">
+                <FaRegLightbulb className="mr-2" /> Effective Perspective-Taking Tips:
+              </h4>
+              <ul className="space-y-2">
+                <li className="text-[#B8C7E0] text-sm flex items-start">
+                  <span className="text-[#5983FC] mr-2">•</span>
+                  <span>Be objective and unbiased in your description</span>
+                </li>
+                <li className="text-[#B8C7E0] text-sm flex items-start">
+                  <span className="text-[#5983FC] mr-2">•</span>
+                  <span>Consider both sides of the situation</span>
+                </li>
+                <li className="text-[#B8C7E0] text-sm flex items-start">
+                  <span className="text-[#5983FC] mr-2">•</span>
+                  <span>Try to understand their feelings and thoughts</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        );
+        
+      default:
+        return null;
+    }
+  };
   
   useEffect(() => {
-    // Load exercise content based on the link path
-    const fetchExerciseContent = async () => {
-      setLoading(true);
+    // Load exercise content based on the exercise properties
+    const loadExerciseContent = async () => {
+      setIsLoading(true);
+
       try {
-        // Extract the exercise type from the link
-        const exercisePath = exercise.link.split('/').pop();
+        // Determine which exercise to load based on title, type, or category
+        const exerciseKey = determineExerciseKey();
         
-        // Define content for different exercise types
-        const exerciseContents = {
-          // GRIEF EXERCISES
-          'grief-journal': {
-            title: "Grief Journaling Exercise",
-            description: "Writing about your grief can help process emotions and honor your memories.",
-            steps: [
-              {
-                title: "Prepare",
-                content: "Find a quiet space where you won't be interrupted. Take a few deep breaths to center yourself."
-              },
-              {
-                title: "Remember",
-                content: "Think of a memory with your loved one. It could be a special moment, a regular day, or something that captures their essence."
-              },
-              {
-                title: "Write",
-                content: "Write freely about this memory. What happened? What did you see, hear, or feel? What made this moment meaningful?"
-              },
-              {
-                title: "Reflect",
-                content: "How does remembering make you feel now? Notice your emotions without judgment. There's no right or wrong way to feel."
-              }
-            ],
-            prompts: [
-              "Describe a memory that brings you joy when you think of your loved one.",
-              "What qualities or traits do you miss most about them?",
-              "If you could tell them something now, what would you say?",
-              "How has your relationship with them shaped who you are today?",
-              "What traditions or activities remind you of them?"
-            ],
-            tips: [
-              "Don't worry about grammar or structure - just write from the heart.",
-              "It's okay if tears come while writing - that's a natural part of grief.",
-              "You can save your journal entries to revisit when you need to feel connected.",
-              "There's no timeline for grief. Be patient with yourself in this process."
-            ],
-            resources: [
-              {
-                title: "What is Normal Grief? | Mayo Clinic",
-                description: "Expert information about grief processes and coping strategies",
-                link: "https://www.mayoclinic.org/patient-visitor-guide/support-groups/what-is-grief"
-              },
-              {
-                title: "Coping with Grief and Loss | HelpGuide.org",
-                description: "Comprehensive guide to understanding and navigating grief",
-                link: "https://www.helpguide.org/articles/grief/coping-with-grief-and-loss.htm"
-              },
-              {
-                title: "The Ball in the Box: A Helpful Analogy for Grief | Twitter Thread",
-                description: "A simple but profound way to understand how grief changes over time",
-                link: "https://twitter.com/LaurenHerschel/status/946887540732915712"
-              },
-              {
-                title: "What's Your Grief: 64 Journaling Prompts",
-                description: "Extensive list of journaling prompts specifically for grief",
-                link: "https://whatsyourgrief.com/64-journaling-prompts-for-coping-with-grief/"
-              }
-            ],
-            type: "journal"
-          },
-          
-          // ANXIETY & STRESS EXERCISES
-          'breathing': {
-            title: "4-7-8 Breathing Technique",
-            description: "A calming breathing exercise to help reduce anxiety and stress.",
-            steps: [
-              {
-                title: "Prepare",
-                content: "Find a comfortable sitting position. Place the tip of your tongue against the ridge behind your upper front teeth."
-              },
-              {
-                title: "Inhale",
-                content: "Close your mouth and inhale quietly through your nose for a count of 4."
-              },
-              {
-                title: "Hold",
-                content: "Hold your breath for a count of 7."
-              },
-              {
-                title: "Exhale",
-                content: "Exhale completely through your mouth with a whooshing sound for a count of 8."
-              }
-            ],
-            tips: [
-              "Repeat this cycle 4 times initially, and work up to 8 cycles with practice.",
-              "This exercise is especially helpful before bed or during moments of stress.",
-              "The ratio of 4:7:8 is important, but you can adjust the actual time if needed.",
-              "You may feel lightheaded at first - this is normal and will pass with practice."
-            ],
-            resources: [
-              {
-                title: "The 4-7-8 Breathing Technique | Dr. Andrew Weil",
-                description: "Video demonstration by Dr. Weil who popularized this technique",
-                link: "https://www.drweil.com/videos-features/videos/breathing-exercises-4-7-8-breath/"
-              },
-              {
-                title: "Harvard Health: Relaxation techniques: Breath control helps quell errant stress response",
-                description: "Scientific explanation of how breathing exercises affect stress",
-                link: "https://www.health.harvard.edu/mind-and-mood/relaxation-techniques-breath-control-helps-quell-errant-stress-response"
-              },
-              {
-                title: "Guided 4-7-8 Breathing Exercise | YouTube",
-                description: "Follow along with this guided video for proper technique",
-                link: "https://www.youtube.com/watch?v=PmBYdfv5RSk"
-              }
-            ],
-            type: "breathing"
-          },
-          'grounding': {
-            title: "5-4-3-2-1 Grounding Exercise",
-            description: "A sensory awareness technique to help manage anxiety and bring you back to the present moment.",
-            steps: [
-              {
-                title: "Observe",
-                content: "Look around and identify 5 things you can SEE in the room. Say them out loud or note them mentally."
-              },
-              {
-                title: "Touch",
-                content: "Find 4 things you can TOUCH or FEEL. This could be the texture of your clothing, the surface of a table, or the feeling of the chair against your back."
-              },
-              {
-                title: "Listen",
-                content: "Focus on 3 things you can HEAR. These might be distant sounds, like birds outside, or closer sounds, like your own breathing."
-              },
-              {
-                title: "Smell",
-                content: "Notice 2 things you can SMELL. If you can't smell anything at first, move to another spot or find something with a scent, like hand lotion or a candle."
-              },
-              {
-                title: "Taste",
-                content: "Identify 1 thing you can TASTE. You might take a sip of a beverage, eat a small piece of food, or simply notice the current taste in your mouth."
-              }
-            ],
-            tips: [
-              "Take your time with each step – there's no rush.",
-              "If you're in a situation where you can't speak aloud, just note each observation silently.",
-              "For a shorter exercise, you can do a 3-2-1 version with just three senses.",
-              "Practice regularly to make this technique more effective during high-anxiety moments."
-            ],
-            resources: [
-              {
-                title: "Grounding Techniques | University of Rochester Medical Center",
-                description: "Evidence-based grounding techniques from mental health experts",
-                link: "https://www.urmc.rochester.edu/behavioral-health-partners/bhp-blog/april-2018/5-4-3-2-1-coping-technique-for-anxiety.aspx"
-              },
-              {
-                title: "How to Ground Yourself During an Anxiety Attack | Healthline",
-                description: "Practical strategies for using grounding during high anxiety moments",
-                link: "https://www.healthline.com/health/grounding-techniques"
-              },
-              {
-                title: "VA: PTSD Coach Online - Grounding Exercises",
-                description: "Collection of grounding exercises from the Veterans Administration",
-                link: "https://www.ptsd.va.gov/apps/ptsdcoachonline/tools/index.htm"
-              }
-            ],
-            type: "sensory"
-          },
-          'muscle-relaxation': {
-            title: "Progressive Muscle Relaxation",
-            description: "A technique that involves tensing and then releasing different muscle groups to reduce physical tension and anxiety.",
-            steps: [
-              {
-                title: "Prepare",
-                content: "Find a comfortable position sitting or lying down. Close your eyes if you feel comfortable doing so."
-              },
-              {
-                title: "Feet & Legs",
-                content: "Start with your feet and legs. Tense these muscles by pointing your toes and tightening your calves and thighs. Hold for 5 seconds, then release completely. Notice the difference between tension and relaxation."
-              },
-              {
-                title: "Abdomen & Chest",
-                content: "Move to your abdomen and chest. Tighten these muscles by taking a deep breath and holding it while clenching your stomach muscles. Hold for 5 seconds, then release, letting the breath go."
-              },
-              {
-                title: "Arms & Hands",
-                content: "Next, focus on your arms and hands. Make fists and tense your arms. Hold for 5 seconds, then release, letting your hands go limp."
-              },
-              {
-                title: "Shoulders & Neck",
-                content: "Move to your shoulders and neck. Raise your shoulders toward your ears and tighten your neck muscles. Hold for 5 seconds, then release, feeling the tension melt away."
-              },
-              {
-                title: "Face",
-                content: "Finally, tense the muscles in your face by squeezing your eyes shut and clenching your jaw. Hold for 5 seconds, then release, feeling your face soften."
-              },
-              {
-                title: "Complete Body",
-                content: "Now, become aware of your entire body. Notice any remaining tension and let it go. Feel a wave of relaxation flowing from the top of your head to the tips of your toes."
-              }
-            ],
-            tips: [
-              "Don't tense your muscles too tightly to avoid cramping or pain.",
-              "Focus on the contrast between tension and relaxation.",
-              "Breathe normally throughout the exercise, except when specifically instructed otherwise.",
-              "Practice regularly for best results - aim for once or twice daily."
-            ],
-            resources: [
-              {
-                title: "Progressive Muscle Relaxation | Anxiety Canada",
-                description: "Detailed guide with audio instructions for PMR",
-                link: "https://www.anxietycanada.com/articles/how-to-do-progressive-muscle-relaxation/"
-              },
-              {
-                title: "The Science Behind Progressive Muscle Relaxation | American Psychological Association",
-                description: "Scientific research on the effectiveness of progressive muscle relaxation",
-                link: "https://www.apa.org/topics/stress/relaxation"
-              },
-              {
-                title: "15-Minute Progressive Muscle Relaxation | YouTube",
-                description: "Guided video to follow along with a full PMR session",
-                link: "https://www.youtube.com/watch?v=1nZEdqcGVzo"
-              }
-            ],
-            type: "physical"
-          },
-          
-          // GRATITUDE & POSITIVE EMOTION EXERCISES
-          'gratitude': {
-            title: "Gratitude Practice",
-            description: "Cultivating gratitude has been shown to increase positive emotions and improve well-being.",
-            steps: [
-              {
-                title: "Reflect",
-                content: "Take a moment to think about the past day or week. What are you grateful for?"
-              },
-              {
-                title: "List",
-                content: "Write down 3-5 things you feel grateful for. These can be simple things like a good meal or complex things like a supportive relationship."
-              },
-              {
-                title: "Elaborate",
-                content: "Choose one item from your list and expand on why you're grateful for it. How does it affect your life? What would be different without it?"
-              },
-              {
-                title: "Feel",
-                content: "As you write, try to really feel the gratitude in your body. Where do you notice these positive feelings? Allow yourself to fully experience this emotion."
-              }
-            ],
-            prompts: [
-              "What's something in your daily life that you might take for granted, but would really miss if it were gone?",
-              "Who has done something that you're thankful for recently?",
-              "What's something about your body or health that you're grateful for today?",
-              "What opportunity or experience are you thankful for having had?",
-              "What's something in nature that brings you joy or awe?"
-            ],
-            tips: [
-              "Try to be specific rather than general in your gratitude items.",
-              "Focus on people rather than things where possible, as this tends to build stronger positive emotions.",
-              "Consider surprising or unexpected things you're grateful for.",
-              "Make this a regular practice - daily or weekly - for maximum benefit."
-            ],
-            resources: [
-              {
-                title: "The Science of Gratitude | Greater Good Science Center, UC Berkeley",
-                description: "Research on the psychological benefits of gratitude practice",
-                link: "https://greatergood.berkeley.edu/topic/gratitude/definition"
-              },
-              {
-                title: "Giving Thanks Can Make You Happier | Harvard Health",
-                description: "Harvard's perspective on the mental health benefits of gratitude",
-                link: "https://www.health.harvard.edu/healthbeat/giving-thanks-can-make-you-happier"
-              },
-              {
-                title: "How Gratitude Changes You and Your Brain | Greater Good Magazine",
-                description: "Research findings on the neural effects of gratitude practice",
-                link: "https://greatergood.berkeley.edu/article/item/how_gratitude_changes_you_and_your_brain"
-              }
-            ],
-            type: "journal"
-          },
-          'three-good-things': {
-            title: "Three Good Things Practice",
-            description: "This simple exercise helps train your mind to notice and remember positive experiences.",
-            steps: [
-              {
-                title: "Identify",
-                content: "Think of three good things that happened today. They can be small (enjoying a cup of coffee) or significant (accomplishing a goal)."
-              },
-              {
-                title: "Write",
-                content: "For each good thing, write it down and note why it happened and how it made you feel."
-              },
-              {
-                title: "Reflect",
-                content: "Consider what these positive events tell you about your life, yourself, and others around you."
-              },
-              {
-                title: "Savor",
-                content: "Take a moment to really savor the positive feelings associated with these good things."
-              }
-            ],
-            tips: [
-              "Try to do this exercise before bed to end your day on a positive note.",
-              "Keep a dedicated journal for your Three Good Things practice to build a collection of positive memories.",
-              "Even on difficult days, challenge yourself to find three positive moments, no matter how small.",
-              "Look for patterns over time - what consistently brings you joy or satisfaction?"
-            ],
-            resources: [
-              {
-                title: "Three Good Things Exercise | Positive Psychology Center, UPenn",
-                description: "The original research-backed Three Good Things practice from Dr. Martin Seligman's team",
-                link: "https://ppc.sas.upenn.edu/resources/three-good-things-exercise"
-              },
-              {
-                title: "The Three Good Things Exercise | Action for Happiness",
-                description: "Detailed instructions and variations on the practice",
-                link: "https://www.actionforhappiness.org/take-action/find-three-good-things-each-day"
-              },
-              {
-                title: "The Science of Three Good Things | Psychology Today",
-                description: "Scientific research on why this simple exercise is so effective",
-                link: "https://www.psychologytoday.com/us/blog/click-here-happiness/201807/the-three-good-things-exercise"
-              }
-            ],
-            type: "journal"
-          },
-          
-          // MINDFULNESS EXERCISES
-          'mindfulness': {
-            title: "Basic Mindfulness Meditation",
-            description: "A simple meditation practice to develop present-moment awareness and acceptance.",
-            steps: [
-              {
-                title: "Posture",
-                content: "Find a comfortable seated position with your back straight but not rigid. Place your hands on your lap or knees."
-              },
-              {
-                title: "Breath",
-                content: "Close your eyes or lower your gaze. Bring your attention to your breathing. Notice the sensations as you inhale and exhale naturally. Don't try to control your breath, just observe it."
-              },
-              {
-                title: "Anchor",
-                content: "When your mind wanders (which is normal), gently bring your attention back to your breath. The practice isn't about preventing thoughts but noticing when you're distracted and returning to your anchor."
-              },
-              {
-                title: "Body",
-                content: "Expand your awareness to include your whole body. Notice any sensations, tension, or comfort without trying to change anything."
-              },
-              {
-                title: "Sounds",
-                content: "Now include awareness of sounds in your environment. Notice them come and go without labeling them as good or bad."
-              },
-              {
-                title: "Thoughts",
-                content: "Finally, observe your thoughts as they arise. Try to see them as passing events rather than facts or commands that require action."
-              },
-              {
-                title: "Close",
-                content: "When you're ready to end your practice, slowly open your eyes if they were closed. Take a moment to notice how you feel before moving on with your day."
-              }
-            ],
-            tips: [
-              "Start with just 5 minutes and gradually increase your time.",
-              "Consistency is more important than duration - a daily 5-minute practice is better than an occasional 30-minute one.",
-              "Be kind to yourself when your mind wanders. This is part of the practice, not a failure.",
-              "Try using a timer so you don't need to check the time during your practice."
-            ],
-            resources: [
-              {
-                title: "Getting Started with Mindfulness | Mindful.org",
-                description: "Comprehensive beginner's guide to mindfulness meditation",
-                link: "https://www.mindful.org/meditation/mindfulness-getting-started/"
-              },
-              {
-                title: "How to Meditate | The New York Times",
-                description: "Well-respected guide for beginners from The New York Times",
-                link: "https://www.nytimes.com/guides/well/how-to-meditate"
-              },
-              {
-                title: "Body Scan Meditation | Guided Practice from UCLA",
-                description: "Free guided audio meditation from UCLA's Mindful Awareness Research Center",
-                link: "https://www.uclahealth.org/programs/marc/mindful-meditations"
-              },
-              {
-                title: "The Science of Mindfulness | Harvard Health",
-                description: "Research on the benefits of mindfulness meditation",
-                link: "https://www.health.harvard.edu/blog/mindfulness-meditation-may-ease-anxiety-mental-stress-201401086967"
-              }
-            ],
-            type: "meditation"
-          },
-          
-          // ANGER MANAGEMENT EXERCISES
-          'anger-management': {
-            title: "Anger Cooling Technique",
-            description: "A multi-step approach to manage intense anger in the moment.",
-            steps: [
-              {
-                title: "Recognize",
-                content: "Become aware that you're feeling angry. Notice physical signs like increased heart rate, muscle tension, or feeling hot."
-              },
-              {
-                title: "Pause",
-                content: "Take a deliberate pause before reacting. Count slowly to 10 while taking deep breaths."
-              },
-              {
-                title: "Breathe",
-                content: "Take several deep breaths. Inhale through your nose for 4 counts, hold for 2, and exhale through your mouth for 6 counts."
-              },
-              {
-                title: "Reframe",
-                content: "Try to look at the situation from a different perspective. Ask yourself: Will this matter in an hour? A day? A week?"
-              },
-              {
-                title: "Choose",
-                content: "Consciously choose how to respond rather than react. Consider what response will best serve you in the long run."
-              }
-            ],
-            tips: [
-              "If possible, physically step away from the triggering situation temporarily.",
-              "Avoid making important decisions or having difficult conversations when you're at the height of anger.",
-              "Regular physical exercise can help reduce overall stress and make anger management easier.",
-              "If anger is a frequent issue that impacts your relationships or wellbeing, consider speaking with a mental health professional."
-            ],
-            resources: [
-              {
-                title: "Controlling Anger Before It Controls You | American Psychological Association",
-                description: "Expert strategies for managing anger from the APA",
-                link: "https://www.apa.org/topics/anger/control"
-              },
-              {
-                title: "How to Control Anger: 25 Tips to Manage Your Anger | Healthline",
-                description: "Practical techniques for immediate and long-term anger management",
-                link: "https://www.healthline.com/health/mental-health/how-to-control-anger"
-              },
-              {
-                title: "Anger Management: 10 Tips to Tame Your Temper | Mayo Clinic",
-                description: "Evidence-based approaches to managing anger from medical experts",
-                link: "https://www.mayoclinic.org/healthy-lifestyle/adult-health/in-depth/anger-management/art-20045434"
-              },
-              {
-                title: "Strategies to Keep Anger at Bay | HelpGuide.org",
-                description: "Comprehensive guide with specific techniques for different situations",
-                link: "https://www.helpguide.org/articles/relationships-communication/anger-management.htm"
-              }
-            ],
-            type: "coping"
-          },
-          
-          // DEFAULT EXERCISE
-          'default': {
-            title: exercise.title || "Mindfulness Exercise",
-            description: exercise.description || "A guided exercise to help with your well-being.",
-            steps: [
-              {
-                title: "Center",
-                content: "Find a comfortable position and take a few moments to center yourself."
-              },
-              {
-                title: "Breathe",
-                content: "Take a few deep breaths, feeling your body relax with each exhale."
-              },
-              {
-                title: "Reflect",
-                content: "Gently reflect on what you're experiencing right now, with an attitude of curiosity and kindness."
-              }
-            ],
-            tips: [
-              "There's no right or wrong way to practice mindfulness.",
-              "Return to your breath whenever you notice your mind wandering.",
-              "Even a few minutes of practice can be beneficial."
-            ],
-            type: "general"
-          },
-          'active-listening': {
-            title: "Active Listening Practice",
-            description: "Active listening is a powerful skill that strengthens relationships and improves understanding. This practice will help you develop your active listening abilities.",
-            steps: [
-              {
-                title: "Understanding Active Listening",
-                content: "Active listening means fully concentrating on what someone is saying, understanding their message, responding thoughtfully, and remembering key information. It's about being present rather than just waiting for your turn to speak."
-              },
-              {
-                title: "Key Components",
-                content: "Active listening involves several key behaviors: maintaining eye contact, giving verbal and non-verbal feedback, avoiding interruptions, asking clarifying questions, paraphrasing to confirm understanding, and responding thoughtfully."
-              },
-              {
-                title: "Practice Exercise",
-                content: "Next time you're in a conversation, try the RASA technique: Receive (pay attention), Appreciate (nod, say 'hmm'), Summarize ('So what you're saying is...'), and Ask questions to clarify or deepen understanding."
-              },
-              {
-                title: "Reflection",
-                content: "After practicing, reflect on: How did it feel to listen this way? What did you notice about the speaker's response? What was challenging? What insights did you gain that you might have missed otherwise?"
-              }
-            ],
-            resources: [
-              {
-                title: "The Power of Listening | William Ury | TEDxSanDiego",
-                description: "A compelling TED talk on the transformative power of listening",
-                link: "https://www.youtube.com/watch?v=saXfavo1OQo"
-              },
-              {
-                title: "10 Steps To Effective Listening - Forbes",
-                description: "Practical steps to improve your listening skills",
-                link: "https://www.forbes.com/sites/womensmedia/2012/11/09/10-steps-to-effective-listening/"
-              },
-              {
-                title: "Active Listening - Mind Tools",
-                description: "Comprehensive guide to active listening techniques",
-                link: "https://www.mindtools.com/CommSkll/ActiveListening.htm"
-              },
-              {
-                title: "Julian Treasure: 5 Ways To Listen Better | TED Talk",
-                description: "Learn how to listen consciously in this popular TED talk",
-                link: "https://www.ted.com/talks/julian_treasure_5_ways_to_listen_better"
-              }
-            ],
-            tips: [
-              "Focus completely on the speaker and remove distractions (put away your phone, turn off notifications).",
-              "Show that you're listening through your body language - face the person, maintain appropriate eye contact, and nod occasionally.",
-              "Avoid preparing your response while the other person is still talking.",
-              "Ask open-ended questions that encourage elaboration rather than yes/no answers.",
-              "Practice empathy by trying to understand the speaker's perspective, even if you disagree.",
-              "Provide feedback by paraphrasing ('What I'm hearing is...') to ensure you've understood correctly."
-            ],
-            exercises: [
-              {
-                title: "One-Minute Exercise",
-                description: "In your next conversation, try counting to 1 silently after the person stops speaking before you respond. This small pause ensures they're finished and gives you time to consider your response."
-              },
-              {
-                title: "Paraphrasing Practice",
-                description: "In your next three conversations, challenge yourself to paraphrase what the speaker has said before responding with your own thoughts."
-              },
-              {
-                title: "Emotion Recognition",
-                description: "During a conversation, try to identify the emotions behind what the person is saying, not just the content. You might note to yourself: 'They seem excited about this' or 'I sense frustration in their voice.'"
-              }
-            ],
-            type: "relationship"
-          },
-          'self-compassion': {
-            title: "Self-Compassion Practice",
-            description: "Learn to treat yourself with the same kindness and understanding you would offer to a good friend.",
-            steps: [
-              {
-                title: "Recognize Suffering",
-                content: "Notice when you're experiencing difficulty or emotional pain. Acknowledge it with phrases like 'This is a moment of suffering' or 'This is hard right now.'"
-              },
-              {
-                title: "Remember Common Humanity",
-                content: "Remind yourself that suffering is part of the shared human experience. Many others have felt what you're feeling. Try saying: 'Everyone struggles sometimes' or 'I'm not alone in this feeling.'"
-              },
-              {
-                title: "Offer Kindness",
-                content: "Speak to yourself with warmth and understanding. Place a hand on your heart if that feels comfortable. Ask: 'What do I need to hear right now?' Then offer those words to yourself."
-              },
-              {
-                title: "Physical Self-Compassion",
-                content: "Take a self-compassion break by giving yourself physical comfort. This might be a gentle hand on your cheek, a deep breath, or a moment of rest. Honor what your body needs right now."
-              }
-            ],
-            resources: [
-              {
-                title: "Self-Compassion Guided Practices and Exercises | Dr. Kristin Neff",
-                description: "Free resources from the leading researcher on self-compassion",
-                link: "https://self-compassion.org/category/exercises/"
-              },
-              {
-                title: "The Three Elements of Self-Compassion | Greater Good Magazine",
-                description: "Learn about the three components that make up self-compassion",
-                link: "https://greatergood.berkeley.edu/article/item/the_three_parts_of_self_compassion"
-              },
-              {
-                title: "Self-Compassion Break | Guided Audio Practice",
-                description: "Follow along with this 5-minute guided self-compassion exercise",
-                link: "https://self-compassion.org/wp-content/uploads/2015/12/self-compassion.break_.mp3"
-              },
-              {
-                title: "The Science of Self-Compassion | Stanford Medicine",
-                description: "Research on how self-compassion affects mental and physical health",
-                link: "https://med.stanford.edu/compassion/research.html"
-              }
-            ],
-            tips: [
-              "Try to use the same supportive tone you would use with a good friend going through a difficult time.",
-              "It's normal to feel resistance to self-compassion at first. Notice this without judgment.",
-              "Start with small moments of difficulty before tackling your biggest challenges.",
-              "Practice regularly, even when you're feeling good, to build the self-compassion habit.",
-              "Remember that self-compassion is not self-pity or self-indulgence—it's about honest kindness."
-            ],
-            type: "emotional"
-          }
-        };
+        // Set the exercise content
+        setExerciseContent(exerciseContents[exerciseKey] || createDefaultExercise());
         
-        // Get the appropriate content or fall back to default
-        const content = exerciseContents[exercisePath] || exerciseContents['default'];
-        
-        // Set the content
-        setExerciseContent(content);
-        
-        // Initialize checklist for exercises that use it
-        if (content.steps) {
+        // Initialize checklist if needed
+        if (exerciseContents[exerciseKey]?.checkItems) {
           const initialChecklist = {};
-          content.steps.forEach((_, index) => {
+          exerciseContents[exerciseKey].checkItems.forEach((_, index) => {
             initialChecklist[index] = false;
           });
           setChecklist(initialChecklist);
         }
-        
-        setLoading(false);
       } catch (error) {
         console.error("Error loading exercise content:", error);
-        setLoading(false);
-        // Fall back to a basic template
-        setExerciseContent({
-          title: exercise.title,
-          description: exercise.description,
-          steps: [{ title: "Practice", content: "Follow the instructions provided." }],
-          tips: ["Take your time with this exercise."],
-          type: "general"
-        });
+        // Fallback to default
+        setExerciseContent(createDefaultExercise());
+      } finally {
+        setIsLoading(false);
       }
     };
     
-    fetchExerciseContent();
+    loadExerciseContent();
   }, [exercise]);
-
+  
+  // Determine which exercise content to load based on the exercise props
+  const determineExerciseKey = () => {
+    if (!exercise) return 'default';
+    
+    // First check if there's a direct link
+    if (exercise.link && typeof exercise.link === 'string') {
+      // Check for direct match with the link value
+      if (exerciseContents[exercise.link]) {
+        return exercise.link;
+      }
+      
+      // Check path segments if it's a full URL
+      const pathSegments = exercise.link.split('/');
+      const lastSegment = pathSegments[pathSegments.length - 1];
+      if (exerciseContents[lastSegment]) {
+        return lastSegment;
+      }
+    }
+    
+    // Next check title matches
+    const titleLower = exercise.title?.toLowerCase() || '';
+    
+    // Relationship exercises
+    if (titleLower.includes('values clarification')) return 'values-clarification';
+    if (titleLower.includes('appreciation expression')) return 'appreciation-expression';
+    if (titleLower.includes('perspective-taking')) return 'perspective-taking';
+    
+    // Self-esteem exercises
+    if (titleLower.includes('self-compass')) return 'self-compassion';
+    if (titleLower.includes('strengths inventory')) return 'strengths-inventory';
+    if (titleLower.includes('inner critic')) return 'inner-critic';
+    
+    // Grief exercises
+    if (titleLower.includes('grief') || titleLower.includes('loss')) {
+      if (titleLower.includes('journal')) return 'grief-journal';
+      if (titleLower.includes('ritual') || titleLower.includes('honor')) return 'memory-honor';
+      if (titleLower.includes('letter')) return 'grief-letter';
+      return 'grief-processing';
+    }
+    
+    // Anxiety exercises
+    if (titleLower.includes('anxiety') || titleLower.includes('stress')) {
+      if (titleLower.includes('ground') || titleLower.includes('5-4-3-2-1')) return 'grounding';
+      if (titleLower.includes('breath')) return 'breathing';
+      if (titleLower.includes('worry')) return 'worry-time';
+      if (titleLower.includes('muscle') || titleLower.includes('relax')) return 'muscle-relaxation';
+      return 'anxiety-management';
+    }
+    
+    // Anger exercises
+    if (titleLower.includes('anger')) {
+      if (titleLower.includes('stop')) return 'anger-stop';
+      if (titleLower.includes('letter')) return 'anger-letter';
+      if (titleLower.includes('root')) return 'anger-root-cause';
+      return 'anger-management';
+    }
+    
+    // Work exercises
+    if (titleLower.includes('work')) {
+      if (titleLower.includes('boundar')) return 'work-boundaries';
+      if (titleLower.includes('task') || titleLower.includes('priorit')) return 'task-prioritization';
+      if (titleLower.includes('value')) return 'work-values';
+      return 'work-stress';
+    }
+    
+    // Mindfulness exercises
+    if (titleLower.includes('mindful')) {
+      if (titleLower.includes('body') || titleLower.includes('scan')) return 'body-scan';
+      if (titleLower.includes('breath')) return 'mindful-breathing';
+      if (titleLower.includes('observ')) return 'mindful-observation';
+      return 'mindfulness';
+    }
+    
+    // Loneliness exercises
+    if (titleLower.includes('lonel') || titleLower.includes('connect')) {
+      if (titleLower.includes('inventory')) return 'connection-inventory';
+      if (titleLower.includes('self-connect')) return 'self-connection';
+      return 'belonging-expansion';
+    }
+    
+    // Health exercises
+    if (titleLower.includes('health') || titleLower.includes('body')) {
+      if (titleLower.includes('appreciat')) return 'body-appreciation';
+      if (titleLower.includes('worry')) return 'health-worry';
+      return 'mindful-body-scan';
+    }
+    
+    // Check type
+    if (exercise.type === 'journaling' || exercise.type === 'journal') return 'journaling';
+    if (exercise.type === 'meditation') return 'mindfulness';
+    if (exercise.type === 'breathing') return 'breathing';
+    if (exercise.type === 'grounding') return 'grounding';
+    if (exercise.type === 'reflection') return 'reflection';
+    
+    // Default
+    return 'default';
+  };
+  
+  // Create a default exercise if we can't determine the specific one
+  const createDefaultExercise = () => {
+    return {
+      title: exercise.title || "Wellness Exercise",
+      description: exercise.description || "A practice to support your well-being.",
+      steps: exercise.steps 
+        ? exercise.steps.map(step => typeof step === 'string' 
+            ? { title: "Step", content: step } 
+            : step)
+        : [{ title: "Practice", content: "Follow the instructions provided." }],
+      tips: exercise.benefits 
+        ? ["Remember: " + exercise.benefits] 
+        : ["Take your time with this exercise."],
+      resources: exercise.resources || [],
+      type: exercise.type || "general"
+    };
+  };
+  
   const handleSave = () => {
     if (journalEntry.trim()) {
       // In a real application, you would save this to your backend
@@ -667,30 +1266,15 @@ const ExerciseModal = ({ exercise, onClose }) => {
   };
 
   const nextStep = () => {
-    if (exerciseContent && step < exerciseContent.steps.length) {
+    if (exerciseContent && step < exerciseContent.steps.length - 1) {
       setStep(step + 1);
     }
   };
 
   const prevStep = () => {
-    if (step > 1) {
+    if (step > 0) {
       setStep(step - 1);
     }
-  };
-
-  const toggleTimer = () => {
-    setTimerActive(!timerActive);
-  };
-
-  const resetTimer = () => {
-    setSeconds(0);
-    setTimerActive(false);
-  };
-
-  const formatTime = (timeInSeconds) => {
-    const minutes = Math.floor(timeInSeconds / 60);
-    const seconds = timeInSeconds % 60;
-    return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
   };
 
   const toggleCheckItem = (index) => {
@@ -698,6 +1282,1099 @@ const ExerciseModal = ({ exercise, onClose }) => {
       ...checklist,
       [index]: !checklist[index]
     });
+  };
+  
+  // All exercise content definitions
+  const exerciseContents = {
+    // GRIEF EXERCISES
+    'grief-journal': {
+      title: "Grief Journaling Exercise",
+      description: "Writing about your grief can help process emotions and honor your memories.",
+      steps: [
+        {
+          title: "Prepare",
+          content: "Find a quiet space where you won't be interrupted. Take a few deep breaths to center yourself."
+        },
+        {
+          title: "Remember",
+          content: "Think of a memory with your loved one. It could be a special moment, a regular day, or something that captures their essence."
+        },
+        {
+          title: "Write",
+          content: "Write freely about this memory. What happened? What did you see, hear, or feel? What made this moment meaningful?"
+        },
+        {
+          title: "Reflect",
+          content: "How does remembering make you feel now? Notice your emotions without judgment. There's no right or wrong way to feel."
+        }
+      ],
+      prompts: [
+        "Describe a memory that brings you joy when you think of your loved one.",
+        "What qualities or traits do you miss most about them?",
+        "If you could tell them something now, what would you say?",
+        "How has your relationship with them shaped who you are today?",
+        "What traditions or activities remind you of them?"
+      ],
+      tips: [
+        "Don't worry about grammar or structure - just write from the heart.",
+        "It's okay if tears come while writing - that's a natural part of grief.",
+        "You can save your journal entries to revisit when you need to feel connected.",
+        "There's no timeline for grief. Be patient with yourself in this process."
+      ],
+      resources: [
+        {
+          type: "article",
+          title: "What is Normal Grief? | Mayo Clinic",
+          description: "Expert information about grief processes and coping strategies",
+          url: "https://www.mayoclinic.org/patient-visitor-guide/support-groups/what-is-grief"
+        },
+        {
+          type: "video",
+          title: "Coping with Grief and Loss | HelpGuide.org",
+          description: "Comprehensive guide to understanding and navigating grief",
+          url: "https://www.helpguide.org/articles/grief/coping-with-grief-and-loss.htm"
+        },
+        {
+          type: "website",
+          title: "What's Your Grief: 64 Journaling Prompts",
+          description: "Extensive list of journaling prompts specifically for grief",
+          url: "https://whatsyourgrief.com/64-journaling-prompts-for-coping-with-grief/"
+        }
+      ],
+      type: "journal"
+    },
+    'memory-honor': {
+      title: "Memory Honor Ritual",
+      description: "Create a small ritual to honor what you've lost while acknowledging the need to move forward.",
+      steps: [
+        {
+          title: "Prepare Your Space",
+          content: "Choose a quiet, private space where you won't be interrupted. You might light a candle, play gentle music, or gather meaningful objects related to your loss."
+        },
+        {
+          title: "Set Your Intention",
+          content: "Take a moment to clarify your purpose for this ritual. For example: 'I'm here to honor my loved one and also find ways to carry their memory forward as I continue my life.'"
+        },
+        {
+          title: "Connect With Memories",
+          content: "Hold or look at an object connected to what you've lost. It might be a photo, a letter, or something that belonged to them. Spend time recalling specific positive memories."
+        },
+        {
+          title: "Express Gratitude",
+          content: "Speak aloud or write down what you're thankful for regarding what you've lost. What gifts did this person, relationship, or experience bring to your life?"
+        },
+        {
+          title: "Acknowledge Pain",
+          content: "Allow yourself to acknowledge the pain of your loss. You might say something like, 'I miss you and it hurts that you're gone.'"
+        },
+        {
+          title: "Create a Symbol of Continuation",
+          content: "Choose a way to symbolize how you'll carry this forward. This might be placing a special object somewhere you'll see it regularly, or deciding on a regular practice to honor the memory."
+        },
+        {
+          title: "Close With Intention",
+          content: "End your ritual with words or gestures that feel right to you. You might say, 'I will always love you, and I will also continue living fully.'"
+        }
+      ],
+      resources: [
+        {
+          type: "article",
+          title: "Creating Grief Rituals",
+          description: "American Counseling Association",
+          url: "https://www.counseling.org/docs/default-source/Private/loss-grief-bereavement/grief-rituals.pdf"
+        },
+        {
+          type: "website",
+          title: "Rituals for Healing Grief",
+          description: "Center for Loss & Life Transition",
+          url: "https://www.centerforloss.com/grief/rituals-for-grief/"
+        },
+        {
+          type: "video",
+          title: "The Power of Ritual | TED Talk",
+          description: "How rituals help us process difficult emotions",
+          url: "https://www.ted.com/talks/dorothy_mcrae_mcmahon_rituals_for_our_times"
+        }
+      ],
+      reflectionPrompts: [
+        "What aspects of this ritual felt most meaningful to you?",
+        "How did this ritual help you connect with your feelings about your loss?",
+        "What would you like to incorporate as a regular practice going forward?"
+      ],
+      type: "reflection"
+    },
+    'grief-letter': {
+      title: "Letter of Release",
+      description: "Write a letter expressing unresolved feelings toward what you've lost.",
+      steps: [
+        {
+          title: "Prepare",
+          content: "Find a quiet space and set aside 20-30 minutes of uninterrupted time. Have paper and pen ready, or open a document on your device."
+        },
+        {
+          title: "Begin Your Letter",
+          content: "Start with 'Dear...' addressing what you've lost - a person, a relationship, an opportunity, a version of yourself, etc."
+        },
+        {
+          title: "Express Everything",
+          content: "Write freely about what you need to say. This might include: things left unsaid, feelings about how things ended, what you miss, what has been difficult, or memories you cherish."
+        },
+        {
+          title: "Include Gratitude",
+          content: "If appropriate, include what you're grateful for regarding what you've lost. What did this person, experience, or phase of life teach you or give you?"
+        },
+        {
+          title: "Write Your Goodbye",
+          content: "End your letter with words of farewell and release. This might be difficult, but it's an important step toward healing."
+        },
+        {
+          title: "Ceremony (Optional)",
+          content: "Decide what to do with your letter. You might keep it in a special place, bury it, burn it safely as a symbol of release, or place it somewhere meaningful."
+        }
+      ],
+      prompts: [
+        "What do I wish I had said to you?",
+        "How has my life changed since you've been gone?",
+        "What have I learned from this loss?",
+        "How will I carry you/this forward with me?",
+        "What am I ready to release now?"
+      ],
+      resources: [
+        {
+          type: "article",
+          title: "Writing to Heal | James Pennebaker Research",
+          description: "Scientific evidence behind expressive writing for processing loss",
+          url: "https://www.apa.org/monitor/jun02/writing"
+        },
+        {
+          type: "website",
+          title: "Therapeutic Letter Writing | Good Therapy",
+          description: "Guidelines for writing therapeutic letters",
+          url: "https://www.goodtherapy.org/blog/therapeutic-letter-writing-healing-through-words-0712184"
+        }
+      ],
+      type: "journal"
+    },
+    'grief-processing': {
+      title: "Loss Processing Exercise",
+      description: "Honor what's been lost while finding ways to move forward.",
+      steps: [
+        {
+          title: "Acknowledge All Losses",
+          content: "Create a list of what specifically you've lost. Include both tangible losses (e.g., a person, home, job) and intangible ones (e.g., sense of security, future plans, identity)."
+        },
+        {
+          title: "Express Your Feelings",
+          content: "For each loss on your list, write down the emotions associated with it. Give yourself permission to name all feelings without judgment."
+        },
+        {
+          title: "Identify What Remains",
+          content: "Make a second list of what still remains in your life despite these losses. Include relationships, strengths, resources, and possibilities."
+        },
+        {
+          title: "Find Meaning",
+          content: "Reflect on what you've learned through this experience. How has it changed your perspective? What wisdom might you carry forward?"
+        },
+        {
+          title: "Small Step Forward",
+          content: "Identify one small, concrete step you can take toward adapting to your new reality. This might be a self-care practice, a social connection, or a meaningful activity."
+        }
+      ],
+      reflectionPrompts: [
+        "What has been the most difficult aspect of this loss to accept?",
+        "What strengths have you discovered in yourself through this experience?",
+        "What would moving forward with this loss (not past it) look like for you?"
+      ],
+      resources: [
+        {
+          type: "article",
+          title: "Growing Around Grief | Refuge in Grief",
+          description: "A helpful model for understanding how we grow around our grief",
+          url: "https://refugeingrief.com/growing-around-grief/"
+        },
+        {
+          type: "video",
+          title: "We don't 'move on' from grief, we move forward with it | TED Talk",
+          description: "Nora McInerny's powerful talk on living with loss",
+          url: "https://www.ted.com/talks/nora_mcinerny_we_don_t_move_on_from_grief_we_move_forward_with_it"
+        }
+      ],
+      type: "reflection"
+    },
+    
+    // ANXIETY EXERCISES
+    'grounding': {
+      title: "5-4-3-2-1 Grounding Exercise",
+      description: "A sensory awareness technique to help manage anxiety and bring you back to the present moment.",
+      steps: [
+        {
+          title: "Observe",
+          content: "Look around and identify 5 things you can SEE in the room. Say them out loud or note them mentally."
+        },
+        {
+          title: "Touch",
+          content: "Find 4 things you can TOUCH or FEEL. This could be the texture of your clothing, the surface of a table, or the feeling of the chair against your back."
+        },
+        {
+          title: "Listen",
+          content: "Focus on 3 things you can HEAR. These might be distant sounds, like birds outside, or closer sounds, like your own breathing."
+        },
+        {
+          title: "Smell",
+          content: "Notice 2 things you can SMELL. If you can't smell anything at first, move to another spot or find something with a scent, like hand lotion or a candle."
+        },
+        {
+          title: "Taste",
+          content: "Identify 1 thing you can TASTE. You might take a sip of a beverage, eat a small piece of food, or simply notice the current taste in your mouth."
+        }
+      ],
+      tips: [
+        "Take your time with each step – there's no rush.",
+        "If you're in a situation where you can't speak aloud, just note each observation silently.",
+        "For a shorter exercise, you can do a 3-2-1 version with just three senses.",
+        "Practice regularly to make this technique more effective during high-anxiety moments."
+      ],
+      resources: [
+        {
+          type: "article",
+          title: "Grounding Techniques | University of Rochester Medical Center",
+          description: "Evidence-based grounding techniques from mental health experts",
+          url: "https://www.urmc.rochester.edu/behavioral-health-partners/bhp-blog/april-2018/5-4-3-2-1-coping-technique-for-anxiety.aspx"
+        },
+        {
+          type: "video",
+          title: "How to Ground Yourself During an Anxiety Attack | Healthline",
+          description: "Practical strategies for using grounding during high anxiety moments",
+          url: "https://www.healthline.com/health/grounding-techniques"
+        },
+        {
+          type: "website",
+          title: "VA: PTSD Coach Online - Grounding Exercises",
+          description: "Collection of grounding exercises from the Veterans Administration",
+          url: "https://www.ptsd.va.gov/apps/ptsdcoachonline/tools/index.htm"
+        }
+      ],
+      type: "sensory"
+    },
+    'breathing': {
+      title: "4-7-8 Breathing Technique",
+      description: "A calming breathing exercise to help reduce anxiety and stress.",
+      steps: [
+        {
+          title: "Prepare",
+          content: "Find a comfortable sitting position. Place the tip of your tongue against the ridge behind your upper front teeth."
+        },
+        {
+          title: "Inhale",
+          content: "Close your mouth and inhale quietly through your nose for a count of 4."
+        },
+        {
+          title: "Hold",
+          content: "Hold your breath for a count of 7."
+        },
+        {
+          title: "Exhale",
+          content: "Exhale completely through your mouth with a whooshing sound for a count of 8."
+        }
+      ],
+      tips: [
+        "Repeat this cycle 4 times initially, and work up to 8 cycles with practice.",
+        "This exercise is especially helpful before bed or during moments of stress.",
+        "The ratio of 4:7:8 is important, but you can adjust the actual time if needed.",
+        "You may feel lightheaded at first - this is normal and will pass with practice."
+      ],
+      resources: [
+        {
+          type: "article",
+          title: "The 4-7-8 Breathing Technique | Dr. Andrew Weil",
+          description: "Video demonstration by Dr. Weil who popularized this technique",
+          url: "https://www.drweil.com/videos-features/videos/breathing-exercises-4-7-8-breath/"
+        },
+        {
+          type: "website",
+          title: "Harvard Health: Relaxation techniques",
+          description: "Scientific explanation of how breathing exercises affect stress",
+          url: "https://www.health.harvard.edu/mind-and-mood/relaxation-techniques-breath-control-helps-quell-errant-stress-response"
+        },
+        {
+          type: "video",
+          title: "Guided 4-7-8 Breathing Exercise | YouTube",
+          description: "Follow along with this guided video for proper technique",
+          url: "https://www.youtube.com/watch?v=PmBYdfv5RSk"
+        }
+      ],
+      type: "breathing",
+      audioUrl: "https://cdn.example.com/guided-breathing.mp3" // Replace with actual audio URL
+    },
+    'worry-time': {
+      title: "Worry Time Technique",
+      description: "Contain anxious thoughts by scheduling a dedicated time for them.",
+      steps: [
+        {
+          title: "Schedule Worry Time",
+          content: "Set aside 15-20 minutes at the same time each day specifically for worrying. Choose a time that's not too close to bedtime."
+        },
+        {
+          title: "Create a Worry List",
+          content: "Throughout the day, when worries arise, write them down in a dedicated 'worry notebook' or note on your phone."
+        },
+        {
+          title: "Postpone Worrying",
+          content: "When you notice yourself worrying outside your designated worry time, remind yourself: 'I'll think about this during my worry time, not now.'"
+        },
+        {
+          title: "During Worry Time",
+          content: "When your scheduled worry time arrives, set a timer and review your list. Think about each worry and potential solutions or perspectives."
+        },
+        {
+          title: "End Worry Time",
+          content: "When your timer goes off, put your worry list away and intentionally transition to another activity, even if you haven't addressed all worries."
+        }
+      ],
+      checkItems: [
+        "I've scheduled my worry time for: _____ (time of day)",
+        "I have a dedicated place to write down worries",
+        "I've practiced postponing worries at least 3 times today",
+        "I limited my worry time to the scheduled duration",
+        "I transitioned to a different activity after worry time"
+      ],
+      resources: [
+        {
+          type: "article",
+          title: "How to stop worrying | NHS",
+          description: "Evidence-based approaches to managing worry, including worry time",
+          url: "https://www.nhs.uk/mental-health/self-help/guides-tools-and-activities/how-to-stop-worrying/"
+        },
+        {
+          type: "video",
+          title: "Scheduling Worry Time | Anxiety Canada",
+          description: "How and why scheduled worry time works for anxiety management",
+          url: "https://www.anxietycanada.com/articles/how-to-schedule-worry-time/"
+        }
+      ],
+      type: "checklist"
+    },
+    'muscle-relaxation': {
+      title: "Progressive Muscle Relaxation",
+      description: "Systematically tense and release muscle groups to reduce physical tension.",
+      steps: [
+        {
+          title: "Prepare",
+          content: "Find a comfortable position sitting or lying down. Close your eyes if you feel comfortable doing so."
+        },
+        {
+          title: "Feet & Legs",
+          content: "Start with your feet and legs. Tense these muscles by pointing your toes and tightening your calves and thighs. Hold for 5 seconds, then release completely. Notice the difference between tension and relaxation."
+        },
+        {
+          title: "Abdomen & Chest",
+          content: "Move to your abdomen and chest. Tighten these muscles by taking a deep breath and holding it while clenching your stomach muscles. Hold for 5 seconds, then release, letting the breath go."
+        },
+        {
+          title: "Arms & Hands",
+          content: "Next, focus on your arms and hands. Make fists and tense your arms. Hold for 5 seconds, then release, letting your hands go limp."
+        },
+        {
+          title: "Shoulders & Neck",
+          content: "Move to your shoulders and neck. Raise your shoulders toward your ears and tighten your neck muscles. Hold for 5 seconds, then release, feeling the tension melt away."
+        },
+        {
+          title: "Face",
+          content: "Finally, tense the muscles in your face by squeezing your eyes shut and clenching your jaw. Hold for 5 seconds, then release, feeling your face soften."
+        },
+        {
+          title: "Complete Body",
+          content: "Now, become aware of your entire body. Notice any remaining tension and let it go. Feel a wave of relaxation flowing from the top of your head to the tips of your toes."
+        }
+      ],
+      resources: [
+        {
+          type: "article",
+          title: "Progressive Muscle Relaxation | Anxiety Canada",
+          description: "Detailed guide with audio instructions for PMR",
+          url: "https://www.anxietycanada.com/articles/how-to-do-progressive-muscle-relaxation/"
+        },
+        {
+          type: "video",
+          title: "15-Minute Progressive Muscle Relaxation | YouTube",
+          description: "Guided video to follow along with a full PMR session",
+          url: "https://www.youtube.com/watch?v=1nZEdqcGVzo"
+        }
+      ],
+      type: "physical"
+    },
+    
+    // ANGER MANAGEMENT EXERCISES
+    'anger-stop': {
+      title: "STOP Technique for Anger",
+      description: "A quick method to interrupt anger before it escalates.",
+      steps: [
+        {
+          title: "S - STOP",
+          content: "As soon as you notice anger rising, mentally tell yourself to STOP. Pause whatever you're doing or saying."
+        },
+        {
+          title: "T - TAKE a step back",
+          content: "Physically take a step back if possible, or mentally step back from the situation. Create distance between yourself and the trigger."
+        },
+        {
+          title: "O - OBSERVE",
+          content: "Notice what's happening in your body (racing heart, tight chest, clenched fists?), your mind (what thoughts are present?), and the situation itself."
+        },
+        {
+          title: "P - PROCEED mindfully",
+          content: "Choose how to respond rather than react. What response will serve you best in this situation?"
+        },
+        {
+          title: "Breathe",
+          content: "Take three deep breaths before responding to the situation. Breathe in for 4 counts, hold for 1, and exhale for 5."
+        }
+      ],
+      resources: [
+        {
+          type: "article",
+          title: "Anger Management: 10 Tips to Tame Your Temper | Mayo Clinic",
+          description: "Evidence-based approaches for managing anger from medical experts",
+          url: "https://www.mayoclinic.org/healthy-lifestyle/adult-health/in-depth/anger-management/art-20045434"
+        },
+        {
+          type: "website",
+          title: "The STOP Skill | DBT Self Help",
+          description: "Detailed explanation of the STOP technique from Dialectical Behavior Therapy",
+          url: "https://www.dbtselfhelp.com/html/stop_skill.html"
+        }
+      ],
+      type: "coping"
+    },
+    'anger-letter': {
+      title: "Anger Letter Exercise",
+      description: "Write an uncensored letter expressing your anger (that you won't send).",
+      steps: [
+        {
+          title: "Prepare",
+          content: "Find a private space where you can write without interruption. Have paper and pen ready, or open a document on your device."
+        },
+        {
+          title: "Express Freely",
+          content: "Begin writing a letter to the person or situation you're angry with. Express EVERYTHING you feel without censoring yourself. This letter is for your eyes only."
+        },
+        {
+          title: "Be Specific",
+          content: "Detail exactly what made you angry and why. Include specific examples or incidents that triggered your feelings."
+        },
+        {
+          title: "Describe Impact",
+          content: "Explain how the situation has affected you. What consequences have you experienced because of it?"
+        },
+        {
+          title: "State Desires",
+          content: "Write what you wish would happen or what you wanted instead. Be honest about what would feel satisfying to you."
+        },
+        {
+          title: "Release",
+          content: "When you've finished expressing everything, destroy or delete the letter as a symbolic release. Tear it up, burn it safely, or delete the digital file."
+        }
+      ],
+      resources: [
+        {
+          type: "article",
+          title: "Writing About Emotions May Ease Stress and Trauma | Harvard Health",
+          description: "Research on how expressive writing helps process difficult emotions",
+          url: "https://www.health.harvard.edu/healthbeat/writing-about-emotions-may-ease-stress-and-trauma"
+        },
+        {
+          type: "website",
+          title: "Therapeutic Letters | GoodTherapy",
+          description: "Guidelines for therapeutic letter writing",
+          url: "https://www.goodtherapy.org/blog/therapeutic-letter-writing-healing-through-words-0712184"
+        }
+      ],
+      type: "journal"
+    },
+    'anger-root-cause': {
+      title: "Root Cause Anger Analysis",
+      description: "Identify the deeper needs and values behind your anger.",
+      steps: [
+        {
+          title: "Describe the Trigger",
+          content: "Write down the specific situation that triggered your anger. Be objective and focus on facts rather than interpretations."
+        },
+        {
+          title: "Identify Initial Thoughts",
+          content: "What were your immediate thoughts about this situation? What did you tell yourself about what happened?"
+        },
+        {
+          title: "Uncover Threatened Values",
+          content: "Ask yourself: 'What important value or need of mine was threatened or violated?' (e.g., respect, fairness, safety, control, competence)"
+        },
+        {
+          title: "Explore Underlying Fears",
+          content: "Ask: 'What am I afraid might happen or be true in this situation?' Try to identify core fears beneath the anger."
+        },
+        {
+          title: "Identify Core Needs",
+          content: "Based on the values and fears you've identified, what do you truly need in this situation? What would help you feel secure, respected, or at peace?"
+        }
+      ],
+      reflectionPrompts: [
+        "When have I felt similar anger before? Is there a pattern?",
+        "How might my past experiences be influencing my reaction to this situation?",
+        "What would addressing my core need look like in this situation?",
+        "How might I communicate my needs effectively rather than expressing raw anger?"
+      ],
+      resources: [
+        {
+          type: "article",
+          title: "Understanding Anger: How Psychologists Help With Anger Problems | APA",
+          description: "Professional perspective on anger and its underlying causes",
+          url: "https://www.apa.org/topics/anger/understanding"
+        },
+        {
+          type: "video",
+          title: "Why We Get Mad — and Why It's Healthy | TED Talk",
+          description: "Ryan Martin's research on the positive functions of anger",
+          url: "https://www.ted.com/talks/ryan_martin_why_we_get_mad_and_why_it_s_healthy"
+        }
+      ],
+      type: "reflection"
+    },
+    
+    // RELATIONSHIP EXERCISES
+    'perspective-taking': {
+      title: "Perspective-Taking Practice",
+      description: "Strengthen empathy by consciously considering another viewpoint.",
+      steps: [
+        {
+          title: "Identify the Situation",
+          content: "Choose a specific relationship challenge or conflict you're currently experiencing. Briefly describe what happened and who was involved."
+        },
+        {
+          title: "Your Perspective",
+          content: "Write down your perspective of the situation. What did you feel, think, and want? What was important to you?"
+        },
+        {
+          title: "Step Into Their Shoes",
+          content: "Now imagine being the other person involved. Based on what you know about them, how might they have experienced the same situation? What might they have felt, thought, or wanted?"
+        },
+        {
+          title: "Consider Context",
+          content: "Think about what might be happening in the other person's life. What stressors, past experiences, or values might be influencing their perspective?"
+        },
+        {
+          title: "Find Common Ground",
+          content: "Look for areas of shared concern or values between your perspective and theirs. Where might there be alignment beneath the surface disagreement?"
+        },
+        {
+          title: "Apply Insights",
+          content: "Based on this exercise, identify one way you might approach the situation differently, incorporating your new understanding."
+        }
+      ],
+      resources: [
+        {
+          type: "article",
+          title: "The Science of Empathy | Greater Good Magazine",
+          description: "Research on how perspective-taking builds empathy and improves relationships",
+          url: "https://greatergood.berkeley.edu/topic/empathy/definition"
+        },
+        {
+          type: "video",
+          title: "How to Change People's Minds | Psychology Today",
+          description: "Research-based strategies for effective perspective-taking in disagreements",
+          url: "https://www.psychologytoday.com/us/blog/think-act-be/201905/how-change-peoples-minds"
+        }
+      ],
+      type: "reflection",
+      reflectionPrompts: [
+        "How does considering the other person's perspective change your feelings about the situation?",
+        "What new insights have you gained about their needs or concerns?",
+        "What might be a new approach that addresses both perspectives?"
+      ]
+    },
+    'relationship-values': {
+      title: "Values Clarification",
+      description: "Identify what matters most to you in relationships to guide your responses.",
+      steps: [
+        {
+          title: "List Your Values",
+          content: "Write down 5-7 values that are important to you in relationships (e.g., honesty, respect, autonomy, support, growth, fun, intimacy)."
+        },
+        {
+          title: "Rank Your Values",
+          content: "Arrange these values in order of importance to you. This might be difficult, but try to be honest with yourself about your priorities."
+        },
+        {
+          title: "Define Each Value",
+          content: "For each value, write what it specifically means to you. For example, 'respect' might mean different things to different people."
+        },
+        {
+          title: "Identify Expressions",
+          content: "For each value, note one specific way you can express this value in your relationships. How do you show it?"
+        },
+        {
+          title: "Evaluate Current Alignment",
+          content: "Think about your current relationship challenges. Which values might be compromised or in conflict? How does this insight help explain tensions?"
+        },
+        {
+          title: "Create a Values-Aligned Response",
+          content: "Choose one relationship challenge and plan how to address it in a way that honors your top values."
+        }
+      ],
+      resources: [
+        {
+          type: "article",
+          title: "Defining Your Core Values in Relationships | Psychology Today",
+          description: "How values awareness improves relationship satisfaction",
+          url: "https://www.psychologytoday.com/us/blog/fulfillment-any-age/201809/defining-your-core-values-in-relationships"
+        },
+        {
+          type: "website",
+          title: "Personal Values Assessment | Barrett Values Centre",
+          description: "Free online assessment to help identify your core values",
+          url: "https://www.valuescentre.com/tools-assessments/pva/"
+        }
+      ],
+      type: "reflection"
+    },
+    
+    // WORK EXERCISES
+    'work-boundaries': {
+      title: "Work Boundaries Exercise",
+      description: "Establish healthy boundaries to manage work-related stress.",
+      steps: [
+        {
+          title: "Current Boundary Assessment",
+          content: "Make two columns: 'My Work Hours' (when you're officially supposed to work) and 'When Work Actually Happens' (including early mornings, evenings, weekends). Note the discrepancies."
+        },
+        {
+          title: "Identify Boundary Issues",
+          content: "List 2-3 specific boundary issues you face (e.g., after-hours emails, lunch breaks interrupted, difficulty saying no to extra tasks)."
+        },
+        {
+          title: "Create Boundary Statements",
+          content: "For each issue, write an ideal boundary statement. For example: 'I will not check email after 7pm' or 'I will take a full lunch break away from my desk each day.'"
+        },
+        {
+          title: "Anticipate Challenges",
+          content: "For each boundary, list potential obstacles or resistance you might face. What might make it difficult to maintain this boundary?"
+        },
+        {
+          title: "Implementation Plan",
+          content: "Create specific steps for implementing each boundary. Include any communication needed with colleagues, changes to technology, or personal habits to modify."
+        },
+        {
+          title: "Select One Boundary",
+          content: "Choose one boundary to implement this week. Start small with something you feel confident you can maintain."
+        }
+      ],
+      resources: [
+        {
+          type: "article",
+          title: "How to Set Boundaries at Work | Harvard Business Review",
+          description: "Professional strategies for establishing effective work boundaries",
+          url: "https://hbr.org/2021/02/how-to-set-boundaries-in-the-age-of-digital-distraction"
+        },
+        {
+          type: "video",
+          title: "Setting Boundaries | The Muse",
+          description: "Practical tips for establishing and maintaining healthy work boundaries",
+          url: "https://www.themuse.com/advice/setting-boundaries-at-work-expert-advice"
+        }
+      ],
+      type: "checklist"
+    },
+    
+    // Add more exercise content definitions as needed...
+    
+    // Default for fallback
+    'default': {
+      title: "Wellness Exercise",
+      description: "A practice to support your well-being.",
+      steps: [
+        {
+          title: "Prepare",
+          content: "Find a comfortable space where you won't be interrupted."
+        },
+        {
+          title: "Focus",
+          content: "Bring your attention to the present moment and your current needs."
+        },
+        {
+          title: "Practice",
+          content: "Follow the specific guidance for your selected exercise."
+        },
+        {
+          title: "Reflect",
+          content: "Consider what you learned or experienced during this practice."
+        }
+      ],
+      resources: [
+        {
+          type: "website",
+          title: "Mental Health Resources | National Institute of Mental Health",
+          description: "Comprehensive collection of evidence-based mental health information",
+          url: "https://www.nimh.nih.gov/health"
+        }
+      ],
+      type: "general"
+    },
+
+    // MINDFULNESS EXERCISES
+    'mindful-observation': {
+      title: "Mindful Observation Practice",
+      description: "Develop present-moment awareness by fully focusing on a single object.",
+      steps: [
+        {
+          title: "Choose an Object",
+          content: "Find a natural object in your environment - a flower, insect, cloud formation, or any natural element that captures your attention."
+        },
+        {
+          title: "Focus Completely",
+          content: "Hold or observe the object for 1-2 minutes. Examine it as if you're seeing it for the very first time."
+        },
+        {
+          title: "Engage Your Senses",
+          content: "Notice the object's colors, textures, patterns, and shapes. How does light reflect off it? What subtle details emerge as you continue looking?"
+        },
+        {
+          title: "Notice Distractions",
+          content: "When your mind wanders (which is normal), gently bring your attention back to the object. Notice the tendency to label, analyze, or think about the object rather than simply observing it."
+        },
+        {
+          title: "Connect Deeper",
+          content: "Consider how this object came to be. What natural processes formed it? How does it connect to the larger environment around you?"
+        }
+      ],
+      resources: [
+        {
+          type: "article",
+          title: "Mindful Awareness Practice | UCLA Mindful Awareness Research Center",
+          description: "Guidelines for developing mindful observation skills",
+          url: "https://www.uclahealth.org/marc/mindful-awareness-practice"
+        },
+        {
+          type: "audio",
+          title: "Guided Mindfulness Meditation Practices | Jon Kabat-Zinn",
+          description: "Audio recordings by the founder of Mindfulness-Based Stress Reduction",
+          url: "https://www.mindfulnesscds.com/collections/cds"
+        }
+      ],
+      type: "meditation"
+    },
+
+    'body-scan': {
+      title: "Body Scan Meditation",
+      description: "A guided practice to develop awareness of physical sensations throughout your body.",
+      steps: [
+        {
+          title: "Prepare",
+          content: "Find a comfortable position lying down or sitting. Close your eyes if that feels comfortable. Take several deep breaths to settle in."
+        },
+        {
+          title: "Feet & Legs",
+          content: "Bring your attention to your feet. Notice any sensations: warmth, coolness, pressure, tingling. Without trying to change anything, simply observe. Gradually move your awareness up through your legs."
+        },
+        {
+          title: "Hips & Abdomen",
+          content: "Continue moving your awareness up through your hips, lower back, and abdomen. Notice the sensations of your breath as your abdomen rises and falls."
+        },
+        {
+          title: "Chest & Upper Body",
+          content: "Bring awareness to your chest, upper back, and shoulders. Notice areas of tension or ease. Feel your heart beating and your lungs expanding and contracting."
+        },
+        {
+          title: "Arms & Hands",
+          content: "Scan down your arms to your hands and fingertips. Notice sensations of temperature, pressure, or tingling."
+        },
+        {
+          title: "Neck & Head",
+          content: "Bring awareness to your neck, face, and head. Notice sensations in your jaw, eyes, forehead, and scalp."
+        },
+        {
+          title: "Whole Body",
+          content: "Finally, expand your awareness to your entire body as a whole. Notice how all parts are connected and functioning together."
+        }
+      ],
+      audioUrl: "https://cdn.example.com/body-scan.mp3", // Replace with actual audio URL
+      resources: [
+        {
+          type: "video",
+          title: "Body Scan Meditation | Greater Good in Action",
+          description: "Guided body scan from UC Berkeley's Greater Good Science Center",
+          url: "https://ggia.berkeley.edu/practice/body_scan_meditation"
+        },
+        {
+          type: "article",
+          title: "The Body Scan Practice | Mindful",
+          description: "Detailed instructions and science behind the body scan meditation",
+          url: "https://www.mindful.org/beginners-body-scan-meditation/"
+        }
+      ],
+      type: "meditation"
+    },
+
+    // SELF-ESTEEM EXERCISES
+    'self-compassion': {
+      title: "Self-Compassion Practice",
+      description: "Learn to treat yourself with kindness rather than criticism when facing difficulties.",
+      steps: [
+        {
+          title: "Acknowledge Suffering",
+          content: "Notice a moment of difficulty, discomfort, or failure you're experiencing. Say to yourself: 'This is a moment of suffering' or 'This is painful.'"
+        },
+        {
+          title: "Recognize Common Humanity",
+          content: "Remind yourself that suffering is part of the shared human experience. Say: 'I'm not alone in this feeling' or 'Many others have felt this way.'"
+        },
+        {
+          title: "Offer Self-Kindness",
+          content: "Place a hand on your heart or use another soothing touch. Speak to yourself with warmth: 'May I be kind to myself in this moment' or 'I'm here for you.'"
+        },
+        {
+          title: "Compassionate Reframe",
+          content: "Ask yourself: 'What would I say to a good friend facing this situation?' Then offer those same compassionate words to yourself."
+        },
+        {
+          title: "Mindful Awareness",
+          content: "Notice how your body feels after these steps. Has anything shifted in your emotional experience? Simply observe without judgment."
+        }
+      ],
+      resources: [
+        {
+          type: "website",
+          title: "Self-Compassion Exercises | Dr. Kristin Neff",
+          description: "Collection of practices from the leading researcher on self-compassion",
+          url: "https://self-compassion.org/category/exercises/"
+        },
+        {
+          type: "video",
+          title: "The Space Between Self-Esteem and Self-Compassion | TED Talk",
+          description: "Kristin Neff explains why self-compassion works better than self-esteem",
+          url: "https://www.youtube.com/watch?v=IvtZBUSplr4"
+        }
+      ],
+      type: "reflection",
+      reflectionPrompts: [
+        "When do you find it most difficult to be kind to yourself?",
+        "What would change if you treated yourself with the same compassion you offer others?",
+        "What words of kindness do you most need to hear right now?"
+      ]
+    },
+
+    'strengths-inventory': {
+      title: "Strengths Inventory Exercise",
+      description: "Identify and appreciate your authentic personal strengths to build confidence.",
+      steps: [
+        {
+          title: "Brainstorm Strengths",
+          content: "Create a list of your strengths, talents, and positive qualities. Include skills, character traits, values, and accomplishments. Aim for at least 10 items."
+        },
+        {
+          title: "Find Evidence",
+          content: "For each strength, identify a specific example of when you demonstrated it. What situation showed this strength in action?"
+        },
+        {
+          title: "Recognize Impact",
+          content: "For each strength, note how it has benefited you or others. How has this quality made a positive difference?"
+        },
+        {
+          title: "Identify Core Strengths",
+          content: "Review your list and circle 3-5 strengths that feel most authentic and energizing to you. These are your signature strengths."
+        },
+        {
+          title: "Plan for Use",
+          content: "Choose one signature strength and plan how you'll intentionally use it in the next 24 hours. How might you apply this strength in a new or deliberate way?"
+        }
+      ],
+      resources: [
+        {
+          type: "website",
+          title: "VIA Character Strengths Survey | VIA Institute on Character",
+          description: "Free scientific assessment to identify your character strengths",
+          url: "https://www.viacharacter.org/character-strengths-via"
+        },
+        {
+          type: "article",
+          title: "Using Personal Strengths in a Positive Way | Psychology Today",
+          description: "How to leverage your strengths for greater well-being",
+          url: "https://www.psychologytoday.com/us/blog/click-here-happiness/201904/using-personal-strengths-in-positive-way"
+        }
+      ],
+      type: "checklist",
+      checkItems: [
+        "I've identified at least 10 personal strengths",
+        "I've found specific examples for each strength",
+        "I've noted how my strengths benefit myself and others",
+        "I've identified my 3-5 signature strengths",
+        "I've created a plan to use one strength today",
+        "I've scheduled a time to review and update my strengths inventory"
+      ]
+    },
+
+    // HEALTH AND WELLNESS EXERCISES
+    'values-based-living': {
+      title: "Values-Based Wellness Planning",
+      description: "Design a personalized health plan aligned with your core values and meaningful goals.",
+      steps: [
+        {
+          title: "Values Reflection",
+          content: "Consider what matters most to you in life. Why do you want to be healthy? Is it for family, independence, adventure, contribution, learning, or something else?"
+        },
+        {
+          title: "Current Assessment",
+          content: "Rate your satisfaction (1-10) in key wellness areas: physical activity, nutrition, sleep, stress management, social connection, and meaning/purpose."
+        },
+        {
+          title: "Meaningful Goals",
+          content: "Based on your values, set 1-2 specific wellness goals that would be most meaningful to improve. Focus on the areas with lowest satisfaction that align with your values."
+        },
+        {
+          title: "Behavior Design",
+          content: "For each goal, design a tiny habit that takes less than 2 minutes and connects to an existing routine. Example: 'After I brush my teeth, I will do 2 minutes of stretching.'"
+        },
+        {
+          title: "Celebration Plan",
+          content: "Plan how you'll celebrate immediately after completing your tiny habit. This could be a physical gesture, saying 'Yes!', or another brief positive emotion boost."
+        },
+        {
+          title: "Environment Setup",
+          content: "Identify one change to your physical environment that would make your new habit easier. How can you make the healthy choice the obvious choice?"
+        }
+      ],
+      resources: [
+        {
+          type: "book",
+          title: "Tiny Habits | BJ Fogg",
+          description: "Science-based approach to behavior change using small steps",
+          url: "https://tinyhabits.com/book/"
+        },
+        {
+          type: "article",
+          title: "Values-Based Self-Care | Mental Health America",
+          description: "Guide to developing meaningful wellness practices",
+          url: "https://www.mhanational.org/blog/values-based-self-care"
+        }
+      ],
+      type: "checklist",
+      checkItems: [
+        "I've identified my core wellness values",
+        "I've assessed my current satisfaction in key areas",
+        "I've set 1-2 meaningful goals aligned with my values",
+        "I've designed tiny habit steps for each goal",
+        "I've created a celebration plan for completing my habits",
+        "I've identified one environment change to support my habits"
+      ]
+    },
+
+    'values-clarification': {
+      title: "Values Clarification Exercise",
+      description: "Identify what matters most to you in relationships to guide your responses.",
+      steps: [
+        {
+          title: "List Your Values",
+          content: "Write down 5-7 values that are important to you in relationships (e.g., honesty, respect, autonomy, support, growth, fun, intimacy)."
+        },
+        {
+          title: "Rank Your Values",
+          content: "Arrange these values in order of importance to you. This might be difficult, but try to be honest with yourself about your priorities."
+        },
+        {
+          title: "Define Each Value",
+          content: "For each value, write what it specifically means to you. For example, 'respect' might mean different things to different people."
+        },
+        {
+          title: "Identify Expressions",
+          content: "For each value, note one specific way you can express this value in your relationships. How do you show it?"
+        },
+        {
+          title: "Evaluate Current Alignment",
+          content: "Think about your current relationship challenges. Which values might be compromised or in conflict? How does this insight help explain tensions?"
+        },
+        {
+          title: "Create a Values-Aligned Response",
+          content: "Choose one relationship challenge and plan how to address it in a way that honors your top values."
+        }
+      ],
+      type: "reflection",
+      reflectionPrompts: [
+        "What does it feel like when your actions align with your core values?",
+        "When have you compromised your values in relationships? What happened?",
+        "How might clearly understanding your values improve your communication?",
+        "Which value feels most challenging to honor consistently, and why?"
+      ],
+      resources: [
+        {
+          type: "article",
+          title: "How Personal Values Shape Your Life",
+          description: "Psychology Today's research on values and relationships",
+          url: "https://www.psychologytoday.com/us/blog/click-here-happiness/202101/what-are-personal-values"
+        },
+        {
+          type: "website",
+          title: "Personal Values Assessment",
+          description: "Free assessment tool to identify core values",
+          url: "https://www.valuescentre.com/tools-assessments/pva/"
+        },
+        {
+          type: "video",
+          title: "The Importance of Values in Relationships",
+          description: "TEDx Talk on values-based connections",
+          url: "https://www.youtube.com/watch?v=UkdZ0apVSdY"
+        }
+      ]
+    },
+
+    'appreciation-expression': {
+      title: "Appreciation Expression",
+      description: "Strengthen connection through deliberate appreciation.",
+      steps: [
+        {
+          title: "Choose a Person",
+          content: "Think of someone significant in your life whom you would like to express appreciation to. This could be a partner, friend, family member, or colleague."
+        },
+        {
+          title: "List Appreciations",
+          content: "Write down 3 specific things you appreciate about this person. Be as concrete and detailed as possible."
+        },
+        {
+          title: "Explore Personal Impact",
+          content: "For each item on your list, reflect on why it matters to you personally. How does this quality or action affect your life?"
+        },
+        {
+          title: "Select and Prepare",
+          content: "Choose one appreciation to express to this person. Plan how you will express it in a specific, sincere way."
+        },
+        {
+          title: "Practice Expression",
+          content: "Practice what you want to say, either writing it out or saying it aloud. Include: what they did/do, how it affects you, and genuine gratitude."
+        },
+        {
+          title: "Deliver Your Appreciation",
+          content: "Share your appreciation with the person, either verbally or in writing. Notice how it feels to express gratitude explicitly."
+        }
+      ],
+      type: "journaling",
+      prompts: [
+        "What specific behavior or quality do I appreciate about this person?",
+        "How has this person's presence or actions positively affected my life?",
+        "What difference does this person make in my day-to-day experience?",
+        "What might this person not know about how much I value them?",
+        "How would I feel if I never told this person what I appreciate about them?"
+      ],
+      resources: [
+        {
+          type: "article",
+          title: "The Science of Gratitude in Relationships",
+          description: "Research from Greater Good Science Center",
+          url: "https://greatergood.berkeley.edu/article/item/how_gratitude_strengthens_relationships"
+        },
+        {
+          type: "book",
+          title: "The 5 Love Languages",
+          description: "Understanding different ways people express and receive appreciation",
+          url: "https://www.5lovelanguages.com/book/the-5-love-languages/"
+        }
+      ]
+    }
   };
 
   if (loading) {
@@ -726,267 +2403,207 @@ const ExerciseModal = ({ exercise, onClose }) => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm"
     >
       <motion.div 
-        initial={{ scale: 0.9, y: 20 }}
-        animate={{ scale: 1, y: 0 }}
-        className="bg-[#1A2335] border border-[#3E60C1] rounded-xl p-6 max-w-xl w-full max-h-[90vh] overflow-y-auto mx-4"
+        initial={{ scale: 0.9, y: 20, opacity: 0 }}
+        animate={{ scale: 1, y: 0, opacity: 1 }}
+        transition={{ type: "spring", damping: 25, stiffness: 300 }}
+        className="bg-gradient-to-b from-[#1A2335] to-[#1A2335]/95 border border-[#3E60C1]/30 rounded-2xl p-6 max-w-md w-full max-h-[90vh] overflow-y-auto mx-4 shadow-xl"
       >
-        <div className="flex justify-between items-center mb-4">
-          <h3 className="text-xl font-semibold text-white">
-            {exerciseContent?.title || exercise.title}
-          </h3>
-          <button onClick={onClose} className="text-[#B8C7E0] hover:text-white">
-              <FaTimes />
-            </button>
-          </div>
-          
-        <p className="text-[#B8C7E0] mb-6">
-          {exerciseContent?.description || exercise.description}
-        </p>
+        {/* Header */}
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-xl font-bold text-white">{exerciseContent?.title || exercise.title}</h2>
+          <button 
+            onClick={onClose} 
+            className="w-8 h-8 rounded-full flex items-center justify-center text-[#B8C7E0] hover:bg-[#2A3547] transition-colors"
+            aria-label="Close"
+          >
+            <FaTimes />
+          </button>
+        </div>
         
-        {/* Steps progress indicator */}
-        {exerciseContent?.steps && exerciseContent.steps.length > 1 && (
-          <div className="flex justify-between mb-6">
-            {exerciseContent.steps.map((s, i) => (
-              <div 
-                key={i} 
-                className={`flex-1 h-1 rounded-full mx-1 ${
-                  i + 1 === step ? 'bg-[#5983FC]' : 
-                  i + 1 < step ? 'bg-[#3E60C1]/50' : 'bg-[#2A3547]'
-                }`}
-              />
-            ))}
-          </div>
-        )}
+        {/* Description */}
+        <p className="text-[#B8C7E0] mb-4">{exerciseContent?.description || exercise.description}</p>
         
-        {/* Current step content */}
-        {exerciseContent?.steps && (
+        {/* Duration & Type */}
+        <div className="flex items-center justify-between mb-6">
+          {exercise.duration && (
+            <div className="flex items-center text-[#B8C7E0] text-sm">
+              <FaStopwatch className="mr-2 text-[#5983FC]" />
+              {exercise.duration}
+            </div>
+          )}
+          {(exerciseContent?.type || exercise.type) && (
+            <div className="bg-[#0F172A] px-3 py-1 rounded-full text-[#B8C7E0] text-xs font-medium">
+              {(exerciseContent?.type || exercise.type).charAt(0).toUpperCase() + (exerciseContent?.type || exercise.type).slice(1)}
+            </div>
+          )}
+        </div>
+        
+        {/* Tabs: Steps / Resources */}
+        <div className="flex border-b border-[#2A3547] mb-4">
+          <button
+            onClick={() => setShowResources(false)}
+            className={`px-4 py-2 ${!showResources ? 'text-[#5983FC] border-b-2 border-[#5983FC]' : 'text-[#B8C7E0]'}`}
+          >
+            Exercise
+          </button>
+          <button
+            onClick={() => setShowResources(true)}
+            className={`px-4 py-2 ${showResources ? 'text-[#5983FC] border-b-2 border-[#5983FC]' : 'text-[#B8C7E0]'}`}
+          >
+            Resources
+          </button>
+        </div>
+        
+        {!showResources ? (
+          // Exercise view
           <div className="mb-6">
-            <h4 className="text-white font-medium mb-2">
-              {exerciseContent.steps[step-1]?.title || `Step ${step}`}
-            </h4>
-            <p className="text-[#B8C7E0]">
-              {exerciseContent.steps[step-1]?.content}
-            </p>
-            
-            {/* Checkbox for completion */}
-            <div className="mt-4">
-              <button 
-                onClick={() => toggleCheckItem(step-1)}
-                className="flex items-center text-[#B8C7E0] hover:text-white"
-              >
-                <div className={`w-5 h-5 mr-2 flex items-center justify-center rounded border ${
-                  checklist[step-1] ? 'bg-green-500 border-green-600' : 'border-[#3E60C1]'
-                }`}>
-                  {checklist[step-1] && <FaCheck className="text-white text-xs" />}
+            {!completed ? (
+              <>
+                {/* Step progress */}
+                {exerciseContent?.steps && exerciseContent.steps.length > 0 && (
+                  <div className="flex items-center justify-between mb-4">
+                    <span className="text-[#B8C7E0] text-sm">
+                      Step {step + 1} of {exerciseContent.steps.length}
+                    </span>
+                    <div className="flex-1 mx-4">
+                      <div className="h-1 bg-[#0F172A] rounded-full">
+                        <div 
+                          className="h-1 bg-[#5983FC] rounded-full" 
+                          style={{ width: `${((step + 1) / exerciseContent.steps.length) * 100}%` }}
+                        ></div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+                
+                {/* Current step display */}
+                <div className="bg-[#0F172A] p-4 rounded-lg border border-[#2A3547] mb-4">
+                  <h3 className="text-[#5983FC] text-sm font-medium mb-2">
+                    {exerciseContent?.steps?.[step]?.title || `Step ${step + 1}`}
+                  </h3>
+                  <p className="text-white">{getCurrentStep()}</p>
                 </div>
-                Mark as completed
-              </button>
-            </div>
-          </div>
-        )}
-        
-        {/* Breathing exercise timer */}
-        {exerciseContent?.type === 'breathing' && (
-          <div className="mb-6 bg-[#0F172A] rounded-lg border border-[#2A3547] p-4">
-            <h4 className="text-white font-medium mb-3">Breathing Timer</h4>
-            <div className="text-center">
-              <div className="text-3xl font-bold text-[#5983FC] mb-4">
-                {formatTime(seconds)}
-              </div>
-              <div className="flex justify-center space-x-4">
-                <button
-                  onClick={toggleTimer}
-                  className="flex items-center justify-center w-12 h-12 rounded-full bg-[#3E60C1] text-white hover:bg-[#5983FC]"
-                >
-                  {timerActive ? <FaPause /> : <FaPlay />}
-                </button>
-                <button
-                  onClick={resetTimer}
-                  className="flex items-center justify-center w-12 h-12 rounded-full bg-[#2A3547] text-white hover:bg-[#3E60C1]"
-                >
-                  <FaTimes />
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-        
-        {/* Meditation timer */}
-        {exerciseContent?.type === 'meditation' && (
-          <div className="mb-6 bg-[#0F172A] rounded-lg border border-[#2A3547] p-4">
-            <h4 className="text-white font-medium mb-3">Meditation Timer</h4>
-            <div className="text-center">
-              <div className="text-3xl font-bold text-[#5983FC] mb-4">
-                {formatTime(seconds)}
-              </div>
-              <div className="flex justify-center space-x-4">
-                <button
-                  onClick={toggleTimer}
-                  className="flex items-center justify-center w-12 h-12 rounded-full bg-[#3E60C1] text-white hover:bg-[#5983FC]"
-                >
-                  {timerActive ? <FaPause /> : <FaPlay />}
-                </button>
-                <button
-                  onClick={resetTimer}
-                  className="flex items-center justify-center w-12 h-12 rounded-full bg-[#2A3547] text-white hover:bg-[#3E60C1]"
-                >
-                  <FaTimes />
-                </button>
-              </div>
-              <p className="text-[#B8C7E0] text-sm mt-4">
-                Recommended duration: 5-10 minutes for beginners
-              </p>
-            </div>
-          </div>
-        )}
-        
-        {/* Journal entry area for journal-type exercises */}
-        {exerciseContent?.type === 'journal' && (
-          <div className="mb-6">
-            <label className="block text-white font-medium mb-2">Your Journal Entry</label>
-            <div className="bg-[#0F172A] rounded-lg border border-[#2A3547] p-2">
-              <textarea
-                value={journalEntry}
-                onChange={(e) => setJournalEntry(e.target.value)}
-                placeholder="Write your thoughts and feelings here..."
-                className="w-full bg-transparent text-[#B8C7E0] p-2 min-h-[120px] focus:outline-none resize-none"
-              ></textarea>
-            </div>
-            
-            {/* Journal prompts */}
-            {exerciseContent?.prompts && (
-              <div className="mt-4">
-                <h5 className="text-white font-medium mb-2">Prompts for Reflection</h5>
-                <div className="bg-[#0F172A] rounded-lg border border-[#2A3547] p-4">
-                  <ul className="space-y-2">
-                    {exerciseContent.prompts.map((prompt, index) => (
-                      <li key={index} className="flex items-start">
-                        <FaRegLightbulb className="text-yellow-400 mt-1 mr-2 flex-shrink-0" />
-                        <span className="text-[#B8C7E0]">{prompt}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-            )}
-            
-            <div className="mt-4 flex justify-end">
-              <button
-                onClick={handleSave}
-                disabled={!journalEntry.trim()}
-                className={`flex items-center px-4 py-2 rounded-lg ${
-                  journalEntry.trim() 
-                    ? 'bg-green-600 text-white hover:bg-green-700' 
-                    : 'bg-[#2A3547] text-[#B8C7E0] cursor-not-allowed'
-                }`}
-              >
-                <FaSave className="mr-2" /> Save Entry
-              </button>
-            </div>
-            
-            {saved && (
-              <div className="mt-2 text-green-400 text-sm">
-                Journal entry saved successfully!
-              </div>
-            )}
-          </div>
-        )}
-        
-        {/* Tips section */}
-        {exerciseContent?.tips && (
-          <div className="mb-6">
-            <h4 className="text-white font-medium mb-2">Helpful Tips</h4>
-            <div className="bg-[#0F172A] rounded-lg border border-[#2A3547] p-4">
-              <ul className="space-y-2">
-                {exerciseContent.tips.map((tip, index) => (
-                  <li key={index} className="flex items-start">
-                    <FaRegLightbulb className="text-yellow-400 mt-1 mr-2 flex-shrink-0" />
-                    <span className="text-[#B8C7E0]">{tip}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
-        )}
-        
-        {/* External resources section */}
-        {exerciseContent?.resources && (
-          <div className="mb-6">
-            <h4 className="text-white font-medium mb-2">Recommended Resources</h4>
-            <div className="bg-[#0F172A] rounded-lg border border-[#2A3547] p-4">
-              <ul className="space-y-4">
-                {exerciseContent.resources.map((resource, index) => (
-                  <li key={index} className="border-b border-[#2A3547] last:border-0 pb-3 last:pb-0">
-                    <a 
-                      href={resource.link}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-[#5983FC] hover:text-[#3E60C1] font-medium block mb-1"
+                
+                {/* Interactive component if applicable */}
+                {hasInteractiveComponent() && renderInteractiveComponent()}
+                
+                {/* Tips if available */}
+                {exerciseContent?.tips && exerciseContent.tips.length > 0 && step === exerciseContent.steps.length - 1 && (
+                  <div className="mt-4 bg-[#0F172A]/70 p-3 rounded-lg border border-[#2A3547]">
+                    <h4 className="text-[#5983FC] text-sm font-medium mb-2 flex items-center">
+                      <FaRegLightbulb className="mr-2" /> Helpful Tips:
+                    </h4>
+                    <ul className="space-y-2">
+                      {exerciseContent.tips.map((tip, idx) => (
+                        <li key={idx} className="text-[#B8C7E0] text-sm flex items-start">
+                          <span className="text-[#5983FC] mr-2">•</span>
+                          <span>{tip}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+                
+                {/* Navigation buttons */}
+                <div className="flex justify-between mt-6">
+                  <button
+                    onClick={prevStep}
+                    disabled={step === 0}
+                    className={`px-4 py-2 rounded-lg flex items-center ${
+                      step === 0 
+                        ? 'bg-[#0F172A]/50 text-[#B8C7E0]/50 cursor-not-allowed' 
+                        : 'bg-[#0F172A] text-[#B8C7E0] hover:bg-[#2A3547]'
+                    }`}
+                  >
+                    <FaArrowLeft className="mr-2" /> Previous
+                  </button>
+                  
+                  {step < (exerciseContent?.steps?.length - 1) ? (
+                    <button
+                      onClick={nextStep}
+                      className="px-4 py-2 rounded-lg bg-[#3E60C1] text-white hover:bg-[#5983FC] flex items-center"
                     >
-                      {resource.title} <FaExternalLinkAlt className="inline-block ml-1 text-xs" />
-                    </a>
-                    <p className="text-[#B8C7E0] text-sm">{resource.description}</p>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
-        )}
-        
-        {/* Additional exercises section */}
-        {exerciseContent?.exercises && (
-          <div className="mb-6">
-            <h4 className="text-white font-medium mb-2">Try These Micro-Practices</h4>
-            <div className="bg-[#0F172A] rounded-lg border border-[#2A3547] p-4">
-              <ul className="space-y-3">
-                {exerciseContent.exercises.map((ex, index) => (
-                  <li key={index} className="flex items-start">
-                    <div className="bg-blue-500/20 p-2 rounded-full mt-1 mr-3">
-                      <FaRegLightbulb className="text-blue-400 text-xs" />
-                    </div>
-                    <div>
-                      <h5 className="text-white font-medium mb-1">{ex.title}</h5>
-                      <p className="text-[#B8C7E0] text-sm">{ex.description}</p>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
-        )}
-        
-        {/* Navigation buttons */}
-        {exerciseContent?.steps && exerciseContent.steps.length > 1 && (
-          <div className="flex justify-between mt-6">
-            <button
-              onClick={prevStep}
-              disabled={step === 1}
-              className={`px-4 py-2 rounded-lg flex items-center ${
-                step !== 1 
-                  ? 'bg-[#3E60C1] text-white hover:bg-[#5983FC]' 
-                  : 'bg-[#2A3547] text-[#B8C7E0] cursor-not-allowed'
-              }`}
-            >
-              <FaArrowLeft className="mr-2" /> Previous
-            </button>
-            
-            {step < exerciseContent.steps.length ? (
-              <button
-                onClick={nextStep}
-                className="px-4 py-2 rounded-lg bg-[#3E60C1] text-white hover:bg-[#5983FC] flex items-center"
-              >
-                Next <FaArrowRight className="ml-2" />
-              </button>
+                      Next <FaArrowRight className="ml-2" />
+                    </button>
+                  ) : (
+                    <button
+                      onClick={handleComplete}
+                      className="px-4 py-2 rounded-lg bg-emerald-500 text-white hover:bg-emerald-600 flex items-center"
+                    >
+                      Complete <FaCheck className="ml-2" />
+                    </button>
+                  )}
+                </div>
+              </>
             ) : (
-            <button
-                onClick={onClose}
-                className="px-4 py-2 rounded-lg bg-[#3E60C1] text-white hover:bg-[#5983FC]"
-              >
-                Complete
-            </button>
+              // Completion view
+              <div className="text-center py-8">
+                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-emerald-500/20 text-emerald-500 mb-4">
+                  <FaCheck className="text-2xl" />
+                </div>
+                <h3 className="text-white text-xl font-medium mb-2">Exercise Completed!</h3>
+                <p className="text-[#B8C7E0] mb-6">
+                  Great job! How do you feel after completing this exercise?
+                </p>
+                
+                {/* Reflection prompt */}
+                <div className="mb-6">
+                  <textarea
+                    className="w-full h-20 bg-[#0F172A] border border-[#2A3547] rounded-lg p-3 text-[#B8C7E0] focus:outline-none focus:border-[#5983FC] mb-4"
+                    placeholder="Share your thoughts on how this exercise affected you..."
+                  />
+                </div>
+                
+                <button
+                  onClick={onClose}
+                  className="px-6 py-2 rounded-lg bg-[#3E60C1] text-white hover:bg-[#5983FC]"
+                >
+                  Done
+                </button>
+              </div>
+            )}
+          </div>
+        ) : (
+          // Resources view
+          <div className="mb-6">
+            <h3 className="text-white font-medium mb-3">Professional Resources</h3>
+            
+            {exerciseContent?.resources?.length > 0 || exercise.resources?.length > 0 ? (
+              <div className="space-y-3">
+                {(exerciseContent?.resources || exercise.resources || []).map((resource, index) => (
+                  <a 
+                    key={index}
+                    href={resource.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-start bg-[#0F172A] p-3 rounded-lg border border-[#2A3547] hover:border-[#5983FC] transition-colors"
+                  >
+                    <div className="bg-[#2A3547] p-2 rounded-lg mr-3">
+                      {resource.type === 'video' ? (
+                        <FaYoutube className="text-red-500" />
+                      ) : resource.type === 'article' ? (
+                        <FaFileAlt className="text-blue-400" />
+                      ) : resource.type === 'book' ? (
+                        <FaBook className="text-amber-400" />
+                      ) : (
+                        <FaLink className="text-[#5983FC]" />
+                      )}
+                    </div>
+                    <div className="flex-1">
+                      <h4 className="text-white text-sm font-medium">{resource.title}</h4>
+                      <p className="text-[#B8C7E0] text-xs">{resource.description}</p>
+                    </div>
+                    <FaExternalLinkAlt className="text-[#5983FC] ml-2 mt-1 flex-shrink-0" />
+                  </a>
+                ))}
+              </div>
+            ) : (
+              <p className="text-[#B8C7E0] text-sm">
+                No external resources available for this exercise.
+              </p>
             )}
           </div>
         )}
@@ -995,4 +2612,4 @@ const ExerciseModal = ({ exercise, onClose }) => {
   );
 };
 
-export default ExerciseModal; 
+export default ExerciseModal;
