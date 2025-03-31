@@ -1,31 +1,42 @@
-import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { FaCalendarAlt, FaClock } from 'react-icons/fa';
 
 const JournalPreview = ({ entry }) => {
-  const emotionList = entry.emotions?.slice(0, 3).map(e => e[0]).join(', ') || '';
-
   return (
     <motion.div 
-      whileHover={{ x: 5 }}
-      className="border-b border-calm-100 py-4 last:border-0"
+      whileHover={{ scale: 1.01 }}
+      className="bg-[#0F172A] rounded-xl p-4 transition-all duration-300"
     >
-      <Link to={`/journal/${entry.id}`} className="block hover:text-primary.DEFAULT">
-        <div className="flex justify-between items-center">
-          <div>
-            <h4 className="font-medium">
-              {new Date(entry.date).toLocaleDateString()}
-            </h4>
-            <p className="text-calm-400 text-sm line-clamp-1">
-              {entry.content}
-            </p>
-          </div>
-          {emotionList && (
-            <span className="bg-primary.light text-primary.DEFAULT px-3 py-1 rounded-full text-sm">
-              {emotionList}
-            </span>
-          )}
+      <div className="flex items-start gap-4">
+        <div className="bg-[#3E60C1]/20 p-2 rounded-lg flex-shrink-0">
+          <FaCalendarAlt className="text-[#5983FC]" size={16} />
         </div>
-      </Link>
+        
+        <div className="flex-grow min-w-0">
+          <div className="flex items-center gap-2 mb-2">
+            <h4 className="text-white font-medium truncate">
+              {new Date(entry.date).toLocaleDateString(undefined, {
+                weekday: 'long',
+                month: 'short',
+                day: 'numeric'
+              })}
+            </h4>
+            <div className="flex items-center gap-1 text-xs text-[#B8C7E0]">
+              <FaClock className="text-[#5983FC]" size={10} />
+              <span>
+                {new Date(entry.date).toLocaleTimeString([], {
+                  hour: '2-digit',
+                  minute: '2-digit'
+                })}
+              </span>
+            </div>
+          </div>
+          
+          <p className="text-[#B8C7E0] text-sm line-clamp-2 leading-relaxed">
+            {entry.content}
+          </p>
+        </div>
+      </div>
     </motion.div>
   );
 };
