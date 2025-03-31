@@ -2,11 +2,28 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { logout, resetState } from '../../features/auth/authSlice';
-import ThemeToggle from './ThemeToggle';
-import '../../styles/components/_navbar.css';
+import { motion } from 'framer-motion';
+import { 
+  FaSignOutAlt, 
+  FaBook, 
+  FaHome, 
+  FaUser, 
+  FaChartLine, 
+  FaRegSmile 
+} from 'react-icons/fa';
 import api from '../../services/api';
-import { FaSignOutAlt, FaBook, FaSignInAlt, FaHome, FaUser, FaChartLine } from 'react-icons/fa';
-import { motion, AnimatePresence } from 'framer-motion';
+
+const NavLink = ({ to, icon: Icon, children }) => (
+  <Link
+    to={to}
+    className="flex items-center justify-center relative rounded-xl text-[#B8C7E0] hover:bg-[#2A3547] hover:text-white transition-all duration-200 h-11"
+  >
+    <Icon size={20} className="flex-shrink-0 absolute left-1/2 -translate-x-1/2 group-hover:left-3 group-hover:translate-x-0 transition-all duration-200" />
+    <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap pl-10">
+      {children}
+    </span>
+  </Link>
+);
 
 const Navbar = ({ onHoverChange }) => {
   const dispatch = useDispatch();
@@ -24,7 +41,7 @@ const Navbar = ({ onHoverChange }) => {
     }
   };
 
-  // Don't render the sidebar at all for unauthenticated users
+  // Public navbar for unauthenticated users
   if (!isAuthenticated) {
     return (
       <nav className="fixed top-0 left-0 right-0 bg-[#1A2335] border-b border-[#2A3547] z-50">
@@ -32,16 +49,16 @@ const Navbar = ({ onHoverChange }) => {
           <Link to="/" className="text-2xl font-bold bg-gradient-to-r from-[#5983FC] to-[#3E60C1] bg-clip-text text-transparent">
             Serenity Sphere
           </Link>
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center gap-4">
             <Link
               to="/login"
-              className="px-6 py-2 rounded-lg text-[#B8C7E0] hover:bg-[#2A3547] transition-colors"
+              className="px-6 py-2.5 rounded-xl text-[#B8C7E0] hover:bg-[#2A3547] transition-all duration-200"
             >
               Sign In
             </Link>
             <Link
               to="/register"
-              className="px-6 py-2 rounded-lg bg-[#3E60C1] text-white hover:bg-[#5983FC] transition-colors"
+              className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#3E60C1] to-[#5983FC] text-white hover:shadow-lg hover:shadow-[#5983FC]/20 transition-all duration-200"
             >
               Sign Up
             </Link>
@@ -51,78 +68,51 @@ const Navbar = ({ onHoverChange }) => {
     );
   }
 
-  // Render sidebar for authenticated users
+  // Sidebar navigation for authenticated users
   return (
     <motion.nav 
-      className="fixed left-0 top-0 h-screen bg-[#1A2335] border-r border-[#2A3547] flex flex-col p-6 group z-50"
-      initial={{ width: '5rem' }}
+      className="fixed left-0 top-0 h-screen bg-[#1A2335] border-r border-[#2A3547] flex flex-col py-6 group z-50"
+      initial={{ width: '4rem' }}
       whileHover={{ width: '16rem' }}
       onHoverStart={() => onHoverChange?.(true)}
       onHoverEnd={() => onHoverChange?.(false)}
-      transition={{ duration: 0.2 }}
+      transition={{ duration: 0.3, ease: 'easeInOut' }}
     >
-      <div className="mb-10 flex items-center">
-        <span className="text-2xl font-bold bg-gradient-to-r from-[#5983FC] to-[#3E60C1] bg-clip-text text-transparent whitespace-nowrap overflow-hidden">
+      {/* Logo */}
+      <div className="mb-8 px-3">
+        <motion.span 
+          className="text-2xl font-bold bg-gradient-to-r from-[#5983FC] to-[#3E60C1] bg-clip-text text-transparent whitespace-nowrap overflow-hidden"
+        >
           <span className="inline-block group-hover:opacity-100 opacity-0 transition-opacity duration-200">
             Serenity Sphere
           </span>
-        </span>
+        </motion.span>
       </div>
 
-      <ul className="space-y-4 flex-1">
+      {/* Navigation Links */}
+      <ul className="space-y-1 flex-1 px-2">
         <li>
-          <Link
-            to="/"
-            className="flex items-center space-x-3 p-3 rounded-xl hover:bg-[#2A3547] transition-colors text-[#B8C7E0]"
-          >
-            <FaHome size={20} className="flex-shrink-0" />
-            <span className="group-hover:opacity-100 opacity-0 transition-opacity duration-200 whitespace-nowrap">
-              Dashboard
-            </span>
-          </Link>
+          <NavLink to="/" icon={FaHome}>Dashboard</NavLink>
         </li>
         <li>
-          <Link
-            to="/journal"
-            className="flex items-center space-x-3 p-3 rounded-xl hover:bg-[#2A3547] transition-colors text-[#B8C7E0]"
-          >
-            <FaBook size={20} className="flex-shrink-0" />
-            <span className="group-hover:opacity-100 opacity-0 transition-opacity duration-200 whitespace-nowrap">
-              Journal
-            </span>
-          </Link>
+          <NavLink to="/journal" icon={FaBook}>Journal</NavLink>
         </li>
         <li>
-          <Link
-            to="/mood"
-            className="flex items-center space-x-3 p-3 rounded-xl hover:bg-[#2A3547] transition-colors text-[#B8C7E0]"
-          >
-            <FaChartLine size={20} className="flex-shrink-0" />
-            <span className="group-hover:opacity-100 opacity-0 transition-opacity duration-200 whitespace-nowrap">
-              Mood Trends
-            </span>
-          </Link>
+          <NavLink to="/mood" icon={FaChartLine}>Mood Trends</NavLink>
         </li>
         <li>
-          <Link
-            to="/profile"
-            className="flex items-center space-x-3 p-3 rounded-xl hover:bg-[#2A3547] transition-colors text-[#B8C7E0]"
-          >
-            <FaUser size={20} className="flex-shrink-0" />
-            <span className="group-hover:opacity-100 opacity-0 transition-opacity duration-200 whitespace-nowrap">
-              Profile
-            </span>
-          </Link>
+          <NavLink to="/profile" icon={FaUser}>Profile</NavLink>
         </li>
       </ul>
 
-      <div className="border-t border-[#2A3547] pt-6">
+      {/* Logout Button */}
+      <div className="pt-4 border-t border-[#2A3547] px-2">
         <button
           onClick={handleLogout}
-          className="w-full flex items-center space-x-3 p-3 rounded-xl hover:bg-[#2A3547] text-[#B8C7E0]"
+          className="w-full flex items-center justify-center relative rounded-xl text-[#B8C7E0] hover:bg-[#2A3547] hover:text-white transition-all duration-200 h-11"
         >
-          <FaSignOutAlt size={20} className="flex-shrink-0" />
-          <span className="group-hover:opacity-100 opacity-0 transition-opacity duration-200 whitespace-nowrap">
+          <FaSignOutAlt size={20} className="flex-shrink-0 absolute left-1/2 -translate-x-1/2 group-hover:left-3 group-hover:translate-x-0 transition-all duration-200" />
+          <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap pl-10">
             Log Out
           </span>
         </button>
