@@ -80,6 +80,10 @@ const ExerciseModal = ({ exercise, onClose }) => {
   const [contradictingEvidence, setContradictingEvidence] = useState(['']);
   const [controlPercentage, setControlPercentage] = useState(50);
   const [actionStep, setActionStep] = useState('');
+  const [anxiousThought, setAnxiousThought] = useState('');
+  const [thoughtBelief, setThoughtBelief] = useState(50);
+  const [balancedThought, setBalancedThought] = useState('');
+  const [newBelief, setNewBelief] = useState(50);
 
   // Mindful Body Scan states
   const [currentBodyPart, setCurrentBodyPart] = useState(0);
@@ -89,23 +93,23 @@ const ExerciseModal = ({ exercise, onClose }) => {
 
   const timerRef = useRef(null);
   const audioRef = useRef(null);
-  
+
   // Extract duration in seconds from exercise duration string if available
   const getDurationInSeconds = () => {
     if (!exercise.duration) return 300; // Default 5 minutes
-    
+
     const durationMatch = exercise.duration.match(/(\d+)[-–]?(\d+)?\s+minute/i);
     if (durationMatch) {
       const minDuration = parseInt(durationMatch[1], 10);
       const maxDuration = durationMatch[2] ? parseInt(durationMatch[2], 10) : minDuration;
       return Math.max(minDuration, maxDuration) * 60;
     }
-    
+
     return 300; // Default 5 minutes
   };
-  
+
   const totalDuration = getDurationInSeconds();
-  
+
   // Timer controls
   const startTimer = () => {
     if (!timerActive) {
@@ -121,17 +125,17 @@ const ExerciseModal = ({ exercise, onClose }) => {
       }, 1000);
     }
   };
-  
+
   const pauseTimer = () => {
     setTimerActive(false);
     clearInterval(timerRef.current);
   };
-  
+
   const resetTimer = () => {
     pauseTimer();
     setTimeElapsed(0);
   };
-  
+
   // Audio controls
   const toggleAudio = () => {
     if (audioRef.current) {
@@ -142,7 +146,7 @@ const ExerciseModal = ({ exercise, onClose }) => {
       }
     }
   };
-  
+
   // Clean up on unmount
   useEffect(() => {
     return () => {
@@ -154,61 +158,62 @@ const ExerciseModal = ({ exercise, onClose }) => {
       }
     };
   }, []);
-  
+
   // Format time display (MM:SS)
   const formatTime = (seconds) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
-  
+
   // Get the current step content
   const getCurrentStep = () => {
     if (!exerciseContent?.steps || exerciseContent.steps.length === 0) {
       return "No steps available for this exercise.";
     }
-    
+
     if (step < exerciseContent.steps.length) {
       return exerciseContent.steps[step].content;
     }
-    
+
     return "Complete! How do you feel now?";
   };
-  
+
   // Handle completing the exercise
   const handleComplete = () => {
     pauseTimer();
     setCompleted(true);
   };
-  
+
   // Determine if this exercise has an interactive component
   const hasInteractiveComponent = () => {
     if (!exerciseContent) return false;
-    
-    return exerciseContent.type === 'journal' || 
-           exerciseContent.type === 'journaling' ||
-           exerciseContent.type === 'appreciation' ||
-           exerciseContent.type === 'meditation' || 
-           exerciseContent.type === 'breathing' ||
-           exerciseContent.type === 'reflection' ||
-           exerciseContent.type === 'checklist' ||
-           exerciseContent.type === 'sensory' ||
-           exerciseContent.type === 'coping' ||
-           exerciseContent.type === 'physical' ||
-           exerciseContent.type === 'relationship' ||
-           exerciseContent.type === 'work' ||
-           exerciseContent.type === 'task' ||
-           exerciseContent.type === 'work-values' ||
-           exerciseContent.type === 'appreciation' ||
-           exerciseContent.type === 'body-appreciation' ||
-           exerciseContent.type === 'health-worry' ||
-           exerciseContent.type === 'body-scan';
+
+    return exerciseContent.type === 'journal' ||
+      exerciseContent.type === 'journaling' ||
+      exerciseContent.type === 'appreciation' ||
+      exerciseContent.type === 'meditation' ||
+      exerciseContent.type === 'breathing' ||
+      exerciseContent.type === 'reflection' ||
+      exerciseContent.type === 'checklist' ||
+      exerciseContent.type === 'sensory' ||
+      exerciseContent.type === 'coping' ||
+      exerciseContent.type === 'physical' ||
+      exerciseContent.type === 'relationship' ||
+      exerciseContent.type === 'work' ||
+      exerciseContent.type === 'task' ||
+      exerciseContent.type === 'work-values' ||
+      exerciseContent.type === 'appreciation' ||
+      exerciseContent.type === 'body-appreciation' ||
+      exerciseContent.type === 'health-worry' ||
+      exerciseContent.type === 'body-scan' ||
+      exerciseContent.type === 'anxious-thought';
   };
-  
+
   // Render the appropriate interactive component based on exercise type
   const renderInteractiveComponent = () => {
     if (!exerciseContent) return null;
-    
+
     switch (exerciseContent.type) {
       case 'journal':
       case 'journaling':
@@ -218,7 +223,7 @@ const ExerciseModal = ({ exercise, onClose }) => {
             <div className="mb-3 flex items-center justify-between">
               <div className="flex space-x-2">
                 {['😢', '😔', '😐', '🙂', '😊'].map((emoji, idx) => (
-                  <button 
+                  <button
                     key={idx}
                     onClick={() => setJournalEntry(prev => `${prev}\nFeeling: ${emoji}\n\n`)}
                     className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-[#3E60C1]/20 transition-colors"
@@ -235,14 +240,14 @@ const ExerciseModal = ({ exercise, onClose }) => {
               className="w-full h-32 bg-[#0F172A] border border-[#2A3547] rounded-lg p-3 text-[#B8C7E0] focus:outline-none focus:border-[#5983FC]"
               placeholder="Start writing here..."
             />
-            
+
             {exerciseContent.prompts && (
               <div className="mt-4">
                 <h4 className="text-white text-sm mb-2">Journaling Prompts:</h4>
                 <div className="space-y-2">
                   {exerciseContent.prompts.map((prompt, idx) => (
-                    <div 
-                      key={idx} 
+                    <div
+                      key={idx}
                       className="bg-[#0F172A] p-3 rounded-lg border border-[#2A3547] text-[#B8C7E0] text-sm cursor-pointer hover:border-[#5983FC] transition-colors"
                       onClick={() => setJournalEntry(prev => prev ? `${prev}\n\n${prompt}:\n` : `${prompt}:\n`)}
                     >
@@ -254,7 +259,7 @@ const ExerciseModal = ({ exercise, onClose }) => {
             )}
           </div>
         );
-        
+
       case 'breathing':
         return (
           <div className="mt-4">
@@ -263,59 +268,57 @@ const ExerciseModal = ({ exercise, onClose }) => {
               <div className="text-2xl font-semibold text-white mb-3">
                 {formatTime(timeElapsed)} / {formatTime(totalDuration)}
               </div>
-              
+
               {/* Visual breathing guide */}
               <div className="relative w-32 h-32 mb-6">
-                <div 
-                  className={`absolute inset-0 rounded-full border-2 border-[#5983FC] ${
-                    timerActive ? 'animate-pulse-slow' : ''
-                  }`}
+                <div
+                  className={`absolute inset-0 rounded-full border-2 border-[#5983FC] ${timerActive ? 'animate-pulse-slow' : ''
+                    }`}
                 ></div>
-                <div 
-                  className={`absolute inset-0 bg-[#5983FC]/20 rounded-full transform transition-all duration-4000 ${
-                    timerActive && timeElapsed % 8 < 4 
-                      ? 'scale-100' 
+                <div
+                  className={`absolute inset-0 bg-[#5983FC]/20 rounded-full transform transition-all duration-4000 ${timerActive && timeElapsed % 8 < 4
+                      ? 'scale-100'
                       : 'scale-50'
-                  }`}
+                    }`}
                 ></div>
                 <div className="absolute inset-0 flex items-center justify-center text-white">
-                  {timerActive && timeElapsed % 12 < 4 
-                    ? "Inhale" 
-                    : timerActive && timeElapsed % 12 < 7 
-                      ? "Hold" 
+                  {timerActive && timeElapsed % 12 < 4
+                    ? "Inhale"
+                    : timerActive && timeElapsed % 12 < 7
+                      ? "Hold"
                       : "Exhale"}
                 </div>
               </div>
-              
+
               {/* Progress bar */}
               <div className="w-full bg-[#0F172A] h-2 rounded-full mb-4">
-                <div 
+                <div
                   className="bg-gradient-to-r from-[#3E60C1] to-[#5983FC] h-2 rounded-full"
                   style={{ width: `${(timeElapsed / totalDuration) * 100}%` }}
                 ></div>
               </div>
-              
+
               {/* Controls */}
               <div className="flex items-center space-x-4">
                 {timerActive ? (
-                  <button 
+                  <button
                     onClick={pauseTimer}
                     className="bg-[#0F172A] p-3 rounded-full text-[#B8C7E0] hover:text-white transition-colors"
                   >
                     <FaPause />
                   </button>
                 ) : (
-                  <button 
+                  <button
                     onClick={startTimer}
                     className="bg-[#0F172A] p-3 rounded-full text-[#B8C7E0] hover:text-white transition-colors"
                   >
                     <FaPlay />
                   </button>
                 )}
-                
+
                 <div className="flex space-x-2">
                   {['🌧️', '🌊', '🌳', '🔥'].map((sound, idx) => (
-                    <button 
+                    <button
                       key={idx}
                       onClick={() => {
                         if (audioRef.current) {
@@ -329,9 +332,9 @@ const ExerciseModal = ({ exercise, onClose }) => {
                     </button>
                   ))}
                 </div>
-                
+
                 {exerciseContent.audioUrl && (
-                  <button 
+                  <button
                     onClick={toggleAudio}
                     className="bg-[#0F172A] p-3 rounded-full text-[#B8C7E0] hover:text-white transition-colors"
                   >
@@ -339,13 +342,13 @@ const ExerciseModal = ({ exercise, onClose }) => {
                   </button>
                 )}
               </div>
-              
+
               {/* Hidden audio element */}
               <audio ref={audioRef} src={exerciseContent.audioUrl} loop />
             </div>
           </div>
         );
-        
+
       case 'meditation':
         return (
           <div className="mt-4">
@@ -354,21 +357,21 @@ const ExerciseModal = ({ exercise, onClose }) => {
               <div className="text-2xl font-semibold text-white mb-3">
                 {formatTime(timeElapsed)} / {formatTime(totalDuration)}
               </div>
-              
+
               {/* Body scan visualization */}
               <div className="w-full max-w-[200px] relative mb-6">
                 <svg viewBox="0 0 100 220" className="w-full">
-                  <path d="M50,10 Q65,30 50,50 Q35,70 50,90 Q65,110 50,140 Q35,160 50,180 Q65,200 50,220" 
-                    fill="none" 
-                    stroke="#5983FC" 
+                  <path d="M50,10 Q65,30 50,50 Q35,70 50,90 Q65,110 50,140 Q35,160 50,180 Q65,200 50,220"
+                    fill="none"
+                    stroke="#5983FC"
                     strokeWidth="1.5"
                     strokeDasharray="5,5"
                   />
-                  <circle 
-                    cx="50" 
-                    cy={10 + (timeElapsed % 30) * 7} 
-                    r="5" 
-                    fill="#5983FC" 
+                  <circle
+                    cx="50"
+                    cy={10 + (timeElapsed % 30) * 7}
+                    r="5"
+                    fill="#5983FC"
                     className={timerActive ? "animate-pulse" : ""}
                   />
                   <rect x="30" y="30" width="40" height="60" rx="20" fill="none" stroke="#5983FC" strokeWidth="0.5" />
@@ -378,49 +381,49 @@ const ExerciseModal = ({ exercise, onClose }) => {
                 <div className="text-[#B8C7E0] text-xs text-center mt-2">
                   Focus on your {
                     timerActive && timeElapsed % 30 < 5 ? "head" :
-                    timerActive && timeElapsed % 30 < 10 ? "shoulders" :
-                    timerActive && timeElapsed % 30 < 15 ? "chest" :
-                    timerActive && timeElapsed % 30 < 20 ? "abdomen" :
-                    timerActive && timeElapsed % 30 < 25 ? "legs" : "feet"
+                      timerActive && timeElapsed % 30 < 10 ? "shoulders" :
+                        timerActive && timeElapsed % 30 < 15 ? "chest" :
+                          timerActive && timeElapsed % 30 < 20 ? "abdomen" :
+                            timerActive && timeElapsed % 30 < 25 ? "legs" : "feet"
                   }
                 </div>
               </div>
-              
+
               {/* Progress bar */}
               <div className="w-full bg-[#0F172A] h-2 rounded-full mb-4">
-                <div 
+                <div
                   className="bg-gradient-to-r from-[#3E60C1] to-[#5983FC] h-2 rounded-full"
                   style={{ width: `${(timeElapsed / totalDuration) * 100}%` }}
                 ></div>
               </div>
-              
+
               {/* Controls */}
               <div className="flex items-center space-x-4">
                 {timerActive ? (
-                  <button 
+                  <button
                     onClick={pauseTimer}
                     className="bg-[#0F172A] p-3 rounded-full text-[#B8C7E0] hover:text-white transition-colors"
                   >
                     <FaPause />
                   </button>
                 ) : (
-                  <button 
+                  <button
                     onClick={startTimer}
                     className="bg-[#0F172A] p-3 rounded-full text-[#B8C7E0] hover:text-white transition-colors"
                   >
                     <FaPlay />
                   </button>
                 )}
-                
-                <button 
+
+                <button
                   onClick={resetTimer}
                   className="bg-[#0F172A] p-3 rounded-full text-[#B8C7E0] hover:text-white transition-colors"
                 >
                   <FaArrowLeft />
                 </button>
-                
+
                 {exerciseContent.audioUrl && (
-                  <button 
+                  <button
                     onClick={toggleAudio}
                     className="bg-[#0F172A] p-3 rounded-full text-[#B8C7E0] hover:text-white transition-colors"
                   >
@@ -431,7 +434,7 @@ const ExerciseModal = ({ exercise, onClose }) => {
             </div>
           </div>
         );
-        
+
       case 'reflection':
         if (exerciseContent.title?.toLowerCase().includes('values clarification')) {
           return (
@@ -439,11 +442,11 @@ const ExerciseModal = ({ exercise, onClose }) => {
               <div className="bg-[#0F172A] p-4 rounded-lg border border-[#2A3547] mb-3">
                 <h4 className="text-white text-sm font-medium mb-3">Values Tracker</h4>
                 <p className="text-[#B8C7E0] text-xs mb-3">Enter your values and drag to reorder by importance:</p>
-                
+
                 <div className="space-y-3 mb-4">
                   {valuesList.map((item) => (
-                    <div 
-                      key={item.id} 
+                    <div
+                      key={item.id}
                       className="flex items-center space-x-3 cursor-move p-2 rounded-lg hover:bg-[#1A2335]/50 transition-colors"
                       draggable
                       onDragStart={(e) => handleDragStart(e, item)}
@@ -451,12 +454,12 @@ const ExerciseModal = ({ exercise, onClose }) => {
                       onDragOver={handleDragOver}
                       onDrop={(e) => handleDrop(e, item)}
                     >
-                      <div 
+                      <div
                         className="w-8 h-8 bg-[#3E60C1]/20 rounded-full flex items-center justify-center text-[#5983FC] flex-shrink-0"
                       >
                         {item.rank}
                       </div>
-                      <input 
+                      <input
                         type="text"
                         value={item.value}
                         onChange={(e) => handleValueChange(item.id, e.target.value)}
@@ -473,13 +476,13 @@ const ExerciseModal = ({ exercise, onClose }) => {
                     </div>
                   ))}
                 </div>
-                
+
                 <div className="mt-4 p-3 bg-[#1A2335]/50 rounded-lg border border-[#2A3547]">
                   <div className="text-xs text-[#B8C7E0] mb-2">
                     <span className="text-[#5983FC]">Drag & drop tip:</span> Drag values up or down to rearrange their priority order.
                   </div>
                 </div>
-                
+
                 <h4 className="text-white text-sm font-medium mb-2 mt-4">Value Definition</h4>
                 <div className="mb-3">
                   <textarea
@@ -489,7 +492,7 @@ const ExerciseModal = ({ exercise, onClose }) => {
                     placeholder={`Define what your top value "${valuesList[0]?.value || 'value'}" means to you personally...`}
                   />
                 </div>
-                
+
                 <h4 className="text-white text-sm font-medium mb-2">Action Plan</h4>
                 <div>
                   <textarea
@@ -507,55 +510,53 @@ const ExerciseModal = ({ exercise, onClose }) => {
             <div className="mt-4">
               <div className="bg-[#0F172A] p-4 rounded-lg border border-[#2A3547] mb-3">
                 <div className="flex mb-4">
-                  <button 
+                  <button
                     onClick={() => setActivePerspective('your')}
-                    className={`flex-1 py-2 ${
-                      activePerspective === 'your' 
-                        ? 'bg-[#3E60C1] text-white rounded-l-lg' 
+                    className={`flex-1 py-2 ${activePerspective === 'your'
+                        ? 'bg-[#3E60C1] text-white rounded-l-lg'
                         : 'bg-[#1A2335] text-[#B8C7E0] rounded-l-lg hover:bg-[#2A3547]'
-                    } transition-colors`}
+                      } transition-colors`}
                   >
                     Your View
                   </button>
-                  <button 
+                  <button
                     onClick={() => setActivePerspective('their')}
-                    className={`flex-1 py-2 ${
-                      activePerspective === 'their' 
-                        ? 'bg-[#3E60C1] text-white rounded-r-lg' 
+                    className={`flex-1 py-2 ${activePerspective === 'their'
+                        ? 'bg-[#3E60C1] text-white rounded-r-lg'
                         : 'bg-[#1A2335] text-[#B8C7E0] rounded-r-lg hover:bg-[#2A3547]'
-                    } transition-colors`}
+                      } transition-colors`}
                   >
                     Their View
                   </button>
                 </div>
-                
+
                 {activePerspective === 'your' ? (
                   <div className="space-y-3">
                     <div>
                       <label className="text-[#5983FC] text-xs mb-1 block">Describe the situation briefly:</label>
                       <textarea
                         value={yourViewData.situation}
-                        onChange={(e) => setYourViewData({...yourViewData, situation: e.target.value})}
+                        onChange={(e) => setYourViewData({ ...yourViewData, situation: e.target.value })}
                         className="w-full h-16 bg-[#1A2335] border border-[#2A3547] rounded-lg p-2 text-[#B8C7E0] text-sm focus:outline-none focus:border-[#5983FC]"
                         placeholder="What happened? Who was involved?"
                       />
                     </div>
-                    
+
                     <div>
                       <label className="text-[#5983FC] text-xs mb-1 block">How did you feel about it?</label>
                       <textarea
                         value={yourViewData.feelings}
-                        onChange={(e) => setYourViewData({...yourViewData, feelings: e.target.value})}
+                        onChange={(e) => setYourViewData({ ...yourViewData, feelings: e.target.value })}
                         className="w-full h-16 bg-[#1A2335] border border-[#2A3547] rounded-lg p-2 text-[#B8C7E0] text-sm focus:outline-none focus:border-[#5983FC]"
                         placeholder="Your emotions and reactions..."
                       />
                     </div>
-                    
+
                     <div>
                       <label className="text-[#5983FC] text-xs mb-1 block">What did you want or need in this situation?</label>
                       <textarea
                         value={yourViewData.needs}
-                        onChange={(e) => setYourViewData({...yourViewData, needs: e.target.value})}
+                        onChange={(e) => setYourViewData({ ...yourViewData, needs: e.target.value })}
                         className="w-full h-16 bg-[#1A2335] border border-[#2A3547] rounded-lg p-2 text-[#B8C7E0] text-sm focus:outline-none focus:border-[#5983FC]"
                         placeholder="Your goals, needs, or desires..."
                       />
@@ -567,34 +568,34 @@ const ExerciseModal = ({ exercise, onClose }) => {
                       <label className="text-[#5983FC] text-xs mb-1 block">How might they have felt about it?</label>
                       <textarea
                         value={theirViewData.feelings}
-                        onChange={(e) => setTheirViewData({...theirViewData, feelings: e.target.value})}
+                        onChange={(e) => setTheirViewData({ ...theirViewData, feelings: e.target.value })}
                         className="w-full h-16 bg-[#1A2335] border border-[#2A3547] rounded-lg p-2 text-[#B8C7E0] text-sm focus:outline-none focus:border-[#5983FC]"
                         placeholder="Try to imagine their emotions and reactions..."
                       />
                     </div>
-                    
+
                     <div>
                       <label className="text-[#5983FC] text-xs mb-1 block">What might they have wanted or needed?</label>
                       <textarea
                         value={theirViewData.needs}
-                        onChange={(e) => setTheirViewData({...theirViewData, needs: e.target.value})}
+                        onChange={(e) => setTheirViewData({ ...theirViewData, needs: e.target.value })}
                         className="w-full h-16 bg-[#1A2335] border border-[#2A3547] rounded-lg p-2 text-[#B8C7E0] text-sm focus:outline-none focus:border-[#5983FC]"
                         placeholder="Their possible goals, needs, or concerns..."
                       />
                     </div>
-                    
+
                     <div>
                       <label className="text-[#5983FC] text-xs mb-1 block">What context or background might influence their perspective?</label>
                       <textarea
                         value={theirViewData.context}
-                        onChange={(e) => setTheirViewData({...theirViewData, context: e.target.value})}
+                        onChange={(e) => setTheirViewData({ ...theirViewData, context: e.target.value })}
                         className="w-full h-16 bg-[#1A2335] border border-[#2A3547] rounded-lg p-2 text-[#B8C7E0] text-sm focus:outline-none focus:border-[#5983FC]"
                         placeholder="Their history, values, current stressors..."
                       />
                     </div>
                   </div>
                 )}
-                
+
                 {/* Common ground section always visible */}
                 <div className="mt-4 pt-4 border-t border-[#2A3547]">
                   <label className="text-[#5983FC] text-xs mb-1 block">Possible common ground:</label>
@@ -605,7 +606,7 @@ const ExerciseModal = ({ exercise, onClose }) => {
                     placeholder="What shared concerns, values, or goals might you both have?"
                   />
                 </div>
-                
+
                 {/* Summary section with insights */}
                 {(yourViewData.needs || theirViewData.needs) && (
                   <div className="mt-4 pt-4 border-t border-[#2A3547]">
@@ -637,7 +638,7 @@ const ExerciseModal = ({ exercise, onClose }) => {
                   <div className="flex justify-end mt-2">
                     <div className="flex space-x-1">
                       {['🤔', '💡', '❤️', '👍', '👎'].map((reaction, idx) => (
-                        <button 
+                        <button
                           key={idx}
                           className="w-6 h-6 flex items-center justify-center rounded-full hover:bg-[#3E60C1]/20 transition-colors text-xs"
                         >
@@ -651,25 +652,23 @@ const ExerciseModal = ({ exercise, onClose }) => {
             </div>
           );
         }
-        
+
       case 'checklist':
         return (
           <div className="mt-4 space-y-2">
             {exerciseContent.checkItems?.map((item, index) => (
-              <div 
-                key={index} 
-                className={`flex items-start p-3 rounded-lg border ${
-                  checklist[index] 
+              <div
+                key={index}
+                className={`flex items-start p-3 rounded-lg border ${checklist[index]
                     ? 'bg-[#3E60C1]/10 border-[#5983FC]/30'
                     : 'bg-[#0F172A] border-[#2A3547]'
-                } transition-colors`}
+                  } transition-colors`}
               >
-                <div 
-                  className={`w-5 h-5 rounded border mr-3 cursor-pointer flex-shrink-0 mt-0.5 ${
-                    checklist[index]
+                <div
+                  className={`w-5 h-5 rounded border mr-3 cursor-pointer flex-shrink-0 mt-0.5 ${checklist[index]
                       ? 'border-[#5983FC] bg-[#5983FC]/10'
                       : 'border-[#2A3547]'
-                  } transition-colors`}
+                    } transition-colors`}
                   onClick={() => toggleCheckItem(index)}
                 >
                   {checklist[index] && <FaCheck className="text-[#5983FC] text-xs m-auto" />}
@@ -696,7 +695,7 @@ const ExerciseModal = ({ exercise, onClose }) => {
             </div>
           </div>
         );
-        
+
       case 'sensory':
         return (
           <div className="mt-4">
@@ -705,47 +704,45 @@ const ExerciseModal = ({ exercise, onClose }) => {
                 {['👁️', '👂', '👃', '👅', '👐'].map((icon, idx) => (
                   <button
                     key={idx}
-                    className={`p-2 flex flex-col items-center justify-center rounded-lg border ${
-                      step % 5 === idx 
-                        ? 'border-[#5983FC] bg-[#3E60C1]/10 text-white' 
+                    className={`p-2 flex flex-col items-center justify-center rounded-lg border ${step % 5 === idx
+                        ? 'border-[#5983FC] bg-[#3E60C1]/10 text-white'
                         : 'border-[#2A3547] text-[#B8C7E0]'
-                    }`}
+                      }`}
                     onClick={() => setStep(idx)}
                   >
                     <span className="text-xl">{icon}</span>
                     <span className="text-xs mt-1">{
                       idx === 0 ? "See" :
-                      idx === 1 ? "Hear" :
-                      idx === 2 ? "Smell" :
-                      idx === 3 ? "Taste" : "Touch"
+                        idx === 1 ? "Hear" :
+                          idx === 2 ? "Smell" :
+                            idx === 3 ? "Taste" : "Touch"
                     }</span>
                   </button>
                 ))}
               </div>
-              
+
               <h4 className="text-white text-sm font-medium mb-2">
                 {step % 5 === 0 ? "What do you SEE?" :
-                 step % 5 === 1 ? "What do you HEAR?" :
-                 step % 5 === 2 ? "What can you SMELL?" :
-                 step % 5 === 3 ? "What do you TASTE?" :
-                 "What can you FEEL?"}
+                  step % 5 === 1 ? "What do you HEAR?" :
+                    step % 5 === 2 ? "What can you SMELL?" :
+                      step % 5 === 3 ? "What do you TASTE?" :
+                        "What can you FEEL?"}
               </h4>
-              
+
               <div className="space-y-2">
                 {[1, 2, 3, 4, 5].slice(0, 5 - step % 5).map((num) => (
                   <div key={num} className="flex items-center">
                     <div className="w-6 h-6 bg-[#3E60C1]/20 rounded-full flex items-center justify-center text-[#5983FC] mr-2">
                       {num}
                     </div>
-                    <input 
+                    <input
                       type="text"
                       className="flex-1 bg-[#1A2335] border border-[#2A3547] rounded-lg p-2 text-[#B8C7E0] text-sm focus:outline-none focus:border-[#5983FC]"
-                      placeholder={`Enter something you can ${
-                        step % 5 === 0 ? "see" :
-                        step % 5 === 1 ? "hear" :
-                        step % 5 === 2 ? "smell" :
-                        step % 5 === 3 ? "taste" : "feel"
-                      }...`}
+                      placeholder={`Enter something you can ${step % 5 === 0 ? "see" :
+                          step % 5 === 1 ? "hear" :
+                            step % 5 === 2 ? "smell" :
+                              step % 5 === 3 ? "taste" : "feel"
+                        }...`}
                     />
                   </div>
                 ))}
@@ -761,15 +758,15 @@ const ExerciseModal = ({ exercise, onClose }) => {
               <h4 className="text-white text-sm font-medium mb-3">Emotion Intensity</h4>
               <div className="flex items-center mb-6">
                 <span className="text-[#B8C7E0] text-sm mr-3">Low</span>
-                <input 
-                  type="range" 
-                  min="1" 
-                  max="10" 
+                <input
+                  type="range"
+                  min="1"
+                  max="10"
                   className="w-full h-2 bg-gradient-to-r from-green-500 via-yellow-500 to-red-500 rounded-lg appearance-none cursor-pointer"
                 />
                 <span className="text-[#B8C7E0] text-sm ml-3">High</span>
               </div>
-              
+
               <h4 className="text-white text-sm font-medium mb-2">Thought Reframing</h4>
               <div className="space-y-3 mb-4">
                 <div>
@@ -804,7 +801,7 @@ const ExerciseModal = ({ exercise, onClose }) => {
             </div>
           </div>
         );
-        
+
       case 'physical':
         return (
           <div className="mt-4">
@@ -813,76 +810,75 @@ const ExerciseModal = ({ exercise, onClose }) => {
               <div className="text-xl font-semibold text-white mb-3">
                 {formatTime(timeElapsed)} / {formatTime(totalDuration)}
               </div>
-              
+
               {/* Body parts highlight */}
               <div className="w-full max-w-[200px] relative mb-4">
                 <svg viewBox="0 0 100 220" className="w-full">
-                  <rect x="30" y="30" width="40" height="60" rx="20" 
-                    fill={timeElapsed % 35 < 5 ? "#5983FC33" : "none"} 
-                    stroke="#5983FC" strokeWidth="0.5" 
+                  <rect x="30" y="30" width="40" height="60" rx="20"
+                    fill={timeElapsed % 35 < 5 ? "#5983FC33" : "none"}
+                    stroke="#5983FC" strokeWidth="0.5"
                   />
-                  <rect x="35" y="90" width="30" height="60" rx="5" 
-                    fill={timeElapsed % 35 >= 5 && timeElapsed % 35 < 15 ? "#5983FC33" : "none"} 
-                    stroke="#5983FC" strokeWidth="0.5" 
+                  <rect x="35" y="90" width="30" height="60" rx="5"
+                    fill={timeElapsed % 35 >= 5 && timeElapsed % 35 < 15 ? "#5983FC33" : "none"}
+                    stroke="#5983FC" strokeWidth="0.5"
                   />
-                  <rect x="40" y="150" width="20" height="70" rx="5" 
-                    fill={timeElapsed % 35 >= 15 && timeElapsed % 35 < 25 ? "#5983FC33" : "none"} 
-                    stroke="#5983FC" strokeWidth="0.5" 
+                  <rect x="40" y="150" width="20" height="70" rx="5"
+                    fill={timeElapsed % 35 >= 15 && timeElapsed % 35 < 25 ? "#5983FC33" : "none"}
+                    stroke="#5983FC" strokeWidth="0.5"
                   />
-                  <circle cx="50" cy="15" r="10" 
-                    fill={timeElapsed % 35 >= 25 ? "#5983FC33" : "none"} 
-                    stroke="#5983FC" strokeWidth="0.5" 
+                  <circle cx="50" cy="15" r="10"
+                    fill={timeElapsed % 35 >= 25 ? "#5983FC33" : "none"}
+                    stroke="#5983FC" strokeWidth="0.5"
                   />
                 </svg>
               </div>
-              
+
               {/* Visual guide for tension/release cycles */}
               <div className="w-full bg-[#0F172A] h-6 rounded-full mb-4 overflow-hidden relative">
-                <div 
-                  className={`h-6 ${
-                    timerActive && timeElapsed % 10 < 5 
-                      ? "bg-amber-500 transition-all duration-500" 
+                <div
+                  className={`h-6 ${timerActive && timeElapsed % 10 < 5
+                      ? "bg-amber-500 transition-all duration-500"
                       : "bg-[#5983FC] transition-all duration-500"
-                  }`}
-                  style={{ 
+                    }`}
+                  style={{
                     width: `${(timeElapsed / totalDuration) * 100}%`,
                   }}
                 ></div>
                 <div className="absolute inset-0 flex items-center justify-center text-white text-sm">
-                  {timerActive && timeElapsed % 10 < 5 
-                    ? "TENSE" 
+                  {timerActive && timeElapsed % 10 < 5
+                    ? "TENSE"
                     : "RELEASE"}
                 </div>
               </div>
-              
+
               <div className="text-[#B8C7E0] text-sm mb-3">
-                {timerActive && timeElapsed % 35 < 5 
-                  ? "Focus on your FACE & JAW" 
-                  : timerActive && timeElapsed % 35 < 15 
-                  ? "Focus on your SHOULDERS & ARMS" 
-                  : timerActive && timeElapsed % 35 < 25 
-                  ? "Focus on your LEGS & FEET"
-                  : "Focus on your ABDOMEN & CHEST"}
+                {timerActive && timeElapsed % 35 < 5
+                  ? "Focus on your FACE & JAW"
+                  : timerActive && timeElapsed % 35 < 15
+                    ? "Focus on your SHOULDERS & ARMS"
+                    : timerActive && timeElapsed % 35 < 25
+                      ? "Focus on your LEGS & FEET"
+                      : "Focus on your ABDOMEN & CHEST"}
               </div>
-              
+
               <div className="flex items-center space-x-4">
                 {timerActive ? (
-                  <button 
+                  <button
                     onClick={pauseTimer}
                     className="bg-[#0F172A] p-3 rounded-full text-[#B8C7E0] hover:text-white transition-colors"
                   >
                     <FaPause />
                   </button>
                 ) : (
-                  <button 
+                  <button
                     onClick={startTimer}
                     className="bg-[#0F172A] p-3 rounded-full text-[#B8C7E0] hover:text-white transition-colors"
                   >
                     <FaPlay />
                   </button>
                 )}
-                
-                <button 
+
+                <button
                   onClick={resetTimer}
                   className="bg-[#0F172A] p-3 rounded-full text-[#B8C7E0] hover:text-white transition-colors"
                 >
@@ -892,26 +888,26 @@ const ExerciseModal = ({ exercise, onClose }) => {
             </div>
           </div>
         );
-        
+
       case 'relationship':
         return (
           <div className="mt-4">
             <div className="bg-[#0F172A] p-4 rounded-lg border border-[#2A3547] mb-3">
               <h4 className="text-white text-sm font-medium mb-3">Perspective Switcher</h4>
-              
+
               <div className="flex mb-4">
-                <button 
+                <button
                   className="flex-1 py-2 rounded-l-lg bg-[#3E60C1] text-white"
                 >
                   Your View
                 </button>
-                <button 
+                <button
                   className="flex-1 py-2 rounded-r-lg bg-[#1A2335] text-[#B8C7E0]"
                 >
                   Their View
                 </button>
               </div>
-              
+
               <div className="space-y-3">
                 <div>
                   <label className="text-[#5983FC] text-xs mb-1 block">What I want or need:</label>
@@ -920,7 +916,7 @@ const ExerciseModal = ({ exercise, onClose }) => {
                     placeholder="Describe what you want from this situation or relationship..."
                   />
                 </div>
-                
+
                 <div>
                   <label className="text-[#5983FC] text-xs mb-1 block">What they might want or need:</label>
                   <textarea
@@ -928,7 +924,7 @@ const ExerciseModal = ({ exercise, onClose }) => {
                     placeholder="Consider what the other person might want..."
                   />
                 </div>
-                
+
                 <div>
                   <label className="text-[#5983FC] text-xs mb-1 block">Common ground:</label>
                   <textarea
@@ -940,13 +936,13 @@ const ExerciseModal = ({ exercise, onClose }) => {
             </div>
           </div>
         );
-        
+
       case 'work':
         return (
           <div className="mt-4">
             <div className="bg-[#0F172A] p-4 rounded-lg border border-[#2A3547] mb-4">
               <h4 className="text-white text-sm font-medium mb-3">Current Work Pattern</h4>
-              
+
               <div className="grid grid-cols-1 gap-3 mb-4">
                 <div>
                   <label className="text-[#5983FC] text-xs mb-1 block">My Official Work Hours:</label>
@@ -957,7 +953,7 @@ const ExerciseModal = ({ exercise, onClose }) => {
                     placeholder="E.g., Monday-Friday, 9am-5pm"
                   />
                 </div>
-                
+
                 <div>
                   <label className="text-[#5983FC] text-xs mb-1 block">When Work Actually Happens:</label>
                   <textarea
@@ -968,12 +964,12 @@ const ExerciseModal = ({ exercise, onClose }) => {
                   />
                 </div>
               </div>
-              
+
               {/* Time visualization */}
               <div className="mb-4 p-3 bg-[#1A2335]/50 rounded-lg">
                 <h5 className="text-white text-xs font-medium mb-2">Work-Life Time Visualization</h5>
                 <div className="h-6 bg-[#0F172A] rounded-full overflow-hidden mb-1">
-                  <div className="h-full bg-gradient-to-r from-green-500 to-yellow-500 rounded-full" style={{width: '60%'}}></div>
+                  <div className="h-full bg-gradient-to-r from-green-500 to-yellow-500 rounded-full" style={{ width: '60%' }}></div>
                 </div>
                 <div className="flex justify-between text-xs text-[#B8C7E0]">
                   <span>12am</span>
@@ -990,15 +986,15 @@ const ExerciseModal = ({ exercise, onClose }) => {
                 </div>
               </div>
             </div>
-            
+
             <div className="bg-[#0F172A] p-4 rounded-lg border border-[#2A3547] mb-4">
               <h4 className="text-white text-sm font-medium mb-3">Boundary Issues & Solutions</h4>
-              
+
               <div className="space-y-4">
                 {[0, 1, 2].map((index) => (
                   <div key={index} className="p-3 bg-[#1A2335]/50 rounded-lg border border-[#2A3547]">
                     <h5 className="text-white text-xs font-medium mb-2">Issue #{index + 1}</h5>
-                    
+
                     <div className="mb-3">
                       <label className="text-[#5983FC] text-xs mb-1 block">Specific Boundary Issue:</label>
                       <textarea
@@ -1008,7 +1004,7 @@ const ExerciseModal = ({ exercise, onClose }) => {
                         placeholder="E.g., After-hours work emails, lunch breaks interrupted..."
                       />
                     </div>
-                    
+
                     <div className="mb-3">
                       <label className="text-[#5983FC] text-xs mb-1 block">Boundary Statement:</label>
                       <textarea
@@ -1018,7 +1014,7 @@ const ExerciseModal = ({ exercise, onClose }) => {
                         placeholder="E.g., I will not check email after 7pm..."
                       />
                     </div>
-                    
+
                     <div>
                       <label className="text-[#5983FC] text-xs mb-1 block">Potential Obstacles:</label>
                       <textarea
@@ -1032,30 +1028,28 @@ const ExerciseModal = ({ exercise, onClose }) => {
                 ))}
               </div>
             </div>
-            
+
             <div className="bg-[#0F172A] p-4 rounded-lg border border-[#2A3547] mb-4">
               <h4 className="text-white text-sm font-medium mb-3">Implementation Plan</h4>
-              
+
               <p className="text-[#B8C7E0] text-sm mb-3">Select one boundary to implement first:</p>
-              
+
               <div className="space-y-2 mb-4">
                 {boundaryStatements.map((statement, index) => (
                   statement && (
-                    <div 
+                    <div
                       key={index}
                       onClick={() => setSelectedBoundary(statement)}
-                      className={`p-3 rounded-lg cursor-pointer ${
-                        selectedBoundary === statement
+                      className={`p-3 rounded-lg cursor-pointer ${selectedBoundary === statement
                           ? 'bg-[#3E60C1]/20 border-[#5983FC]/50 border'
                           : 'bg-[#1A2335] border border-[#2A3547] hover:border-[#3E60C1]/50'
-                      }`}
+                        }`}
                     >
                       <div className="flex items-center">
-                        <div className={`w-4 h-4 rounded-full mr-3 flex items-center justify-center ${
-                          selectedBoundary === statement
+                        <div className={`w-4 h-4 rounded-full mr-3 flex items-center justify-center ${selectedBoundary === statement
                             ? 'border-[#5983FC] bg-[#5983FC]/10 border-2'
                             : 'border border-[#3E60C1]'
-                        }`}>
+                          }`}>
                           {selectedBoundary === statement && (
                             <div className="w-2 h-2 rounded-full bg-[#5983FC]"></div>
                           )}
@@ -1066,7 +1060,7 @@ const ExerciseModal = ({ exercise, onClose }) => {
                   )
                 ))}
               </div>
-              
+
               {selectedBoundary && (
                 <div className="p-3 bg-[#1A2335]/50 rounded-lg">
                   <h5 className="text-white text-xs font-medium mb-2">Next Steps for Implementation</h5>
@@ -1080,7 +1074,7 @@ const ExerciseModal = ({ exercise, onClose }) => {
                 </div>
               )}
             </div>
-            
+
             <div className="bg-[#0F172A]/70 p-3 rounded-lg border border-[#2A3547]">
               <h4 className="text-[#5983FC] text-sm font-medium mb-2 flex items-center">
                 <FaRegLightbulb className="mr-2" /> Tips for Setting Work Boundaries:
@@ -1102,20 +1096,20 @@ const ExerciseModal = ({ exercise, onClose }) => {
             </div>
           </div>
         );
-        
+
       case 'values-clarification':
         return (
           <div className="mt-4">
             <div className="bg-[#0F172A] p-4 rounded-lg border border-[#2A3547] mb-3">
               <h4 className="text-white text-sm font-medium mb-3">Values Tracker</h4>
-              
+
               <div className="space-y-3 mb-4">
                 {[1, 2, 3, 4, 5].map((num) => (
                   <div key={num} className="flex items-center space-x-3">
                     <div className="w-6 h-6 bg-[#3E60C1]/20 rounded-full flex items-center justify-center text-[#5983FC]">
                       {num}
                     </div>
-                    <input 
+                    <input
                       type="text"
                       className="flex-1 bg-[#1A2335] border border-[#2A3547] rounded-lg p-2 text-[#B8C7E0] text-sm focus:outline-none focus:border-[#5983FC]"
                       placeholder={`Value #${num}...`}
@@ -1130,7 +1124,7 @@ const ExerciseModal = ({ exercise, onClose }) => {
                   </div>
                 ))}
               </div>
-              
+
               <h4 className="text-white text-sm font-medium mb-2">Value Definition</h4>
               <div className="mb-3">
                 <textarea
@@ -1138,7 +1132,7 @@ const ExerciseModal = ({ exercise, onClose }) => {
                   placeholder="Define what your top value means to you personally..."
                 />
               </div>
-              
+
               <h4 className="text-white text-sm font-medium mb-2">Action Plan</h4>
               <div>
                 <textarea
@@ -1155,16 +1149,16 @@ const ExerciseModal = ({ exercise, onClose }) => {
           <div className="mt-4">
             <div className="bg-[#0F172A] p-4 rounded-lg border border-[#2A3547] mb-3">
               <h4 className="text-white text-sm font-medium mb-3">Appreciation Exercise</h4>
-              
+
               <div className="mb-4">
                 <label className="text-[#5983FC] text-xs mb-1 block">Who would you like to appreciate?</label>
-                <input 
+                <input
                   type="text"
                   className="w-full bg-[#1A2335] border border-[#2A3547] rounded-lg p-2 text-[#B8C7E0] text-sm focus:outline-none focus:border-[#5983FC]"
                   placeholder="Name or relationship (e.g., friend, partner, family member, or colleague)"
                 />
               </div>
-              
+
               <div className="space-y-4 mb-4">
                 {[1, 2, 3].map((num) => (
                   <div key={num} className="bg-[#1A2335]/50 p-3 rounded-lg border border-[#2A3547]">
@@ -1181,7 +1175,7 @@ const ExerciseModal = ({ exercise, onClose }) => {
                   </div>
                 ))}
               </div>
-              
+
               <div className="bg-[#1A2335]/50 p-3 rounded-lg border border-[#2A3547]">
                 <h4 className="text-white text-sm font-medium mb-2">Practice Your Expression</h4>
                 <p className="text-[#B8C7E0] text-xs mb-2">Craft a message you could share with this person:</p>
@@ -1191,7 +1185,7 @@ const ExerciseModal = ({ exercise, onClose }) => {
                 />
               </div>
             </div>
-            
+
             <div className="bg-[#0F172A]/70 p-3 rounded-lg border border-[#2A3547]">
               <h4 className="text-[#5983FC] text-sm font-medium mb-2 flex items-center">
                 <FaRegLightbulb className="mr-2" /> Tips for Effective Appreciation:
@@ -1213,13 +1207,13 @@ const ExerciseModal = ({ exercise, onClose }) => {
             </div>
           </div>
         );
-        
+
       case 'perspective-taking':
         return (
           <div className="mt-4">
             <div className="bg-[#0F172A] p-4 rounded-lg border border-[#2A3547] mb-3">
               <h4 className="text-white text-sm font-medium mb-3">Perspective-Taking Practice</h4>
-              
+
               <div className="space-y-3 mb-4">
                 <div>
                   <label className="text-[#5983FC] text-xs mb-1 block">Describe the situation:</label>
@@ -1228,7 +1222,7 @@ const ExerciseModal = ({ exercise, onClose }) => {
                     placeholder="Briefly describe the situation or conflict..."
                   />
                 </div>
-                
+
                 <div>
                   <label className="text-[#5983FC] text-xs mb-1 block">Your perspective:</label>
                   <textarea
@@ -1236,7 +1230,7 @@ const ExerciseModal = ({ exercise, onClose }) => {
                     placeholder="Write down your perspective on the situation..."
                   />
                 </div>
-                
+
                 <div>
                   <label className="text-[#5983FC] text-xs mb-1 block">Their perspective:</label>
                   <textarea
@@ -1246,7 +1240,7 @@ const ExerciseModal = ({ exercise, onClose }) => {
                 </div>
               </div>
             </div>
-            
+
             <div className="bg-[#0F172A]/70 p-3 rounded-lg border border-[#2A3547]">
               <h4 className="text-[#5983FC] text-sm font-medium mb-2 flex items-center">
                 <FaRegLightbulb className="mr-2" /> Effective Perspective-Taking Tips:
@@ -1268,7 +1262,7 @@ const ExerciseModal = ({ exercise, onClose }) => {
             </div>
           </div>
         );
-        
+
       case 'task':
         return (
           <div className="space-y-6">
@@ -1420,8 +1414,8 @@ const ExerciseModal = ({ exercise, onClose }) => {
             </div>
           </div>
         );
-        
-        
+
+
       case 'body-appreciation':
         return (
           <div className="space-y-4">
@@ -1451,11 +1445,10 @@ const ExerciseModal = ({ exercise, onClose }) => {
                 {bodyAreas.map((item, index) => (
                   <div
                     key={index}
-                    className={`p-3 rounded-lg border ${
-                      item.checked
+                    className={`p-3 rounded-lg border ${item.checked
                         ? 'border-emerald-500/30 bg-emerald-500/10'
                         : 'border-[#2A3547] bg-[#1E293B]'
-                    }`}
+                      }`}
                   >
                     <div className="flex items-center justify-between mb-2">
                       <label className="text-white">{item.area}</label>
@@ -1465,11 +1458,10 @@ const ExerciseModal = ({ exercise, onClose }) => {
                           newAreas[index].checked = !newAreas[index].checked;
                           setBodyAreas(newAreas);
                         }}
-                        className={`w-5 h-5 rounded flex items-center justify-center transition-colors ${
-                          item.checked
+                        className={`w-5 h-5 rounded flex items-center justify-center transition-colors ${item.checked
                             ? 'bg-emerald-500 text-white'
                             : 'border border-[#3E60C1]'
-                        }`}
+                          }`}
                       >
                         {item.checked && "✓"}
                       </button>
@@ -1505,7 +1497,7 @@ const ExerciseModal = ({ exercise, onClose }) => {
             </div>
           </div>
         );
-        
+
       case 'work-boundaries':
         return (
           <div className="space-y-6">
@@ -1519,7 +1511,7 @@ const ExerciseModal = ({ exercise, onClose }) => {
                   <FaPlus />
                 </button>
               </div>
-              
+
               {boundaries.map((boundary, index) => (
                 <div key={index} className="mb-4 p-4 border border-[#2A3547] rounded-lg">
                   <div className="space-y-4">
@@ -1581,7 +1573,7 @@ const ExerciseModal = ({ exercise, onClose }) => {
             </div>
           </div>
         );
-        
+
       case 'task-prioritization':
         return (
           <div className="space-y-6">
@@ -1642,14 +1634,14 @@ const ExerciseModal = ({ exercise, onClose }) => {
             </div>
           </div>
         );
-        
+
       case 'work-values':
         return (
           <div className="space-y-6">
             {/* Work Values Section */}
             <div className="bg-[#0F172A]/70 p-4 rounded-xl border border-[#2A3547]">
               <h3 className="text-white font-medium mb-4">Core Work Values</h3>
-              
+
               {workValues.map((item, index) => (
                 <div key={index} className="mb-4 space-y-3">
                   <div className="flex items-center gap-2">
@@ -1675,7 +1667,7 @@ const ExerciseModal = ({ exercise, onClose }) => {
                       </button>
                     )}
                   </div>
-                  
+
                   <div className="space-y-2">
                     <label className="block text-[#B8C7E0] text-sm">
                       Alignment with current role (1-10):
@@ -1696,7 +1688,7 @@ const ExerciseModal = ({ exercise, onClose }) => {
                       Rating: {item.rating}/10
                     </div>
                   </div>
-                  
+
                   <div>
                     <label className="block text-[#B8C7E0] text-sm mb-1">
                       How does your work currently honor this value?
@@ -1714,7 +1706,7 @@ const ExerciseModal = ({ exercise, onClose }) => {
                   </div>
                 </div>
               ))}
-              
+
               {workValues.length < 5 && (
                 <button
                   onClick={() => setWorkValues([...workValues, { value: '', rating: 5, alignment: '' }])}
@@ -1759,7 +1751,7 @@ const ExerciseModal = ({ exercise, onClose }) => {
             )}
           </div>
         );
-        
+
       case 'health-worry':
         return (
           <div className="space-y-4">
@@ -1918,7 +1910,7 @@ const ExerciseModal = ({ exercise, onClose }) => {
             )}
           </div>
         );
-        
+
       case 'body-scan':
         return (
           <div className="space-y-4">
@@ -1951,9 +1943,9 @@ const ExerciseModal = ({ exercise, onClose }) => {
                     {currentBodyPart + 1} of {bodyParts.length}
                   </span>
                 </div>
-                
+
                 <div className="relative h-2 bg-[#1E293B] rounded-full mb-4">
-                  <div 
+                  <div
                     className="absolute h-full bg-[#3E60C1] rounded-full transition-all duration-500"
                     style={{ width: `${((currentBodyPart + 1) / bodyParts.length) * 100}%` }}
                   />
@@ -2042,12 +2034,183 @@ const ExerciseModal = ({ exercise, onClose }) => {
             )}
           </div>
         );
-        
+
+      case 'anxious-thought':
+        return (
+          <div className="space-y-6">
+            {/* Introduction */}
+            <div className="bg-[#0F172A]/70 p-5 rounded-xl border border-[#2A3547]">
+              <h4 className="text-white font-medium mb-3">Anxious Thought Reframing</h4>
+              <p className="text-[#B8C7E0]">
+                This exercise helps you challenge anxious thoughts by examining evidence and creating more balanced perspectives.
+              </p>
+            </div>
+
+            {/* Step 1: Identify the Thought */}
+            <div className="bg-[#0F172A]/70 p-5 rounded-xl border border-[#2A3547]">
+              <h4 className="text-white font-medium mb-3">Step 1: Identify Your Anxious Thought</h4>
+              <textarea
+                value={anxiousThought}
+                onChange={(e) => setAnxiousThought(e.target.value)}
+                placeholder="Write down the anxious thought that's bothering you..."
+                className="w-full bg-[#0F172A] border border-[#2A3547] rounded-lg p-3 text-[#B8C7E0] focus:outline-none focus:border-[#5983FC] min-h-[100px] mb-4"
+              />
+              <div className="space-y-2">
+                <label className="text-[#B8C7E0] text-sm">How much do you believe this thought?</label>
+                <div className="flex items-center space-x-4">
+                  <input
+                    type="range"
+                    min="0"
+                    max="100"
+                    value={thoughtBelief}
+                    onChange={(e) => setThoughtBelief(parseInt(e.target.value))}
+                    className="flex-1 h-2 bg-[#2A3547] rounded-lg appearance-none cursor-pointer"
+                  />
+                  <span className="text-[#B8C7E0] min-w-[3rem] text-right">{thoughtBelief}%</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Step 2: Evidence Analysis */}
+            <div className="bg-[#0F172A]/70 p-5 rounded-xl border border-[#2A3547]">
+              <h4 className="text-white font-medium mb-3">Step 2: Examine the Evidence</h4>
+
+              {/* Supporting Evidence */}
+              <div className="mb-4">
+                <label className="text-[#B8C7E0] text-sm block mb-2">Evidence Supporting This Thought</label>
+                {supportingEvidence.map((evidence, index) => (
+                  <div key={index} className="flex items-center space-x-2 mb-2">
+                    <input
+                      type="text"
+                      value={evidence}
+                      onChange={(e) => {
+                        const newEvidence = [...supportingEvidence];
+                        newEvidence[index] = e.target.value;
+                        setSupportingEvidence(newEvidence);
+                      }}
+                      placeholder="Add evidence that supports this thought..."
+                      className="flex-1 bg-[#0F172A] border border-[#2A3547] rounded-lg p-2 text-[#B8C7E0] focus:outline-none focus:border-[#5983FC]"
+                    />
+                    <button
+                      onClick={() => {
+                        setSupportingEvidence(supportingEvidence.filter((_, i) => i !== index));
+                      }}
+                      className="text-[#B8C7E0] hover:text-white transition-colors"
+                    >
+                      <FaTimes />
+                    </button>
+                  </div>
+                ))}
+                <button
+                  onClick={() => setSupportingEvidence([...supportingEvidence, ''])}
+                  className="text-[#5983FC] hover:text-[#3E60C1] text-sm flex items-center mt-2"
+                >
+                  <FaPlus className="mr-1" /> Add Evidence
+                </button>
+              </div>
+
+              {/* Contradicting Evidence */}
+              <div>
+                <label className="text-[#B8C7E0] text-sm block mb-2">Evidence That Contradicts This Thought</label>
+                {contradictingEvidence.map((evidence, index) => (
+                  <div key={index} className="flex items-center space-x-2 mb-2">
+                    <input
+                      type="text"
+                      value={evidence}
+                      onChange={(e) => {
+                        const newEvidence = [...contradictingEvidence];
+                        newEvidence[index] = e.target.value;
+                        setContradictingEvidence(newEvidence);
+                      }}
+                      placeholder="Add evidence that contradicts this thought..."
+                      className="flex-1 bg-[#0F172A] border border-[#2A3547] rounded-lg p-2 text-[#B8C7E0] focus:outline-none focus:border-[#5983FC]"
+                    />
+                    <button
+                      onClick={() => {
+                        setContradictingEvidence(contradictingEvidence.filter((_, i) => i !== index));
+                      }}
+                      className="text-[#B8C7E0] hover:text-white transition-colors"
+                    >
+                      <FaTimes />
+                    </button>
+                  </div>
+                ))}
+                <button
+                  onClick={() => setContradictingEvidence([...contradictingEvidence, ''])}
+                  className="text-[#5983FC] hover:text-[#3E60C1] text-sm flex items-center mt-2"
+                >
+                  <FaPlus className="mr-1" /> Add Evidence
+                </button>
+              </div>
+            </div>
+
+            {/* Step 3: Create Balanced Thought */}
+            <div className="bg-[#0F172A]/70 p-5 rounded-xl border border-[#2A3547]">
+              <h4 className="text-white font-medium mb-3">Step 3: Create a Balanced Thought</h4>
+              <textarea
+                value={balancedThought}
+                onChange={(e) => setBalancedThought(e.target.value)}
+                placeholder="Based on the evidence, write a more balanced thought..."
+                className="w-full bg-[#0F172A] border border-[#2A3547] rounded-lg p-3 text-[#B8C7E0] focus:outline-none focus:border-[#5983FC] min-h-[100px] mb-4"
+              />
+              <div className="space-y-2">
+                <label className="text-[#B8C7E0] text-sm">How much do you believe this balanced thought?</label>
+                <div className="flex items-center space-x-4">
+                  <input
+                    type="range"
+                    min="0"
+                    max="100"
+                    value={newBelief}
+                    onChange={(e) => setNewBelief(parseInt(e.target.value))}
+                    className="flex-1 h-2 bg-[#2A3547] rounded-lg appearance-none cursor-pointer"
+                  />
+                  <span className="text-[#B8C7E0] min-w-[3rem] text-right">{newBelief}%</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Summary */}
+            <div className="bg-[#0F172A]/70 p-5 rounded-xl border border-[#2A3547]">
+              <h4 className="text-white font-medium mb-3">Summary</h4>
+              <div className="space-y-3">
+                <div>
+                  <label className="text-[#B8C7E0] text-sm block mb-1">Original Thought</label>
+                  <p className="text-white">{anxiousThought || 'Not specified'}</p>
+                </div>
+                <div>
+                  <label className="text-[#B8C7E0] text-sm block mb-1">Supporting Evidence</label>
+                  <ul className="list-disc list-inside text-white">
+                    {supportingEvidence.map((evidence, index) => (
+                      evidence && <li key={index}>{evidence}</li>
+                    ))}
+                  </ul>
+                </div>
+                <div>
+                  <label className="text-[#B8C7E0] text-sm block mb-1">Contradicting Evidence</label>
+                  <ul className="list-disc list-inside text-white">
+                    {contradictingEvidence.map((evidence, index) => (
+                      evidence && <li key={index}>{evidence}</li>
+                    ))}
+                  </ul>
+                </div>
+                <div>
+                  <label className="text-[#B8C7E0] text-sm block mb-1">Balanced Thought</label>
+                  <p className="text-white">{balancedThought || 'Not specified'}</p>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-[#B8C7E0]">Original Belief: {thoughtBelief}%</span>
+                  <span className="text-[#B8C7E0]">New Belief: {newBelief}%</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+
       default:
         return null;
     }
   };
-  
+
   useEffect(() => {
     // Load exercise content based on the exercise properties
     const loadExerciseContent = async () => {
@@ -2056,10 +2219,10 @@ const ExerciseModal = ({ exercise, onClose }) => {
       try {
         // Determine which exercise to load based on title, type, or category
         const exerciseKey = determineExerciseKey();
-        
+
         // Set the exercise content
         setExerciseContent(exerciseContents[exerciseKey] || createDefaultExercise());
-        
+
         // Initialize checklist if needed
         if (exerciseContents[exerciseKey]?.checkItems) {
           const initialChecklist = {};
@@ -2076,31 +2239,38 @@ const ExerciseModal = ({ exercise, onClose }) => {
         setIsLoading(false);
       }
     };
-    
+
     loadExerciseContent();
   }, [exercise]);
-  
+
   // Determine which exercise content to load based on the exercise props
   const determineExerciseKey = () => {
     if (!exercise) return 'default';
-    
-    if (exercise.link === 'task-prioritization' || 
-        (exercise.type === 'task') || 
-        exercise.title === "Task Prioritization Method") {
-      return 'task-prioritization';
-    }
-    
+
     // First check if there's a direct link
     if (exercise.link && typeof exercise.link === 'string') {
+
+
+      if (exercise.link === 'task-prioritization' ||
+        (exercise.type === 'task') ||
+        exercise.title === "Task Prioritization Method") {
+        return 'task-prioritization';
+      }
+
+      // Add direct check for anxious-thought
+      if (exercise.link === 'anxious-thought') {
+        return 'anxious-thought';
+      }
+
       if (exercise.link === 'work-boundaries') {
         return 'work-boundaries';
       }
-      
+
       // Check for direct match with the link value
       if (exerciseContents[exercise.link]) {
         return exercise.link;
       }
-      
+
       // Check path segments if it's a full URL
       const pathSegments = exercise.link.split('/');
       const lastSegment = pathSegments[pathSegments.length - 1];
@@ -2108,20 +2278,20 @@ const ExerciseModal = ({ exercise, onClose }) => {
         return lastSegment;
       }
     }
-    
+
     // Next check title matches
     const titleLower = exercise.title?.toLowerCase() || '';
-    
+
     // Relationship exercises
     if (titleLower.includes('values clarification')) return 'values-clarification';
     if (titleLower.includes('appreciation expression')) return 'appreciation-expression';
     if (titleLower.includes('perspective-taking')) return 'perspective-taking';
-    
+
     // Self-esteem exercises
     if (titleLower.includes('self-compass')) return 'self-compassion';
     if (titleLower.includes('strengths inventory')) return 'strengths-inventory';
     if (titleLower.includes('inner critic')) return 'inner-critic';
-    
+
     // Grief exercises
     if (titleLower.includes('grief') || titleLower.includes('loss')) {
       if (titleLower.includes('journal')) return 'grief-journal';
@@ -2129,16 +2299,17 @@ const ExerciseModal = ({ exercise, onClose }) => {
       if (titleLower.includes('letter')) return 'grief-letter';
       return 'grief-processing';
     }
-    
+
     // Anxiety exercises
     if (titleLower.includes('anxiety') || titleLower.includes('stress')) {
       if (titleLower.includes('ground') || titleLower.includes('5-4-3-2-1')) return 'grounding';
       if (titleLower.includes('breath')) return 'breathing';
       if (titleLower.includes('worry')) return 'worry-time';
       if (titleLower.includes('muscle') || titleLower.includes('relax')) return 'muscle-relaxation';
+      if (titleLower.includes('thought') || titleLower.includes('reframing')) return 'anxious-thought';
       return 'anxiety-management';
     }
-    
+
     // Anger exercises
     if (titleLower.includes('anger')) {
       if (titleLower.includes('stop')) return 'anger-stop';
@@ -2146,7 +2317,7 @@ const ExerciseModal = ({ exercise, onClose }) => {
       if (titleLower.includes('root')) return 'anger-root-cause';
       return 'anger-management';
     }
-    
+
     // Work exercises
     if (titleLower.includes('work')) {
       if (titleLower.includes('boundar')) return 'work-boundaries';
@@ -2154,7 +2325,7 @@ const ExerciseModal = ({ exercise, onClose }) => {
       if (titleLower.includes('value')) return 'work-values';
       return 'work-stress';
     }
-    
+
     // Mindfulness exercises
     if (titleLower.includes('mindful')) {
       if (titleLower.includes('body') || titleLower.includes('scan')) return 'body-scan';
@@ -2162,55 +2333,55 @@ const ExerciseModal = ({ exercise, onClose }) => {
       if (titleLower.includes('observ')) return 'mindful-observation';
       return 'mindfulness';
     }
-    
+
     // Loneliness exercises
     if (titleLower.includes('lonel') || titleLower.includes('connect')) {
       if (titleLower.includes('inventory')) return 'connection-inventory';
       if (titleLower.includes('self-connect')) return 'self-connection';
       return 'belonging-expansion';
     }
-    
+
     // Health exercises
     if (titleLower.includes('health') || titleLower.includes('body')) {
       if (titleLower.includes('appreciation')) return 'body-appreciation';
       if (titleLower.includes('worry')) return 'health-worry';
       return 'mindful-body-scan';
     }
-    
+
     // Check type
     if (exercise.type === 'journaling' || exercise.type === 'journal') return 'journaling';
     if (exercise.type === 'meditation') return 'mindfulness';
     if (exercise.type === 'breathing') return 'breathing';
     if (exercise.type === 'grounding') return 'grounding';
     if (exercise.type === 'reflection') return 'reflection';
-    
+
     // Default
     return 'default';
   };
-  
+
   // Create a default exercise if we can't determine the specific one
   const createDefaultExercise = () => {
     return {
       title: exercise.title || "Wellness Exercise",
       description: exercise.description || "A practice to support your well-being.",
-      steps: exercise.steps 
-        ? exercise.steps.map(step => typeof step === 'string' 
-            ? { title: "Step", content: step } 
-            : step)
+      steps: exercise.steps
+        ? exercise.steps.map(step => typeof step === 'string'
+          ? { title: "Step", content: step }
+          : step)
         : [{ title: "Practice", content: "Follow the instructions provided." }],
-      tips: exercise.benefits 
-        ? ["Remember: " + exercise.benefits] 
+      tips: exercise.benefits
+        ? ["Remember: " + exercise.benefits]
         : ["Take your time with this exercise."],
       resources: exercise.resources || [],
       type: exercise.type || "general"
     };
   };
-  
+
   const handleSave = () => {
     if (journalEntry.trim()) {
       // In a real application, you would save this to your backend
       console.log("Saving journal entry:", journalEntry);
-      
+
       // For now, just show a success message
       setSaved(true);
       setTimeout(() => {
@@ -2237,112 +2408,112 @@ const ExerciseModal = ({ exercise, onClose }) => {
       [index]: !checklist[index]
     });
   };
-  
+
   // Add this function to handle value input changes
   const handleValueChange = (id, newValue) => {
-    setValuesList(valuesList.map(item => 
+    setValuesList(valuesList.map(item =>
       item.id === id ? { ...item, value: newValue } : item
     ));
   };
-  
+
   // Add these drag and drop handlers
   const handleDragStart = (e, value) => {
     setDraggedValue(value);
     e.target.style.opacity = '0.6';
   };
-  
+
   const handleDragEnd = (e) => {
     e.target.style.opacity = '1';
     setDraggedValue(null);
   };
-  
+
   const handleDragOver = (e) => {
     e.preventDefault();
   };
-  
+
   const handleDrop = (e, targetValue) => {
     e.preventDefault();
-    
+
     // Don't do anything if dropping onto the same item
     if (draggedValue.id === targetValue.id) return;
-    
+
     // Reorder the list based on the drag and drop
     const updatedList = [...valuesList];
-    
+
     // Find indexes
     const draggedIndex = updatedList.findIndex(item => item.id === draggedValue.id);
     const targetIndex = updatedList.findIndex(item => item.id === targetValue.id);
-    
+
     // Swap ranks
     const draggedRank = updatedList[draggedIndex].rank;
     updatedList[draggedIndex].rank = updatedList[targetIndex].rank;
     updatedList[targetIndex].rank = draggedRank;
-    
+
     // Sort by rank
     updatedList.sort((a, b) => a.rank - b.rank);
-    
+
     setValuesList(updatedList);
   };
-  
+
   // All exercise content definitions
-        const exerciseContents = {
-          // GRIEF EXERCISES
-          'grief-journal': {
-            title: "Grief Journaling Exercise",
-            description: "Writing about your grief can help process emotions and honor your memories.",
-            steps: [
-              {
-                title: "Prepare",
-                content: "Find a quiet space where you won't be interrupted. Take a few deep breaths to center yourself."
-              },
-              {
-                title: "Remember",
-                content: "Think of a memory with your loved one. It could be a special moment, a regular day, or something that captures their essence."
-              },
-              {
-                title: "Write",
-                content: "Write freely about this memory. What happened? What did you see, hear, or feel? What made this moment meaningful?"
-              },
-              {
-                title: "Reflect",
-                content: "How does remembering make you feel now? Notice your emotions without judgment. There's no right or wrong way to feel."
-              }
-            ],
-            prompts: [
-              "Describe a memory that brings you joy when you think of your loved one.",
-              "What qualities or traits do you miss most about them?",
-              "If you could tell them something now, what would you say?",
-              "How has your relationship with them shaped who you are today?",
-              "What traditions or activities remind you of them?"
-            ],
-            tips: [
-              "Don't worry about grammar or structure - just write from the heart.",
-              "It's okay if tears come while writing - that's a natural part of grief.",
-              "You can save your journal entries to revisit when you need to feel connected.",
-              "There's no timeline for grief. Be patient with yourself in this process."
-            ],
-            resources: [
-              {
+  const exerciseContents = {
+    // GRIEF EXERCISES
+    'grief-journal': {
+      title: "Grief Journaling Exercise",
+      description: "Writing about your grief can help process emotions and honor your memories.",
+      steps: [
+        {
+          title: "Prepare",
+          content: "Find a quiet space where you won't be interrupted. Take a few deep breaths to center yourself."
+        },
+        {
+          title: "Remember",
+          content: "Think of a memory with your loved one. It could be a special moment, a regular day, or something that captures their essence."
+        },
+        {
+          title: "Write",
+          content: "Write freely about this memory. What happened? What did you see, hear, or feel? What made this moment meaningful?"
+        },
+        {
+          title: "Reflect",
+          content: "How does remembering make you feel now? Notice your emotions without judgment. There's no right or wrong way to feel."
+        }
+      ],
+      prompts: [
+        "Describe a memory that brings you joy when you think of your loved one.",
+        "What qualities or traits do you miss most about them?",
+        "If you could tell them something now, what would you say?",
+        "How has your relationship with them shaped who you are today?",
+        "What traditions or activities remind you of them?"
+      ],
+      tips: [
+        "Don't worry about grammar or structure - just write from the heart.",
+        "It's okay if tears come while writing - that's a natural part of grief.",
+        "You can save your journal entries to revisit when you need to feel connected.",
+        "There's no timeline for grief. Be patient with yourself in this process."
+      ],
+      resources: [
+        {
           type: "article",
-                title: "What is Normal Grief? | Mayo Clinic",
-                description: "Expert information about grief processes and coping strategies",
+          title: "What is Normal Grief? | Mayo Clinic",
+          description: "Expert information about grief processes and coping strategies",
           url: "https://www.mayoclinic.org/patient-visitor-guide/support-groups/what-is-grief"
-              },
-              {
+        },
+        {
           type: "video",
-                title: "Coping with Grief and Loss | HelpGuide.org",
-                description: "Comprehensive guide to understanding and navigating grief",
+          title: "Coping with Grief and Loss | HelpGuide.org",
+          description: "Comprehensive guide to understanding and navigating grief",
           url: "https://www.helpguide.org/articles/grief/coping-with-grief-and-loss.htm"
         },
         {
           type: "website",
-                title: "What's Your Grief: 64 Journaling Prompts",
-                description: "Extensive list of journaling prompts specifically for grief",
+          title: "What's Your Grief: 64 Journaling Prompts",
+          description: "Extensive list of journaling prompts specifically for grief",
           url: "https://whatsyourgrief.com/64-journaling-prompts-for-coping-with-grief/"
-              }
-            ],
-            type: "journal"
-          },
+        }
+      ],
+      type: "journal"
+    },
     'memory-honor': {
       title: "Memory Honor Ritual",
       description: "Create a small ritual to honor what you've lost while acknowledging the need to move forward.",
@@ -2406,9 +2577,9 @@ const ExerciseModal = ({ exercise, onClose }) => {
     'grief-letter': {
       title: "Letter of Release",
       description: "Write a letter expressing unresolved feelings toward what you've lost.",
-            steps: [
-              {
-                title: "Prepare",
+      steps: [
+        {
+          title: "Prepare",
           content: "Find a quiet space and set aside 20-30 minutes of uninterrupted time. Have paper and pen ready, or open a document on your device."
         },
         {
@@ -2438,9 +2609,9 @@ const ExerciseModal = ({ exercise, onClose }) => {
         "What have I learned from this loss?",
         "How will I carry you/this forward with me?",
         "What am I ready to release now?"
-            ],
-            resources: [
-              {
+      ],
+      resources: [
+        {
           type: "article",
           title: "Writing to Heal | James Pennebaker Research",
           description: "Scientific evidence behind expressive writing for processing loss",
@@ -2501,61 +2672,61 @@ const ExerciseModal = ({ exercise, onClose }) => {
       ],
       type: "reflection"
     },
-    
+
     // ANXIETY EXERCISES
-          'grounding': {
-            title: "5-4-3-2-1 Grounding Exercise",
-            description: "A sensory awareness technique to help manage anxiety and bring you back to the present moment.",
-            steps: [
-              {
-                title: "Observe",
-                content: "Look around and identify 5 things you can SEE in the room. Say them out loud or note them mentally."
-              },
-              {
-                title: "Touch",
-                content: "Find 4 things you can TOUCH or FEEL. This could be the texture of your clothing, the surface of a table, or the feeling of the chair against your back."
-              },
-              {
-                title: "Listen",
-                content: "Focus on 3 things you can HEAR. These might be distant sounds, like birds outside, or closer sounds, like your own breathing."
-              },
-              {
-                title: "Smell",
-                content: "Notice 2 things you can SMELL. If you can't smell anything at first, move to another spot or find something with a scent, like hand lotion or a candle."
-              },
-              {
-                title: "Taste",
-                content: "Identify 1 thing you can TASTE. You might take a sip of a beverage, eat a small piece of food, or simply notice the current taste in your mouth."
-              }
-            ],
-            tips: [
-              "Take your time with each step – there's no rush.",
-              "If you're in a situation where you can't speak aloud, just note each observation silently.",
-              "For a shorter exercise, you can do a 3-2-1 version with just three senses.",
-              "Practice regularly to make this technique more effective during high-anxiety moments."
-            ],
-            resources: [
-              {
+    'grounding': {
+      title: "5-4-3-2-1 Grounding Exercise",
+      description: "A sensory awareness technique to help manage anxiety and bring you back to the present moment.",
+      steps: [
+        {
+          title: "Observe",
+          content: "Look around and identify 5 things you can SEE in the room. Say them out loud or note them mentally."
+        },
+        {
+          title: "Touch",
+          content: "Find 4 things you can TOUCH or FEEL. This could be the texture of your clothing, the surface of a table, or the feeling of the chair against your back."
+        },
+        {
+          title: "Listen",
+          content: "Focus on 3 things you can HEAR. These might be distant sounds, like birds outside, or closer sounds, like your own breathing."
+        },
+        {
+          title: "Smell",
+          content: "Notice 2 things you can SMELL. If you can't smell anything at first, move to another spot or find something with a scent, like hand lotion or a candle."
+        },
+        {
+          title: "Taste",
+          content: "Identify 1 thing you can TASTE. You might take a sip of a beverage, eat a small piece of food, or simply notice the current taste in your mouth."
+        }
+      ],
+      tips: [
+        "Take your time with each step – there's no rush.",
+        "If you're in a situation where you can't speak aloud, just note each observation silently.",
+        "For a shorter exercise, you can do a 3-2-1 version with just three senses.",
+        "Practice regularly to make this technique more effective during high-anxiety moments."
+      ],
+      resources: [
+        {
           type: "article",
-                title: "Grounding Techniques | University of Rochester Medical Center",
-                description: "Evidence-based grounding techniques from mental health experts",
+          title: "Grounding Techniques | University of Rochester Medical Center",
+          description: "Evidence-based grounding techniques from mental health experts",
           url: "https://www.urmc.rochester.edu/behavioral-health-partners/bhp-blog/april-2018/5-4-3-2-1-coping-technique-for-anxiety.aspx"
-              },
-              {
+        },
+        {
           type: "video",
-                title: "How to Ground Yourself During an Anxiety Attack | Healthline",
-                description: "Practical strategies for using grounding during high anxiety moments",
+          title: "How to Ground Yourself During an Anxiety Attack | Healthline",
+          description: "Practical strategies for using grounding during high anxiety moments",
           url: "https://www.healthline.com/health/grounding-techniques"
-              },
-              {
+        },
+        {
           type: "website",
-                title: "VA: PTSD Coach Online - Grounding Exercises",
-                description: "Collection of grounding exercises from the Veterans Administration",
+          title: "VA: PTSD Coach Online - Grounding Exercises",
+          description: "Collection of grounding exercises from the Veterans Administration",
           url: "https://www.ptsd.va.gov/apps/ptsdcoachonline/tools/index.htm"
-              }
-            ],
-            type: "sensory"
-          },
+        }
+      ],
+      type: "sensory"
+    },
     'breathing': {
       title: "4-7-8 Breathing Technique",
       description: "A calming breathing exercise to help reduce anxiety and stress.",
@@ -2654,62 +2825,62 @@ const ExerciseModal = ({ exercise, onClose }) => {
       ],
       type: "checklist"
     },
-          'muscle-relaxation': {
-            title: "Progressive Muscle Relaxation",
+    'muscle-relaxation': {
+      title: "Progressive Muscle Relaxation",
       description: "Systematically tense and release muscle groups to reduce physical tension.",
-            steps: [
-              {
-                title: "Prepare",
-                content: "Find a comfortable position sitting or lying down. Close your eyes if you feel comfortable doing so."
-              },
-              {
-                title: "Feet & Legs",
-                content: "Start with your feet and legs. Tense these muscles by pointing your toes and tightening your calves and thighs. Hold for 5 seconds, then release completely. Notice the difference between tension and relaxation."
-              },
-              {
-                title: "Abdomen & Chest",
-                content: "Move to your abdomen and chest. Tighten these muscles by taking a deep breath and holding it while clenching your stomach muscles. Hold for 5 seconds, then release, letting the breath go."
-              },
-              {
-                title: "Arms & Hands",
-                content: "Next, focus on your arms and hands. Make fists and tense your arms. Hold for 5 seconds, then release, letting your hands go limp."
-              },
-              {
-                title: "Shoulders & Neck",
-                content: "Move to your shoulders and neck. Raise your shoulders toward your ears and tighten your neck muscles. Hold for 5 seconds, then release, feeling the tension melt away."
-              },
-              {
-                title: "Face",
-                content: "Finally, tense the muscles in your face by squeezing your eyes shut and clenching your jaw. Hold for 5 seconds, then release, feeling your face soften."
-              },
-              {
-                title: "Complete Body",
-                content: "Now, become aware of your entire body. Notice any remaining tension and let it go. Feel a wave of relaxation flowing from the top of your head to the tips of your toes."
-              }
-            ],
-            resources: [
-              {
+      steps: [
+        {
+          title: "Prepare",
+          content: "Find a comfortable position sitting or lying down. Close your eyes if you feel comfortable doing so."
+        },
+        {
+          title: "Feet & Legs",
+          content: "Start with your feet and legs. Tense these muscles by pointing your toes and tightening your calves and thighs. Hold for 5 seconds, then release completely. Notice the difference between tension and relaxation."
+        },
+        {
+          title: "Abdomen & Chest",
+          content: "Move to your abdomen and chest. Tighten these muscles by taking a deep breath and holding it while clenching your stomach muscles. Hold for 5 seconds, then release, letting the breath go."
+        },
+        {
+          title: "Arms & Hands",
+          content: "Next, focus on your arms and hands. Make fists and tense your arms. Hold for 5 seconds, then release, letting your hands go limp."
+        },
+        {
+          title: "Shoulders & Neck",
+          content: "Move to your shoulders and neck. Raise your shoulders toward your ears and tighten your neck muscles. Hold for 5 seconds, then release, feeling the tension melt away."
+        },
+        {
+          title: "Face",
+          content: "Finally, tense the muscles in your face by squeezing your eyes shut and clenching your jaw. Hold for 5 seconds, then release, feeling your face soften."
+        },
+        {
+          title: "Complete Body",
+          content: "Now, become aware of your entire body. Notice any remaining tension and let it go. Feel a wave of relaxation flowing from the top of your head to the tips of your toes."
+        }
+      ],
+      resources: [
+        {
           type: "article",
-                title: "Progressive Muscle Relaxation | Anxiety Canada",
-                description: "Detailed guide with audio instructions for PMR",
+          title: "Progressive Muscle Relaxation | Anxiety Canada",
+          description: "Detailed guide with audio instructions for PMR",
           url: "https://www.anxietycanada.com/articles/how-to-do-progressive-muscle-relaxation/"
         },
         {
           type: "video",
-                title: "15-Minute Progressive Muscle Relaxation | YouTube",
-                description: "Guided video to follow along with a full PMR session",
+          title: "15-Minute Progressive Muscle Relaxation | YouTube",
+          description: "Guided video to follow along with a full PMR session",
           url: "https://www.youtube.com/watch?v=1nZEdqcGVzo"
-              }
-            ],
-            type: "physical"
-          },
-          
+        }
+      ],
+      type: "physical"
+    },
+
     // ANGER MANAGEMENT EXERCISES
     'anger-stop': {
       title: "STOP Technique for Anger",
       description: "A quick method to interrupt anger before it escalates.",
-            steps: [
-              {
+      steps: [
+        {
           title: "S - STOP",
           content: "As soon as you notice anger rising, mentally tell yourself to STOP. Pause whatever you're doing or saying."
         },
@@ -2730,8 +2901,8 @@ const ExerciseModal = ({ exercise, onClose }) => {
           content: "Take three deep breaths before responding to the situation. Breathe in for 4 counts, hold for 1, and exhale for 5."
         }
       ],
-            resources: [
-              {
+      resources: [
+        {
           type: "article",
           title: "Anger Management: 10 Tips to Tame Your Temper | Mayo Clinic",
           description: "Evidence-based approaches for managing anger from medical experts",
@@ -2787,15 +2958,15 @@ const ExerciseModal = ({ exercise, onClose }) => {
           title: "Therapeutic Letters | GoodTherapy",
           description: "Guidelines for therapeutic letter writing",
           url: "https://www.goodtherapy.org/blog/therapeutic-letter-writing-healing-through-words-0712184"
-              }
-            ],
-            type: "journal"
-          },
+        }
+      ],
+      type: "journal"
+    },
     'anger-root-cause': {
       title: "Root Cause Anger Analysis",
       description: "Identify the deeper needs and values behind your anger.",
-            steps: [
-              {
+      steps: [
+        {
           title: "Describe the Trigger",
           content: "Write down the specific situation that triggered your anger. Be objective and focus on facts rather than interpretations."
         },
@@ -2821,9 +2992,9 @@ const ExerciseModal = ({ exercise, onClose }) => {
         "How might my past experiences be influencing my reaction to this situation?",
         "What would addressing my core need look like in this situation?",
         "How might I communicate my needs effectively rather than expressing raw anger?"
-            ],
-            resources: [
-              {
+      ],
+      resources: [
+        {
           type: "article",
           title: "Understanding Anger: How Psychologists Help With Anger Problems | APA",
           description: "Professional perspective on anger and its underlying causes",
@@ -2838,13 +3009,13 @@ const ExerciseModal = ({ exercise, onClose }) => {
       ],
       type: "reflection"
     },
-    
+
     // RELATIONSHIP EXERCISES
     'perspective-taking': {
       title: "Perspective-Taking Practice",
       description: "Strengthen empathy by consciously considering another viewpoint.",
-            steps: [
-              {
+      steps: [
+        {
           title: "Identify the Situation",
           content: "Choose a specific relationship challenge or conflict you're currently experiencing. Briefly describe what happened and who was involved."
         },
@@ -2935,13 +3106,13 @@ const ExerciseModal = ({ exercise, onClose }) => {
       ],
       type: "reflection"
     },
-    
+
     // WORK EXERCISES
     'work-boundaries': {
       title: "Work Boundaries Exercise",
       description: "Establish healthy boundaries to manage work-related stress.",
-            steps: [
-              {
+      steps: [
+        {
           title: "Current Boundary Assessment",
           content: "Make two columns: 'My Work Hours' (when you're officially supposed to work) and 'When Work Actually Happens' (including early mornings, evenings, weekends). Note the discrepancies."
         },
@@ -2966,8 +3137,8 @@ const ExerciseModal = ({ exercise, onClose }) => {
           content: "Choose one boundary to implement this week. Start small with something you feel confident you can maintain."
         }
       ],
-            resources: [
-              {
+      resources: [
+        {
           type: "article",
           title: "How to Set Boundaries at Work | Harvard Business Review",
           description: "Professional strategies for establishing effective work boundaries",
@@ -2982,9 +3153,9 @@ const ExerciseModal = ({ exercise, onClose }) => {
       ],
       type: "checklist"
     },
-    
+
     // Add more exercise content definitions as needed...
-    
+
     // Default for fallback
     'default': {
       title: "Wellness Exercise",
@@ -3022,8 +3193,8 @@ const ExerciseModal = ({ exercise, onClose }) => {
     'mindful-observation': {
       title: "Mindful Observation Practice",
       description: "Develop present-moment awareness by fully focusing on a single object.",
-            steps: [
-              {
+      steps: [
+        {
           title: "Choose an Object",
           content: "Find a natural object in your environment - a flower, insect, cloud formation, or any natural element that captures your attention."
         },
@@ -3064,8 +3235,8 @@ const ExerciseModal = ({ exercise, onClose }) => {
     'body-scan': {
       title: "Body Scan Meditation",
       description: "A guided practice to develop awareness of physical sensations throughout your body.",
-            steps: [
-              {
+      steps: [
+        {
           title: "Prepare",
           content: "Find a comfortable position lying down or sitting. Close your eyes if that feels comfortable. Take several deep breaths to settle in."
         },
@@ -3095,8 +3266,8 @@ const ExerciseModal = ({ exercise, onClose }) => {
         }
       ],
       audioUrl: "https://cdn.example.com/body-scan.mp3", // Replace with actual audio URL
-            resources: [
-              {
+      resources: [
+        {
           type: "video",
           title: "Body Scan Meditation | Greater Good in Action",
           description: "Guided body scan from UC Berkeley's Greater Good Science Center",
@@ -3214,8 +3385,8 @@ const ExerciseModal = ({ exercise, onClose }) => {
     'values-based-living': {
       title: "Values-Based Wellness Planning",
       description: "Design a personalized health plan aligned with your core values and meaningful goals.",
-            steps: [
-              {
+      steps: [
+        {
           title: "Values Reflection",
           content: "Consider what matters most to you in life. Why do you want to be healthy? Is it for family, independence, adventure, contribution, learning, or something else?"
         },
@@ -3238,10 +3409,10 @@ const ExerciseModal = ({ exercise, onClose }) => {
         {
           title: "Environment Setup",
           content: "Identify one change to your physical environment that would make your new habit easier. How can you make the healthy choice the obvious choice?"
-              }
-            ],
-            resources: [
-              {
+        }
+      ],
+      resources: [
+        {
           type: "book",
           title: "Tiny Habits | BJ Fogg",
           description: "Science-based approach to behavior change using small steps",
@@ -3439,7 +3610,7 @@ const ExerciseModal = ({ exercise, onClose }) => {
         exit={{ opacity: 0 }}
         className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
       >
-        <motion.div 
+        <motion.div
           initial={{ scale: 0.9, y: 20 }}
           animate={{ scale: 1, y: 0 }}
           className="bg-[#1A2335] border border-[#3E60C1] rounded-xl p-6 max-w-xl w-full max-h-[90vh] overflow-y-auto mx-4"
@@ -3459,7 +3630,7 @@ const ExerciseModal = ({ exercise, onClose }) => {
       exit={{ opacity: 0 }}
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm"
     >
-      <motion.div 
+      <motion.div
         initial={{ scale: 0.9, y: 20, opacity: 0 }}
         animate={{ scale: 1, y: 0, opacity: 1 }}
         transition={{ type: "spring", damping: 25, stiffness: 300 }}
@@ -3468,49 +3639,49 @@ const ExerciseModal = ({ exercise, onClose }) => {
         {/* Header */}
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-xl font-bold text-white">{exerciseContent?.title || exercise.title}</h2>
-          <button 
-            onClick={onClose} 
+          <button
+            onClick={onClose}
             className="w-8 h-8 rounded-full flex items-center justify-center text-[#B8C7E0] hover:bg-[#2A3547] transition-colors"
             aria-label="Close"
           >
-              <FaTimes />
-            </button>
-          </div>
-          
+            <FaTimes />
+          </button>
+        </div>
+
         {/* Description */}
         <p className="text-[#B8C7E0] mb-4">{exerciseContent?.description || exercise.description}</p>
-        
+
         {/* Duration & Type */}
         <div className="flex items-center justify-between mb-6">
           {exercise.duration && (
             <div className="flex items-center text-[#B8C7E0] text-sm">
               <FaStopwatch className="mr-2 text-[#5983FC]" />
               {exercise.duration}
-          </div>
-        )}
+            </div>
+          )}
           {(exerciseContent?.type || exercise.type) && (
             <div className="bg-[#0F172A] px-3 py-1 rounded-full text-[#B8C7E0] text-xs font-medium">
               {(exerciseContent?.type || exercise.type).charAt(0).toUpperCase() + (exerciseContent?.type || exercise.type).slice(1)}
-          </div>
-        )}
-              </div>
-        
+            </div>
+          )}
+        </div>
+
         {/* Tabs: Steps / Resources */}
         <div className="flex border-b border-[#2A3547] mb-4">
-                <button
+          <button
             onClick={() => setShowResources(false)}
             className={`px-4 py-2 ${!showResources ? 'text-[#5983FC] border-b-2 border-[#5983FC]' : 'text-[#B8C7E0]'}`}
-                >
+          >
             Exercise
-                </button>
-                <button
+          </button>
+          <button
             onClick={() => setShowResources(true)}
             className={`px-4 py-2 ${showResources ? 'text-[#5983FC] border-b-2 border-[#5983FC]' : 'text-[#B8C7E0]'}`}
-                >
+          >
             Resources
-                </button>
-              </div>
-        
+          </button>
+        </div>
+
         {!showResources ? (
           // Exercise view
           <div className="mb-6">
@@ -3524,57 +3695,56 @@ const ExerciseModal = ({ exercise, onClose }) => {
                     </span>
                     <div className="flex-1 mx-4">
                       <div className="h-1 bg-[#0F172A] rounded-full">
-                        <div 
-                          className="h-1 bg-[#5983FC] rounded-full" 
+                        <div
+                          className="h-1 bg-[#5983FC] rounded-full"
                           style={{ width: `${((step + 1) / exerciseContent.steps.length) * 100}%` }}
                         ></div>
-              </div>
-            </div>
-          </div>
-        )}
-        
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 {/* Current step display */}
                 <div className="bg-[#0F172A] p-4 rounded-lg border border-[#2A3547] mb-4">
                   <h3 className="text-[#5983FC] text-sm font-medium mb-2">
                     {exerciseContent?.steps?.[step]?.title || `Step ${step + 1}`}
                   </h3>
                   <p className="text-white">{getCurrentStep()}</p>
-            </div>
-            
+                </div>
+
                 {/* Interactive component if applicable */}
                 {hasInteractiveComponent() && renderInteractiveComponent()}
-                
+
                 {/* Tips if available */}
                 {exerciseContent?.tips && exerciseContent.tips.length > 0 && step === exerciseContent.steps.length - 1 && (
                   <div className="mt-4 bg-[#0F172A]/70 p-3 rounded-lg border border-[#2A3547]">
                     <h4 className="text-[#5983FC] text-sm font-medium mb-2 flex items-center">
                       <FaRegLightbulb className="mr-2" /> Helpful Tips:
                     </h4>
-                  <ul className="space-y-2">
+                    <ul className="space-y-2">
                       {exerciseContent.tips.map((tip, idx) => (
                         <li key={idx} className="text-[#B8C7E0] text-sm flex items-start">
                           <span className="text-[#5983FC] mr-2">•</span>
                           <span>{tip}</span>
-                      </li>
-                    ))}
-                  </ul>
-              </div>
-            )}
-            
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
                 {/* Navigation buttons */}
                 <div className="flex justify-between mt-6">
-              <button
+                  <button
                     onClick={prevStep}
                     disabled={step === 0}
-                    className={`px-4 py-2 rounded-lg flex items-center ${
-                      step === 0 
-                        ? 'bg-[#0F172A]/50 text-[#B8C7E0]/50 cursor-not-allowed' 
+                    className={`px-4 py-2 rounded-lg flex items-center ${step === 0
+                        ? 'bg-[#0F172A]/50 text-[#B8C7E0]/50 cursor-not-allowed'
                         : 'bg-[#0F172A] text-[#B8C7E0] hover:bg-[#2A3547]'
-                    }`}
+                      }`}
                   >
                     <FaArrowLeft className="mr-2" /> Previous
-              </button>
-                  
+                  </button>
+
                   {step < (exerciseContent?.steps?.length - 1) ? (
                     <button
                       onClick={nextStep}
@@ -3589,8 +3759,8 @@ const ExerciseModal = ({ exercise, onClose }) => {
                     >
                       Complete <FaCheck className="ml-2" />
                     </button>
-            )}
-          </div>
+                  )}
+                </div>
               </>
             ) : (
               // Completion view
@@ -3602,37 +3772,37 @@ const ExerciseModal = ({ exercise, onClose }) => {
                 <p className="text-[#B8C7E0] mb-6">
                   Great job! How do you feel after completing this exercise?
                 </p>
-                
+
                 {/* Reflection prompt */}
-          <div className="mb-6">
+                <div className="mb-6">
                   <textarea
                     className="w-full h-20 bg-[#0F172A] border border-[#2A3547] rounded-lg p-3 text-[#B8C7E0] focus:outline-none focus:border-[#5983FC] mb-4"
                     placeholder="Share your thoughts on how this exercise affected you..."
                   />
-            </div>
-                
+                </div>
+
                 <button
                   onClick={onClose}
                   className="px-6 py-2 rounded-lg bg-[#3E60C1] text-white hover:bg-[#5983FC]"
                 >
                   Done
                 </button>
-          </div>
-        )}
+              </div>
+            )}
           </div>
         ) : (
           // Resources view
           <div className="mb-6">
             <h3 className="text-white font-medium mb-3">Professional Resources</h3>
-            
+
             {exerciseContent?.resources?.length > 0 || exercise.resources?.length > 0 ? (
               <div className="space-y-3">
                 {(exerciseContent?.resources || exercise.resources || []).map((resource, index) => (
-                  <a 
+                  <a
                     key={index}
                     href={resource.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="flex items-start bg-[#0F172A] p-3 rounded-lg border border-[#2A3547] hover:border-[#5983FC] transition-colors"
                   >
                     <div className="bg-[#2A3547] p-2 rounded-lg mr-3">
@@ -3653,7 +3823,7 @@ const ExerciseModal = ({ exercise, onClose }) => {
                     <FaExternalLinkAlt className="text-[#5983FC] ml-2 mt-1 flex-shrink-0" />
                   </a>
                 ))}
-            </div>
+              </div>
             ) : (
               <p className="text-[#B8C7E0] text-sm">
                 No external resources available for this exercise.
@@ -3673,27 +3843,27 @@ const TaskItem = ({ task, onDelete, onEdit, color }) => (
   <div className={`flex items-center justify-between bg-[#1A2335] p-2 rounded-lg border border-${color}-500/20`}>
     <span className="text-[#B8C7E0] text-sm">{task.text}</span>
     <div className="flex gap-2">
-              <button
+      <button
         onClick={onEdit}
         className="text-[#5983FC] hover:text-[#3E60C1] transition-colors"
-              >
+      >
         <FaEdit />
-              </button>
-            <button
+      </button>
+      <button
         onClick={onDelete}
         className="text-red-400 hover:text-red-500 transition-colors"
-              >
+      >
         <FaTrash />
-            </button>
-          </div>
+      </button>
+    </div>
   </div>
-  );
+);
 
 // Add these helper functions for the progress indicator
 const getProgressStyle = () => {
   const checkedAreas = bodyAreas.filter(a => a.checked && a.gratitude.trim());
   const progress = checkedAreas.length;
-  
+
   if (progress >= 4 && generalGratitude && selfCareIntention) {
     return 'bg-emerald-500/10 border border-emerald-500/30 text-emerald-400';
   }
@@ -3706,7 +3876,7 @@ const getProgressStyle = () => {
 const getProgressMessage = () => {
   const checkedAreas = bodyAreas.filter(a => a.checked && a.gratitude.trim());
   const progress = checkedAreas.length;
-  
+
   if (progress >= 4 && generalGratitude && selfCareIntention) {
     return "Beautiful reflection! You've created a meaningful appreciation practice.";
   }

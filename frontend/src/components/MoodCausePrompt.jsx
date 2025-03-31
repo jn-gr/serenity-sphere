@@ -920,8 +920,6 @@ const MoodCausePrompt = ({ notification, onClose }) => {
       {
         title: "Body Appreciation Practice",
         description: "A guided practice to cultivate gratitude for your body's abilities and wisdom.",
-        type: 'body-appreciation',
-        link: 'body-appreciation-link', // Updated to match the new link value
         steps: [
           "Find a comfortable position and center yourself",
           "Connect with your breath and body",
@@ -1591,7 +1589,7 @@ const MoodCausePrompt = ({ notification, onClose }) => {
       enhancedExercise.type = 'work-values';
     }
     else if (recommendation.title === "Health Worry Examination") {
-      enhancedExercise.link = 'health-worry';
+      enhancedExercise.link = 'health-worry-link';
       enhancedExercise.type = 'health-worry';
       enhancedExercise.resources = [
         {
@@ -1604,6 +1602,24 @@ const MoodCausePrompt = ({ notification, onClose }) => {
           type: "video",
           title: "Managing Health Anxiety",
           description: "Professional guidance on coping with health concerns",
+          url: "https://www.youtube.com/watch?v=example"
+        }
+      ];
+    }
+    else if (recommendation.title === "Anxious Thought Reframing") {
+      enhancedExercise.link = 'anxious-thought';
+      enhancedExercise.type = 'anxious-thought';
+      enhancedExercise.resources = [
+        {
+          type: "article",
+          title: "Cognitive Restructuring Techniques",
+          description: "Evidence-based approaches to challenging anxious thoughts",
+          url: "https://www.psychologytoday.com/us/blog/anxiety-files/201801/cognitive-restructuring-techniques"
+        },
+        {
+          type: "video",
+          title: "How to Challenge Anxious Thoughts",
+          description: "Step-by-step guide to thought reframing",
           url: "https://www.youtube.com/watch?v=example"
         }
       ];
