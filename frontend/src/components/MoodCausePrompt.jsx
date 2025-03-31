@@ -1590,6 +1590,24 @@ const MoodCausePrompt = ({ notification, onClose }) => {
       enhancedExercise.link = 'work-values-reflection';
       enhancedExercise.type = 'work-values';
     }
+    else if (recommendation.title === "Health Worry Examination") {
+      enhancedExercise.link = 'health-worry';
+      enhancedExercise.type = 'health-worry';
+      enhancedExercise.resources = [
+        {
+          type: "article",
+          title: "Understanding Health Anxiety",
+          description: "Expert insights on managing health-related worries",
+          url: "https://www.health.harvard.edu/staying-healthy/always-worried-about-your-health-you-may-be-dealing-with-health-anxiety-disorder"
+        },
+        {
+          type: "video",
+          title: "Managing Health Anxiety",
+          description: "Professional guidance on coping with health concerns",
+          url: "https://www.youtube.com/watch?v=example"
+        }
+      ];
+    }
     
     // Ensure resources are available
     if (!enhancedExercise.resources || enhancedExercise.resources.length === 0) {

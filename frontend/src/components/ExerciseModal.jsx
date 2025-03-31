@@ -69,6 +69,23 @@ const ExerciseModal = ({ exercise, onClose }) => {
   const [generalGratitude, setGeneralGratitude] = useState('');
   const [selfCareIntention, setSelfCareIntention] = useState('');
   const [breathCount, setBreathCount] = useState(0);
+  const [isBreathingComplete, setIsBreathingComplete] = useState(false);
+  const [selectedBodyParts, setSelectedBodyParts] = useState([]);
+  const [gratitudeText, setGratitudeText] = useState('');
+
+  // Health Worry Examination states
+  const [healthWorry, setHealthWorry] = useState('');
+  const [worryLevel, setWorryLevel] = useState(5);
+  const [supportingEvidence, setSupportingEvidence] = useState(['']);
+  const [contradictingEvidence, setContradictingEvidence] = useState(['']);
+  const [controlPercentage, setControlPercentage] = useState(50);
+  const [actionStep, setActionStep] = useState('');
+
+  // Mindful Body Scan states
+  const [currentBodyPart, setCurrentBodyPart] = useState(0);
+  const [bodyScanNotes, setBodyScanNotes] = useState({});
+  const [isScanning, setIsScanning] = useState(false);
+  const [scanTimer, setScanTimer] = useState(null);
 
   const timerRef = useRef(null);
   const audioRef = useRef(null);
@@ -183,7 +200,9 @@ const ExerciseModal = ({ exercise, onClose }) => {
            exerciseContent.type === 'task' ||
            exerciseContent.type === 'work-values' ||
            exerciseContent.type === 'appreciation' ||
-           exerciseContent.type === 'body-appreciation';
+           exerciseContent.type === 'body-appreciation' ||
+           exerciseContent.type === 'health-worry' ||
+           exerciseContent.type === 'body-scan';
   };
   
   // Render the appropriate interactive component based on exercise type
@@ -1736,6 +1755,289 @@ const ExerciseModal = ({ exercise, onClose }) => {
                     ? "Great job completing your work values reflection! Consider reviewing these periodically to stay aligned with your purpose."
                     : "Keep going! Reflecting on your work values helps create more meaning in your daily tasks."}
                 </p>
+              </div>
+            )}
+          </div>
+        );
+        
+      case 'health-worry':
+        return (
+          <div className="space-y-4">
+            {/* Main Worry Input */}
+            <div className="bg-[#0F172A]/70 p-4 rounded-lg border border-[#2A3547]">
+              <h3 className="text-white font-medium mb-2">Health Concern</h3>
+              <textarea
+                value={healthWorry}
+                onChange={(e) => setHealthWorry(e.target.value)}
+                placeholder="Describe your specific health concern in detail..."
+                className="w-full bg-[#1E293B] border border-[#3E60C1]/30 rounded-lg p-3 text-white focus:outline-none focus:border-[#5983FC]"
+                rows="3"
+              />
+            </div>
+
+            {/* Worry Level */}
+            <div className="bg-[#0F172A]/70 p-4 rounded-lg border border-[#2A3547]">
+              <h3 className="text-white font-medium mb-2">Worry Level (1-10)</h3>
+              <div className="flex items-center space-x-4">
+                <input
+                  type="range"
+                  min="1"
+                  max="10"
+                  value={worryLevel}
+                  onChange={(e) => setWorryLevel(e.target.value)}
+                  className="flex-1 h-2 bg-gradient-to-r from-emerald-500 via-amber-500 to-red-500 rounded-lg appearance-none cursor-pointer"
+                />
+                <span className="text-white font-medium w-8">{worryLevel}</span>
+              </div>
+            </div>
+
+            {/* Supporting Evidence */}
+            <div className="bg-[#0F172A]/70 p-4 rounded-lg border border-[#2A3547]">
+              <h3 className="text-white font-medium mb-2">Evidence Supporting This Worry</h3>
+              <div className="space-y-2">
+                {supportingEvidence.map((evidence, index) => (
+                  <div key={index} className="flex items-center space-x-2">
+                    <input
+                      type="text"
+                      value={evidence}
+                      onChange={(e) => {
+                        const newEvidence = [...supportingEvidence];
+                        newEvidence[index] = e.target.value;
+                        setSupportingEvidence(newEvidence);
+                      }}
+                      placeholder="Enter evidence..."
+                      className="flex-1 bg-[#1E293B] border border-[#3E60C1]/30 rounded-lg p-2 text-white text-sm focus:outline-none focus:border-[#5983FC]"
+                    />
+                    <button
+                      onClick={() => {
+                        const newEvidence = supportingEvidence.filter((_, i) => i !== index);
+                        setSupportingEvidence(newEvidence);
+                      }}
+                      className="text-red-400 hover:text-red-300 p-2"
+                    >
+                      <FaTimes />
+                    </button>
+                  </div>
+                ))}
+                {supportingEvidence.length < 5 && (
+                  <button
+                    onClick={() => setSupportingEvidence([...supportingEvidence, ''])}
+                    className="text-[#5983FC] hover:text-[#3E60C1] text-sm flex items-center"
+                  >
+                    <FaPlus className="mr-1" /> Add Evidence
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* Contradicting Evidence */}
+            <div className="bg-[#0F172A]/70 p-4 rounded-lg border border-[#2A3547]">
+              <h3 className="text-white font-medium mb-2">Evidence That Contradicts This Worry</h3>
+              <div className="space-y-2">
+                {contradictingEvidence.map((evidence, index) => (
+                  <div key={index} className="flex items-center space-x-2">
+                    <input
+                      type="text"
+                      value={evidence}
+                      onChange={(e) => {
+                        const newEvidence = [...contradictingEvidence];
+                        newEvidence[index] = e.target.value;
+                        setContradictingEvidence(newEvidence);
+                      }}
+                      placeholder="Enter contradicting evidence..."
+                      className="flex-1 bg-[#1E293B] border border-[#3E60C1]/30 rounded-lg p-2 text-white text-sm focus:outline-none focus:border-[#5983FC]"
+                    />
+                    <button
+                      onClick={() => {
+                        const newEvidence = contradictingEvidence.filter((_, i) => i !== index);
+                        setContradictingEvidence(newEvidence);
+                      }}
+                      className="text-red-400 hover:text-red-300 p-2"
+                    >
+                      <FaTimes />
+                    </button>
+                  </div>
+                ))}
+                {contradictingEvidence.length < 5 && (
+                  <button
+                    onClick={() => setContradictingEvidence([...contradictingEvidence, ''])}
+                    className="text-[#5983FC] hover:text-[#3E60C1] text-sm flex items-center"
+                  >
+                    <FaPlus className="mr-1" /> Add Evidence
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* Control Assessment */}
+            <div className="bg-[#0F172A]/70 p-4 rounded-lg border border-[#2A3547]">
+              <h3 className="text-white font-medium mb-2">Control Assessment</h3>
+              <div className="space-y-4">
+                <div>
+                  <label className="text-[#B8C7E0] text-sm block mb-2">
+                    What percentage of this worry is within your control?
+                  </label>
+                  <div className="flex items-center space-x-4">
+                    <input
+                      type="range"
+                      min="0"
+                      max="100"
+                      value={controlPercentage}
+                      onChange={(e) => setControlPercentage(e.target.value)}
+                      className="flex-1 h-2 bg-gradient-to-r from-red-500 via-amber-500 to-emerald-500 rounded-lg appearance-none cursor-pointer"
+                    />
+                    <span className="text-white font-medium w-12">{controlPercentage}%</span>
+                  </div>
+                </div>
+                <div>
+                  <label className="text-[#B8C7E0] text-sm block mb-2">
+                    Action step for the controllable aspect:
+                  </label>
+                  <textarea
+                    value={actionStep}
+                    onChange={(e) => setActionStep(e.target.value)}
+                    placeholder="What specific action can you take to address the controllable part of this worry?"
+                    className="w-full bg-[#1E293B] border border-[#3E60C1]/30 rounded-lg p-3 text-white focus:outline-none focus:border-[#5983FC]"
+                    rows="2"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Summary Section */}
+            {(healthWorry || supportingEvidence.some(e => e) || contradictingEvidence.some(e => e)) && (
+              <div className="bg-[#0F172A]/70 p-4 rounded-lg border border-[#2A3547]">
+                <h3 className="text-white font-medium mb-3">Reflection Summary</h3>
+                <div className="space-y-2 text-sm text-[#B8C7E0]">
+                  <p>• Your worry level is {worryLevel}/10</p>
+                  <p>• You identified {supportingEvidence.filter(e => e).length} supporting factors and {contradictingEvidence.filter(e => e).length} contradicting factors</p>
+                  <p>• {controlPercentage}% of this concern appears to be within your control</p>
+                  {actionStep && <p>• You have a specific action plan to address the controllable aspects</p>}
+                </div>
+              </div>
+            )}
+          </div>
+        );
+        
+      case 'body-scan':
+        return (
+          <div className="space-y-4">
+            {/* Introduction */}
+            <div className="bg-[#0F172A]/70 p-4 rounded-lg border border-[#2A3547]">
+              <h3 className="text-white font-medium mb-2">Mindful Body Scan</h3>
+              <p className="text-[#B8C7E0] text-sm mb-4">
+                Take a moment to systematically bring awareness to each part of your body. Notice sensations without judgment.
+              </p>
+              {!isScanning && (
+                <button
+                  onClick={() => {
+                    setIsScanning(true);
+                    setCurrentBodyPart(0);
+                    setBodyScanNotes({});
+                  }}
+                  className="w-full py-2 bg-[#3E60C1] text-white rounded-lg hover:bg-[#3E60C1]/90 transition-colors"
+                >
+                  Begin Body Scan
+                </button>
+              )}
+            </div>
+
+            {/* Body Scan Progress */}
+            {isScanning && (
+              <div className="bg-[#0F172A]/70 p-4 rounded-lg border border-[#2A3547]">
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="text-white font-medium">Current Focus</h3>
+                  <span className="text-[#B8C7E0] text-sm">
+                    {currentBodyPart + 1} of {bodyParts.length}
+                  </span>
+                </div>
+                
+                <div className="relative h-2 bg-[#1E293B] rounded-full mb-4">
+                  <div 
+                    className="absolute h-full bg-[#3E60C1] rounded-full transition-all duration-500"
+                    style={{ width: `${((currentBodyPart + 1) / bodyParts.length) * 100}%` }}
+                  />
+                </div>
+
+                <div className="text-center mb-6">
+                  <h4 className="text-xl font-medium text-white mb-2">
+                    {bodyParts[currentBodyPart].name}
+                  </h4>
+                  <p className="text-[#B8C7E0] text-sm">
+                    {bodyParts[currentBodyPart].prompt}
+                  </p>
+                </div>
+
+                {/* Notes Section */}
+                <div className="mb-4">
+                  <textarea
+                    value={bodyScanNotes[currentBodyPart] || ''}
+                    onChange={(e) => {
+                      setBodyScanNotes(prev => ({
+                        ...prev,
+                        [currentBodyPart]: e.target.value
+                      }));
+                    }}
+                    placeholder="Note any sensations, tension, or observations..."
+                    className="w-full bg-[#1E293B] border border-[#3E60C1]/30 rounded-lg p-3 text-white focus:outline-none focus:border-[#5983FC]"
+                    rows="3"
+                  />
+                </div>
+
+                {/* Navigation Controls */}
+                <div className="flex justify-between">
+                  <button
+                    onClick={() => {
+                      if (currentBodyPart > 0) {
+                        setCurrentBodyPart(prev => prev - 1);
+                      } else {
+                        setIsScanning(false);
+                      }
+                    }}
+                    className="px-4 py-2 text-[#B8C7E0] hover:text-white transition-colors"
+                  >
+                    {currentBodyPart === 0 ? 'End Scan' : 'Previous'}
+                  </button>
+                  <button
+                    onClick={() => {
+                      if (currentBodyPart < bodyParts.length - 1) {
+                        setCurrentBodyPart(prev => prev + 1);
+                      } else {
+                        setIsScanning(false);
+                      }
+                    }}
+                    className="px-4 py-2 bg-[#3E60C1] text-white rounded-lg hover:bg-[#3E60C1]/90 transition-colors"
+                  >
+                    {currentBodyPart === bodyParts.length - 1 ? 'Complete' : 'Next'}
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Summary Section */}
+            {!isScanning && Object.keys(bodyScanNotes).length > 0 && (
+              <div className="bg-[#0F172A]/70 p-4 rounded-lg border border-[#2A3547]">
+                <h3 className="text-white font-medium mb-3">Body Scan Summary</h3>
+                <div className="space-y-3">
+                  {Object.entries(bodyScanNotes).map(([index, note]) => (
+                    <div key={index} className="bg-[#1E293B] p-3 rounded-lg">
+                      <h4 className="text-white font-medium mb-1">
+                        {bodyParts[parseInt(index)].name}
+                      </h4>
+                      <p className="text-[#B8C7E0] text-sm">{note}</p>
+                    </div>
+                  ))}
+                </div>
+                <button
+                  onClick={() => {
+                    setCurrentBodyPart(0);
+                    setBodyScanNotes({});
+                    setIsScanning(true);
+                  }}
+                  className="mt-4 w-full py-2 bg-[#3E60C1] text-white rounded-lg hover:bg-[#3E60C1]/90 transition-colors"
+                >
+                  Start New Scan
+                </button>
               </div>
             )}
           </div>
