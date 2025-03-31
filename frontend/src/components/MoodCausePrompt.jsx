@@ -899,34 +899,17 @@ const MoodCausePrompt = ({ notification, onClose }) => {
           "Create a focused plan for your top 3 priorities"
         ],
         duration: "15-20 minutes",
-        benefits: "Reduces overwhelm, improves focus, aligns efforts with priorities",
-        type: "task",
-        link: "task-prioritization",
-        resources: [
-          {
-            type: "article",
-            title: "The Eisenhower Matrix: Time & Priority Management",
-            description: "Learn about effective task prioritization using the Eisenhower Matrix",
-            url: "https://www.eisenhower.me/eisenhower-matrix/"
-          },
-          {
-            type: "video",
-            title: "How to Prioritize Tasks Effectively",
-            description: "Practical guide to task management and prioritization",
-            url: "https://www.youtube.com/watch?v=czh3X0VgkuY"
-          }
-        ]
+        benefits: "Reduces overwhelm, improves focus, aligns efforts with priorities"
       },
       {
-        title: "Values-Based Work Reflection",
+        title: "Values Based Work Reflection",
         description: "Reconnect your daily work with deeper meaning and purpose.",
         steps: [
           "List 3-5 core values that matter to you in your work",
           "Rate how well your current role aligns with each value (1-10)",
           "For each value, identify one aspect of your work that honors it",
           "Note one way you could bring more meaning to daily tasks",
-          "Create a personal mission statement for your work",
-          "Post it where you'll see it during your workday"
+          "Create a personal mission statement for your work"
         ],
         duration: "20-30 minutes",
         benefits: "Increases engagement and satisfaction, clarifies purpose"
@@ -936,16 +919,32 @@ const MoodCausePrompt = ({ notification, onClose }) => {
     'health': [
       {
         title: "Body Appreciation Practice",
-        description: "Shift focus from health concerns to gratitude for your body's capacities.",
+        description: "A guided practice to cultivate gratitude for your body's abilities and wisdom.",
+        type: 'body-appreciation',
+        link: 'body-appreciation',
         steps: [
-          "Find a comfortable position and take three deep breaths",
-          "Scan your body from head to toe, noting what's working well",
-          "Identify 5 things your body did for you today",
-          "Express gratitude to specific body parts (e.g., 'Thank you, legs, for carrying me today')",
-          "Set one small intention to honor your body today"
+          "Find a comfortable position and center yourself",
+          "Connect with your breath and body",
+          "Explore areas of gratitude",
+          "Set intentions for self-care",
+          "Complete your reflection"
         ],
-        duration: "10 minutes",
-        benefits: "Counters health anxiety, promotes positive body relationship"
+        duration: "10-15 minutes",
+        benefits: "Builds positive body image, reduces health anxiety, increases self-compassion",
+        resources: [
+          {
+            type: "article",
+            title: "The Science of Body Appreciation",
+            description: "Research on body gratitude and well-being",
+            url: "https://www.sciencedirect.com/science/article/abs/pii/S1740144517302450"
+          },
+          {
+            type: "video",
+            title: "Guided Body Appreciation Meditation",
+            description: "Expert-led meditation for body gratitude",
+            url: "https://www.youtube.com/watch?v=_EjisXtMy_Y"
+          }
+        ]
       },
       {
         title: "Health Worry Examination",
@@ -1598,6 +1597,10 @@ const MoodCausePrompt = ({ notification, onClose }) => {
           url: "https://www.youtube.com/watch?v=czh3X0VgkuY"
         }
       ];
+    }
+    else if (recommendation.title === "Values Based Work Reflection") {
+      enhancedExercise.link = 'work-values-reflection';
+      enhancedExercise.type = 'work-values';
     }
     
     // Ensure resources are available
