@@ -91,6 +91,14 @@ const ExerciseModal = ({ exercise, onClose }) => {
   const [isScanning, setIsScanning] = useState(false);
   const [scanTimer, setScanTimer] = useState(null);
 
+  // Loss Processing Exercise states
+  const [lossDescription, setLossDescription] = useState('');
+  const [tangibleLosses, setTangibleLosses] = useState(['']);
+  const [intangibleLosses, setIntangibleLosses] = useState(['']);
+  const [missedMost, setMissedMost] = useState('');
+  const [remainingStrengths, setRemainingStrengths] = useState(['']);
+  const [adaptationStep, setAdaptationStep] = useState('');
+
   const timerRef = useRef(null);
   const audioRef = useRef(null);
 
@@ -188,26 +196,27 @@ const ExerciseModal = ({ exercise, onClose }) => {
   // Determine if this exercise has an interactive component
   const hasInteractiveComponent = () => {
     if (!exerciseContent) return false;
-
-    return exerciseContent.type === 'journal' ||
-      exerciseContent.type === 'journaling' ||
-      exerciseContent.type === 'appreciation' ||
-      exerciseContent.type === 'meditation' ||
-      exerciseContent.type === 'breathing' ||
-      exerciseContent.type === 'reflection' ||
-      exerciseContent.type === 'checklist' ||
-      exerciseContent.type === 'sensory' ||
-      exerciseContent.type === 'coping' ||
-      exerciseContent.type === 'physical' ||
-      exerciseContent.type === 'relationship' ||
-      exerciseContent.type === 'work' ||
-      exerciseContent.type === 'task' ||
-      exerciseContent.type === 'work-values' ||
-      exerciseContent.type === 'appreciation' ||
-      exerciseContent.type === 'body-appreciation' ||
-      exerciseContent.type === 'health-worry' ||
-      exerciseContent.type === 'body-scan' ||
-      exerciseContent.type === 'anxious-thought';
+    
+    return exerciseContent.type === 'journal' || 
+           exerciseContent.type === 'journaling' ||
+           exerciseContent.type === 'appreciation' ||
+           exerciseContent.type === 'meditation' || 
+           exerciseContent.type === 'breathing' ||
+           exerciseContent.type === 'reflection' ||
+           exerciseContent.type === 'checklist' ||
+           exerciseContent.type === 'sensory' ||
+           exerciseContent.type === 'coping' ||
+           exerciseContent.type === 'physical' ||
+           exerciseContent.type === 'relationship' ||
+           exerciseContent.type === 'work' ||
+           exerciseContent.type === 'task' ||
+           exerciseContent.type === 'work-values' ||
+           exerciseContent.type === 'appreciation' ||
+           exerciseContent.type === 'body-appreciation' ||
+           exerciseContent.type === 'health-worry' ||
+           exerciseContent.type === 'body-scan' ||
+           exerciseContent.type === 'anxious-thought' ||
+           exerciseContent.type === 'loss-processing';
   };
 
   // Render the appropriate interactive component based on exercise type
@@ -2202,6 +2211,161 @@ const ExerciseModal = ({ exercise, onClose }) => {
                   <span className="text-[#B8C7E0]">New Belief: {newBelief}%</span>
                 </div>
               </div>
+            </div>
+          </div>
+        );
+
+      case 'loss-processing':
+        return (
+          <div className="mt-4 space-y-6">
+            {/* Loss Description Section */}
+            <div className="space-y-3">
+              <h4 className="text-white text-sm font-medium">Describe Your Loss</h4>
+              <textarea
+                value={lossDescription}
+                onChange={(e) => setLossDescription(e.target.value)}
+                placeholder="Take a moment to write about the loss you're experiencing..."
+                className="w-full h-32 bg-[#0F172A] border border-[#2A3547] rounded-lg p-3 text-[#B8C7E0] focus:outline-none focus:border-[#5983FC]"
+              />
+            </div>
+
+            {/* Tangible & Intangible Losses Section */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Tangible Losses */}
+              <div className="space-y-3">
+                <h4 className="text-white text-sm font-medium">Tangible Losses</h4>
+                {tangibleLosses.map((loss, index) => (
+                  <div key={index} className="flex gap-2">
+                    <input
+                      type="text"
+                      value={loss}
+                      onChange={(e) => {
+                        const newLosses = [...tangibleLosses];
+                        newLosses[index] = e.target.value;
+                        setTangibleLosses(newLosses);
+                      }}
+                      placeholder="e.g., Physical items, opportunities..."
+                      className="flex-1 bg-[#0F172A] border border-[#2A3547] rounded-lg p-2 text-[#B8C7E0] focus:outline-none focus:border-[#5983FC]"
+                    />
+                    <button
+                      onClick={() => {
+                        if (tangibleLosses.length === 1) {
+                          setTangibleLosses(['']);
+                        } else {
+                          setTangibleLosses(tangibleLosses.filter((_, i) => i !== index));
+                        }
+                      }}
+                      className="p-2 text-[#B8C7E0] hover:text-white"
+                    >
+                      <FaTrash size={14} />
+                    </button>
+                  </div>
+                ))}
+                <button
+                  onClick={() => setTangibleLosses([...tangibleLosses, ''])}
+                  className="text-[#5983FC] hover:text-[#3E60C1] text-sm flex items-center"
+                >
+                  <FaPlus className="mr-1" /> Add another
+                </button>
+              </div>
+
+              {/* Intangible Losses */}
+              <div className="space-y-3">
+                <h4 className="text-white text-sm font-medium">Intangible Losses</h4>
+                {intangibleLosses.map((loss, index) => (
+                  <div key={index} className="flex gap-2">
+                    <input
+                      type="text"
+                      value={loss}
+                      onChange={(e) => {
+                        const newLosses = [...intangibleLosses];
+                        newLosses[index] = e.target.value;
+                        setIntangibleLosses(newLosses);
+                      }}
+                      placeholder="e.g., Feelings, connections..."
+                      className="flex-1 bg-[#0F172A] border border-[#2A3547] rounded-lg p-2 text-[#B8C7E0] focus:outline-none focus:border-[#5983FC]"
+                    />
+                    <button
+                      onClick={() => {
+                        if (intangibleLosses.length === 1) {
+                          setIntangibleLosses(['']);
+                        } else {
+                          setIntangibleLosses(intangibleLosses.filter((_, i) => i !== index));
+                        }
+                      }}
+                      className="p-2 text-[#B8C7E0] hover:text-white"
+                    >
+                      <FaTrash size={14} />
+                    </button>
+                  </div>
+                ))}
+                <button
+                  onClick={() => setIntangibleLosses([...intangibleLosses, ''])}
+                  className="text-[#5983FC] hover:text-[#3E60C1] text-sm flex items-center"
+                >
+                  <FaPlus className="mr-1" /> Add another
+                </button>
+              </div>
+            </div>
+
+            {/* What You Miss Most Section */}
+            <div className="space-y-3">
+              <h4 className="text-white text-sm font-medium">What You Miss Most</h4>
+              <textarea
+                value={missedMost}
+                onChange={(e) => setMissedMost(e.target.value)}
+                placeholder="Describe what you miss most and why..."
+                className="w-full h-24 bg-[#0F172A] border border-[#2A3547] rounded-lg p-3 text-[#B8C7E0] focus:outline-none focus:border-[#5983FC]"
+              />
+            </div>
+
+            {/* Remaining Strengths Section */}
+            <div className="space-y-3">
+              <h4 className="text-white text-sm font-medium">What Remains</h4>
+              {remainingStrengths.map((strength, index) => (
+                <div key={index} className="flex gap-2">
+                  <input
+                    type="text"
+                    value={strength}
+                    onChange={(e) => {
+                      const newStrengths = [...remainingStrengths];
+                      newStrengths[index] = e.target.value;
+                      setRemainingStrengths(newStrengths);
+                    }}
+                    placeholder="List strengths, resources, or support that remains..."
+                    className="flex-1 bg-[#0F172A] border border-[#2A3547] rounded-lg p-2 text-[#B8C7E0] focus:outline-none focus:border-[#5983FC]"
+                  />
+                  <button
+                    onClick={() => {
+                      if (remainingStrengths.length === 1) {
+                        setRemainingStrengths(['']);
+                      } else {
+                        setRemainingStrengths(remainingStrengths.filter((_, i) => i !== index));
+                      }
+                    }}
+                    className="p-2 text-[#B8C7E0] hover:text-white"
+                  >
+                    <FaTrash size={14} />
+                  </button>
+                </div>
+              ))}
+              <button
+                onClick={() => setRemainingStrengths([...remainingStrengths, ''])}
+                className="text-[#5983FC] hover:text-[#3E60C1] text-sm flex items-center"
+              >
+                <FaPlus className="mr-1" /> Add another
+              </button>
+            </div>
+
+            {/* Adaptation Step Section */}
+            <div className="space-y-3">
+              <h4 className="text-white text-sm font-medium">Moving Forward</h4>
+              <textarea
+                value={adaptationStep}
+                onChange={(e) => setAdaptationStep(e.target.value)}
+                placeholder="Write one small step you can take toward adaptation..."
+                className="w-full h-24 bg-[#0F172A] border border-[#2A3547] rounded-lg p-3 text-[#B8C7E0] focus:outline-none focus:border-[#5983FC]"
+              />
             </div>
           </div>
         );

@@ -1624,6 +1624,24 @@ const MoodCausePrompt = ({ notification, onClose }) => {
         }
       ];
     }
+    else if (recommendation.title === "Loss Processing Exercise") {
+      enhancedExercise.link = 'loss-processing';
+      enhancedExercise.type = 'loss-processing';
+      enhancedExercise.resources = [
+        {
+          type: "article",
+          title: "Understanding Grief and Loss",
+          description: "Expert insights on processing different types of loss",
+          url: "https://www.psychologytoday.com/us/basics/grief"
+        },
+        {
+          type: "video",
+          title: "Coping with Loss",
+          description: "Professional guidance on navigating the journey of loss",
+          url: "https://www.youtube.com/watch?v=example"
+        }
+      ];
+    }
     
     // Ensure resources are available
     if (!enhancedExercise.resources || enhancedExercise.resources.length === 0) {
