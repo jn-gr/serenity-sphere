@@ -921,7 +921,7 @@ const MoodCausePrompt = ({ notification, onClose }) => {
         title: "Body Appreciation Practice",
         description: "A guided practice to cultivate gratitude for your body's abilities and wisdom.",
         type: 'body-appreciation',
-        link: 'body-appreciation',
+        link: 'body-appreciation-link', // Updated to match the new link value
         steps: [
           "Find a comfortable position and center yourself",
           "Connect with your breath and body",
@@ -931,20 +931,6 @@ const MoodCausePrompt = ({ notification, onClose }) => {
         ],
         duration: "10-15 minutes",
         benefits: "Builds positive body image, reduces health anxiety, increases self-compassion",
-        resources: [
-          {
-            type: "article",
-            title: "The Science of Body Appreciation",
-            description: "Research on body gratitude and well-being",
-            url: "https://www.sciencedirect.com/science/article/abs/pii/S1740144517302450"
-          },
-          {
-            type: "video",
-            title: "Guided Body Appreciation Meditation",
-            description: "Expert-led meditation for body gratitude",
-            url: "https://www.youtube.com/watch?v=_EjisXtMy_Y"
-          }
-        ]
       },
       {
         title: "Health Worry Examination",
@@ -1567,36 +1553,38 @@ const MoodCausePrompt = ({ notification, onClose }) => {
     }
     else if (recommendation.title === "Appreciation Expression") {
       enhancedExercise.link = 'appreciation-expression';
-      enhancedExercise.type = 'appreciation'; // <-- Changed from 'journaling' to 'appreciation'
+      enhancedExercise.type = 'appreciation';
+    }
+    // Add this specific case for Body Appreciation Practice
+    else if (recommendation.title === "Body Appreciation Practice") {
+      enhancedExercise.link = 'body-appreciation-link';
+      enhancedExercise.type = 'body-appreciation';
+      enhancedExercise.resources = [
+        {
+          type: "article",
+          title: "The Power of Body Gratitude",
+          description: "Research on body appreciation and well-being",
+          url: "https://www.psychologytoday.com/us/blog/beauty-sick/201904/what-is-body-appreciation"
+        },
+        {
+          type: "video",
+          title: "Guided Body Appreciation Practice",
+          description: "Expert-led body gratitude meditation",
+          url: "https://www.youtube.com/watch?v=example"
+        }
+      ];
     }
     else if (recommendation.title === "Perspective-Taking Practice") {
       enhancedExercise.link = 'perspective-taking';
       enhancedExercise.type = 'reflection';
     }
-    // In the handleRecommendationClick function
-    // Add specific handling for Work Boundaries Exercise
     else if (recommendation.title === "Work Boundaries Exercise") {
       enhancedExercise.link = 'work-boundaries';
       enhancedExercise.type = 'work';
     }
-    // In the handleRecommendationClick function, add this case
     else if (recommendation.title === "Task Prioritization Method") {
       enhancedExercise.link = 'task-prioritization';
       enhancedExercise.type = 'task';
-      enhancedExercise.resources = [
-        {
-          type: "article",
-          title: "The Eisenhower Matrix: Time & Priority Management",
-          description: "Learn about effective task prioritization using the Eisenhower Matrix",
-          url: "https://www.eisenhower.me/eisenhower-matrix/"
-        },
-        {
-          type: "video",
-          title: "How to Prioritize Tasks Effectively",
-          description: "Practical guide to task management and prioritization",
-          url: "https://www.youtube.com/watch?v=czh3X0VgkuY"
-        }
-      ];
     }
     else if (recommendation.title === "Values Based Work Reflection") {
       enhancedExercise.link = 'work-values-reflection';
