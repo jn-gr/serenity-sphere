@@ -1066,6 +1066,20 @@ const MoodCausePrompt = ({ notification, onClose }) => {
         benefits: "Reduces anxiety about unknowns, builds tolerance for ambiguity"
       },
       {
+        title: "Future Possibilities Visualization",
+        description: "Reduce uncertainty anxiety by exploring potential outcomes.",
+        steps: [
+          "Choose a situation with an uncertain outcome",
+          "Visualize three different possible scenarios (positive, neutral, challenging)",
+          "For each scenario, imagine how you would cope effectively",
+          "Note resources and strengths available to help you navigate each outcome",
+          "Recognize your capacity to handle different possibilities",
+          "Bring awareness back to the present moment"
+        ],
+        duration: "15 minutes",
+        benefits: "Builds confidence in coping abilities, reduces fear of unknown"
+      },
+      {
         title: "Anchoring in the Present",
         description: "Ground yourself in the present when uncertain futures create anxiety.",
         steps: [

@@ -1,16 +1,14 @@
 import { useTheme } from '../../context/ThemeContext'
+import '../../styles/components/_theme-toggle.css'
+
 import { FaSun, FaMoon } from 'react-icons/fa'
 
 const ThemeToggle = () => {
   const { isDark, toggleTheme } = useTheme()
 
   return (
-    <button
-      onClick={toggleTheme}
-      className="p-2 rounded-lg bg-[#2A3547] hover:bg-[#3A4557] text-[#B8C7E0] transition-colors"
-      aria-label="Toggle Theme"
-    >
-      {isDark ? <FaSun size={18} /> : <FaMoon size={18} />}
+    <button onClick={toggleTheme} className="theme-toggle-button" aria-label="Toggle Theme">
+      {isDark ? <FaSun size={20} /> : <FaMoon size={20} />}
     </button>
   )
 }

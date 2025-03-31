@@ -11,12 +11,12 @@ const Layout = ({ children }) => {
     <div className="min-h-screen bg-[#0F172A]">
       <Navbar onHoverChange={setIsNavExpanded} />
       <motion.main
-        className="min-h-screen transition-colors"
+        className="min-h-screen transition-all duration-200 ease-in-out"
         animate={{
           marginLeft: isAuthenticated ? (isNavExpanded ? '16rem' : '5rem') : '0',
-          width: isAuthenticated ? `calc(100% - ${isNavExpanded ? '16rem' : '5rem'})` : '100%'
+          width: isAuthenticated ? (isNavExpanded ? 'calc(100% - 16rem)' : 'calc(100% - 5rem)') : '100%'
         }}
-        transition={{ duration: 0.2, ease: 'easeInOut' }}
+        transition={{ duration: 0.2 }}
       >
         {children}
       </motion.main>
