@@ -2,8 +2,6 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { logout, resetState } from '../../features/auth/authSlice';
-import ThemeToggle from './ThemeToggle';
-import '../../styles/components/_navbar.css';
 import api from '../../services/api';
 import { FaSignOutAlt, FaBook, FaSignInAlt, FaHome, FaUser, FaChartLine } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -24,7 +22,6 @@ const Navbar = ({ onHoverChange }) => {
     }
   };
 
-  // Don't render the sidebar at all for unauthenticated users
   if (!isAuthenticated) {
     return (
       <nav className="fixed top-0 left-0 right-0 bg-[#1A2335] border-b border-[#2A3547] z-50">
@@ -51,7 +48,6 @@ const Navbar = ({ onHoverChange }) => {
     );
   }
 
-  // Render sidebar for authenticated users
   return (
     <motion.nav 
       className="fixed left-0 top-0 h-screen bg-[#1A2335] border-r border-[#2A3547] flex flex-col p-6 group z-50"
@@ -59,9 +55,9 @@ const Navbar = ({ onHoverChange }) => {
       whileHover={{ width: '16rem' }}
       onHoverStart={() => onHoverChange?.(true)}
       onHoverEnd={() => onHoverChange?.(false)}
-      transition={{ duration: 0.2 }}
+      transition={{ duration: 0.2, ease: 'easeInOut' }}
     >
-      <div className="mb-10 flex items-center">
+      <div className="mb-10">
         <span className="text-2xl font-bold bg-gradient-to-r from-[#5983FC] to-[#3E60C1] bg-clip-text text-transparent whitespace-nowrap overflow-hidden">
           <span className="inline-block group-hover:opacity-100 opacity-0 transition-opacity duration-200">
             Serenity Sphere
@@ -119,7 +115,7 @@ const Navbar = ({ onHoverChange }) => {
       <div className="border-t border-[#2A3547] pt-6">
         <button
           onClick={handleLogout}
-          className="w-full flex items-center space-x-3 p-3 rounded-xl hover:bg-[#2A3547] text-[#B8C7E0]"
+          className="w-full flex items-center space-x-3 p-3 rounded-xl hover:bg-[#2A3547] text-[#B8C7E0] transition-colors"
         >
           <FaSignOutAlt size={20} className="flex-shrink-0" />
           <span className="group-hover:opacity-100 opacity-0 transition-opacity duration-200 whitespace-nowrap">
