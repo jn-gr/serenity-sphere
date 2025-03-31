@@ -1642,6 +1642,24 @@ const MoodCausePrompt = ({ notification, onClose }) => {
         }
       ];
     }
+    else if (recommendation.title === "Meaning-Making Practice") {
+      enhancedExercise.link = 'meaning-making';
+      enhancedExercise.type = 'meaning-making';
+      enhancedExercise.resources = [
+        {
+          type: "article",
+          title: "Finding Meaning in Difficult Experiences",
+          description: "Research on post-traumatic growth and meaning-making",
+          url: "https://www.psychologytoday.com/us/blog/what-doesnt-kill-us/201901/finding-meaning-in-adversity"
+        },
+        {
+          type: "video",
+          title: "The Power of Meaning",
+          description: "Expert insights on meaning-making and resilience",
+          url: "https://www.youtube.com/watch?v=example"
+        }
+      ];
+    }
     
     // Ensure resources are available
     if (!enhancedExercise.resources || enhancedExercise.resources.length === 0) {

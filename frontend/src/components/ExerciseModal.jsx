@@ -99,6 +99,14 @@ const ExerciseModal = ({ exercise, onClose }) => {
   const [remainingStrengths, setRemainingStrengths] = useState(['']);
   const [adaptationStep, setAdaptationStep] = useState('');
 
+  // Meaning-Making Practice states
+  const [perspectiveChange, setPerspectiveChange] = useState('');
+  const [valueShifts, setValueShifts] = useState(['']);
+  const [discoveredStrengths, setDiscoveredStrengths] = useState(['']);
+  const [meaningConnection, setMeaningConnection] = useState('');
+  const [futureImpact, setFutureImpact] = useState('');
+  const [meaningStatement, setMeaningStatement] = useState('');
+
   const timerRef = useRef(null);
   const audioRef = useRef(null);
 
@@ -214,9 +222,10 @@ const ExerciseModal = ({ exercise, onClose }) => {
            exerciseContent.type === 'appreciation' ||
            exerciseContent.type === 'body-appreciation' ||
            exerciseContent.type === 'health-worry' ||
-           exerciseContent.type === 'body-scan' ||
            exerciseContent.type === 'anxious-thought' ||
-           exerciseContent.type === 'loss-processing';
+           exerciseContent.type === 'body-scan' ||
+           exerciseContent.type === 'loss-processing' ||
+           exerciseContent.type === 'meaning-making';
   };
 
   // Render the appropriate interactive component based on exercise type
@@ -2370,6 +2379,147 @@ const ExerciseModal = ({ exercise, onClose }) => {
           </div>
         );
 
+      case 'meaning-making':
+        return (
+          <div className="space-y-6">
+            {/* Perspective Change Section */}
+            <div className="bg-[#1E293B] rounded-xl p-6 space-y-4">
+              <h3 className="text-white font-medium">Perspective Changes</h3>
+              <p className="text-[#94A3B8] text-sm mb-4">
+                How has this experience changed your view of life or yourself?
+              </p>
+              <textarea
+                value={perspectiveChange}
+                onChange={(e) => setPerspectiveChange(e.target.value)}
+                placeholder="Consider how this experience has shifted your understanding or viewpoint..."
+                className="w-full bg-[#0F172A] text-white rounded-lg p-4 min-h-[100px] focus:ring-2 focus:ring-[#3E60C1] focus:outline-none"
+              />
+            </div>
+
+            {/* Values and Priorities Section */}
+            <div className="bg-[#1E293B] rounded-xl p-6 space-y-4">
+              <h3 className="text-white font-medium">Values & Priorities</h3>
+              <p className="text-[#94A3B8] text-sm mb-4">
+                What values or priorities have shifted through this experience?
+              </p>
+              <div className="space-y-3">
+                {valueShifts.map((shift, index) => (
+                  <div key={index} className="flex items-center gap-2">
+                    <input
+                      type="text"
+                      value={shift}
+                      onChange={(e) => {
+                        const newShifts = [...valueShifts];
+                        newShifts[index] = e.target.value;
+                        setValueShifts(newShifts);
+                      }}
+                      placeholder="Enter a value or priority shift..."
+                      className="flex-1 bg-[#0F172A] text-white rounded-lg p-3 focus:ring-2 focus:ring-[#3E60C1] focus:outline-none"
+                    />
+                    <button
+                      onClick={() => {
+                        const newShifts = valueShifts.filter((_, i) => i !== index);
+                        setValueShifts(newShifts);
+                      }}
+                      className="p-2 text-[#94A3B8] hover:text-white transition-colors"
+                    >
+                      <FaTimes />
+                    </button>
+                  </div>
+                ))}
+                <button
+                  onClick={() => setValueShifts([...valueShifts, ''])}
+                  className="text-[#3E60C1] hover:text-[#5983FC] transition-colors text-sm flex items-center gap-2"
+                >
+                  <FaPlus /> Add another value shift
+                </button>
+              </div>
+            </div>
+
+            {/* Growth and Strengths Section */}
+            <div className="bg-[#1E293B] rounded-xl p-6 space-y-4">
+              <h3 className="text-white font-medium">Growth & Strengths</h3>
+              <p className="text-[#94A3B8] text-sm mb-4">
+                What new strengths or capabilities have you discovered?
+              </p>
+              <div className="space-y-3">
+                {discoveredStrengths.map((strength, index) => (
+                  <div key={index} className="flex items-center gap-2">
+                    <input
+                      type="text"
+                      value={strength}
+                      onChange={(e) => {
+                        const newStrengths = [...discoveredStrengths];
+                        newStrengths[index] = e.target.value;
+                        setDiscoveredStrengths(newStrengths);
+                      }}
+                      placeholder="Enter a discovered strength..."
+                      className="flex-1 bg-[#0F172A] text-white rounded-lg p-3 focus:ring-2 focus:ring-[#3E60C1] focus:outline-none"
+                    />
+                    <button
+                      onClick={() => {
+                        const newStrengths = discoveredStrengths.filter((_, i) => i !== index);
+                        setDiscoveredStrengths(newStrengths);
+                      }}
+                      className="p-2 text-[#94A3B8] hover:text-white transition-colors"
+                    >
+                      <FaTimes />
+                    </button>
+                  </div>
+                ))}
+                <button
+                  onClick={() => setDiscoveredStrengths([...discoveredStrengths, ''])}
+                  className="text-[#3E60C1] hover:text-[#5983FC] transition-colors text-sm flex items-center gap-2"
+                >
+                  <FaPlus /> Add another strength
+                </button>
+              </div>
+            </div>
+
+            {/* Connection and Meaning Section */}
+            <div className="bg-[#1E293B] rounded-xl p-6 space-y-4">
+              <h3 className="text-white font-medium">Connection & Meaning</h3>
+              <p className="text-[#94A3B8] text-sm mb-4">
+                How does this experience connect you to others or contribute to your life's meaning?
+              </p>
+              <textarea
+                value={meaningConnection}
+                onChange={(e) => setMeaningConnection(e.target.value)}
+                placeholder="Reflect on how this experience connects to your broader life story..."
+                className="w-full bg-[#0F172A] text-white rounded-lg p-4 min-h-[100px] focus:ring-2 focus:ring-[#3E60C1] focus:outline-none"
+              />
+            </div>
+
+            {/* Future Impact Section */}
+            <div className="bg-[#1E293B] rounded-xl p-6 space-y-4">
+              <h3 className="text-white font-medium">Future Impact</h3>
+              <p className="text-[#94A3B8] text-sm mb-4">
+                How might this experience influence your future choices and path?
+              </p>
+              <textarea
+                value={futureImpact}
+                onChange={(e) => setFutureImpact(e.target.value)}
+                placeholder="Consider how this experience might shape your future decisions..."
+                className="w-full bg-[#0F172A] text-white rounded-lg p-4 min-h-[100px] focus:ring-2 focus:ring-[#3E60C1] focus:outline-none"
+              />
+            </div>
+
+            {/* Meaning Statement Section */}
+            <div className="bg-[#1E293B] rounded-xl p-6 space-y-4">
+              <h3 className="text-white font-medium">Meaning Statement</h3>
+              <p className="text-[#94A3B8] text-sm mb-4">
+                Write a brief statement that captures the meaning you've found in this experience.
+              </p>
+              <textarea
+                value={meaningStatement}
+                onChange={(e) => setMeaningStatement(e.target.value)}
+                placeholder="This experience has taught me that..."
+                className="w-full bg-[#0F172A] text-white rounded-lg p-4 min-h-[100px] focus:ring-2 focus:ring-[#3E60C1] focus:outline-none"
+              />
+            </div>
+          </div>
+        );
+
       default:
         return null;
     }
@@ -2419,6 +2569,9 @@ const ExerciseModal = ({ exercise, onClose }) => {
         (exercise.type === 'task') ||
         exercise.title === "Task Prioritization Method") {
         return 'task-prioritization';
+      }
+      if (exercise.link === 'meaning-making') {
+        return 'meaning-making';
       }
 
       // Add direct check for anxious-thought
