@@ -118,6 +118,11 @@ const ExerciseModal = ({ exercise, onClose }) => {
   const [identityIntegration, setIdentityIntegration] = useState('');
   const [ongoingMessage, setOngoingMessage] = useState('');
 
+  const [uncertaintySituation, setUncertaintySituation] = useState('');
+  const [physicalSensations, setPhysicalSensations] = useState('');
+  const [thoughts, setThoughts] = useState('');
+  const [controlAspects, setControlAspects] = useState('');
+
   const timerRef = useRef(null);
   const audioRef = useRef(null);
 
@@ -238,7 +243,8 @@ const ExerciseModal = ({ exercise, onClose }) => {
            exerciseContent.type === 'loss-processing' ||
            exerciseContent.type === 'meaning-making' ||
            exerciseContent.type === 'continuing-bonds' ||
-           exerciseContent.type === 'inner-critic';
+           exerciseContent.type === 'inner-critic' ||
+           exerciseContent.type === 'uncertainty-tolerance';
   };
 
   // Render the appropriate interactive component based on exercise type
@@ -2750,6 +2756,106 @@ const ExerciseModal = ({ exercise, onClose }) => {
           </div>
         );
 
+      case 'uncertainty-tolerance':
+        return (
+          <div className="space-y-6">
+            <div className="bg-[#0F172A]/70 p-5 rounded-xl border border-[#2A3547]">
+              <h4 className="text-white font-medium mb-3">Uncertainty Tolerance Practice</h4>
+              <p className="text-[#B8C7E0]">
+                This exercise helps you build comfort with uncertainty through mindful awareness and practical steps.
+              </p>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <h4 className="text-white font-medium mb-2">1. Identify Your Situation</h4>
+                <textarea
+                  value={uncertaintySituation}
+                  onChange={(e) => setUncertaintySituation(e.target.value)}
+                  placeholder="Describe the situation that involves uncertainty..."
+                  className="w-full bg-[#0F172A] border border-[#2A3547] rounded-lg p-3 text-[#B8C7E0] focus:outline-none focus:border-[#5983FC] min-h-[100px]"
+                />
+              </div>
+
+              <div>
+                <h4 className="text-white font-medium mb-2">2. Notice Physical Sensations</h4>
+                <textarea
+                  value={physicalSensations}
+                  onChange={(e) => setPhysicalSensations(e.target.value)}
+                  placeholder="What physical sensations arise when you think about this uncertainty? (e.g., tension, butterflies, etc.)"
+                  className="w-full bg-[#0F172A] border border-[#2A3547] rounded-lg p-3 text-[#B8C7E0] focus:outline-none focus:border-[#5983FC] min-h-[100px]"
+                />
+              </div>
+
+              <div>
+                <h4 className="text-white font-medium mb-2">3. Observe Your Thoughts</h4>
+                <textarea
+                  value={thoughts}
+                  onChange={(e) => setThoughts(e.target.value)}
+                  placeholder="What thoughts come up about this uncertainty? Try to observe them without judgment..."
+                  className="w-full bg-[#0F172A] border border-[#2A3547] rounded-lg p-3 text-[#B8C7E0] focus:outline-none focus:border-[#5983FC] min-h-[100px]"
+                />
+              </div>
+
+              <div>
+                <h4 className="text-white font-medium mb-2">4. Identify What's in Your Control</h4>
+                <textarea
+                  value={controlAspects}
+                  onChange={(e) => setControlAspects(e.target.value)}
+                  placeholder="What aspects of this situation are still within your control? What can you influence?"
+                  className="w-full bg-[#0F172A] border border-[#2A3547] rounded-lg p-3 text-[#B8C7E0] focus:outline-none focus:border-[#5983FC] min-h-[100px]"
+                />
+              </div>
+
+              <div>
+                <h4 className="text-white font-medium mb-2">5. Choose an Action Step</h4>
+                <textarea
+                  value={actionStep}
+                  onChange={(e) => setActionStep(e.target.value)}
+                  placeholder="What is one small action you can take within your control to move forward?"
+                  className="w-full bg-[#0F172A] border border-[#2A3547] rounded-lg p-3 text-[#B8C7E0] focus:outline-none focus:border-[#5983FC] min-h-[100px]"
+                />
+              </div>
+            </div>
+
+            <div className="bg-[#0F172A]/70 p-5 rounded-xl border border-[#2A3547]">
+              <h4 className="text-white font-medium mb-3">Exercise Summary</h4>
+              <div className="space-y-3">
+                {uncertaintySituation && (
+                  <div>
+                    <p className="text-[#B8C7E0] font-medium">Your Situation:</p>
+                    <p className="text-[#B8C7E0]">{uncertaintySituation}</p>
+                  </div>
+                )}
+                {physicalSensations && (
+                  <div>
+                    <p className="text-[#B8C7E0] font-medium">Physical Sensations:</p>
+                    <p className="text-[#B8C7E0]">{physicalSensations}</p>
+                  </div>
+                )}
+                {thoughts && (
+                  <div>
+                    <p className="text-[#B8C7E0] font-medium">Your Thoughts:</p>
+                    <p className="text-[#B8C7E0]">{thoughts}</p>
+                  </div>
+                )}
+                {controlAspects && (
+                  <div>
+                    <p className="text-[#B8C7E0] font-medium">What's in Your Control:</p>
+                    <p className="text-[#B8C7E0]">{controlAspects}</p>
+                  </div>
+                )}
+                {actionStep && (
+                  <div>
+                    <p className="text-[#B8C7E0] font-medium">Your Action Step:</p>
+                    <p className="text-[#B8C7E0]">{actionStep}</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        );
+
       default:
         return null;
     }
@@ -2800,6 +2906,11 @@ const ExerciseModal = ({ exercise, onClose }) => {
         exercise.title === "Task Prioritization Method") {
         return 'task-prioritization';
       }
+
+      if (exercise.link === 'uncertainty-tolerance') {
+        return 'uncertainty-tolerance';
+      }
+
       if (exercise.link === 'meaning-making') {
         return 'meaning-making';
       }

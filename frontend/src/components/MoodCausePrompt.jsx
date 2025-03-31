@@ -1696,6 +1696,24 @@ const MoodCausePrompt = ({ notification, onClose }) => {
         }
       ];
     }
+    else if (recommendation.title === "Uncertainty Tolerance Practice") {
+      enhancedExercise.link = 'uncertainty-tolerance';
+      enhancedExercise.type = 'uncertainty-tolerance';
+      enhancedExercise.resources = [
+        {
+          type: "article",
+          title: "Building Tolerance for Uncertainty",
+          description: "Research on managing uncertainty and anxiety",
+          url: "https://www.psychologytoday.com/us/blog/anxiety-files/201801/how-build-tolerance-uncertainty"
+        },
+        {
+          type: "video",
+          title: "Managing Uncertainty in Life",
+          description: "Expert guidance on developing uncertainty tolerance",
+          url: "https://www.youtube.com/watch?v=example"
+        }
+      ];
+    }
     
     // Ensure resources are available
     if (!enhancedExercise.resources || enhancedExercise.resources.length === 0) {
