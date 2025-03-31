@@ -216,35 +216,6 @@ const ExerciseModal = ({ exercise, onClose }) => {
               className="w-full h-32 bg-[#0F172A] border border-[#2A3547] rounded-lg p-3 text-[#B8C7E0] focus:outline-none focus:border-[#5983FC]"
               placeholder="Start writing here..."
             />
-            <div className="flex justify-between mt-2">
-              <button 
-                onClick={() => {
-                  const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-                  recognition.onresult = (event) => {
-                    const transcript = event.results[0][0].transcript;
-                    setJournalEntry(prev => prev ? `${prev}\n${transcript}` : transcript);
-                  };
-                  recognition.start();
-                }}
-                className="flex items-center bg-[#2A3547] text-[#B8C7E0] px-3 py-1 rounded-lg text-sm hover:bg-[#3E60C1]/30 transition-colors"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="mr-2">
-                  <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path>
-                  <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
-                  <line x1="12" x2="12" y1="19" y2="22"></line>
-                </svg>
-                Voice Input
-              </button>
-              <button 
-                onClick={() => {
-                  setSaved(true);
-                  setTimeout(() => setSaved(false), 2000);
-                }}
-                className="flex items-center bg-[#3E60C1] text-white px-3 py-1 rounded-lg text-sm hover:bg-[#5983FC] transition-colors"
-              >
-                <FaSave className="mr-2" /> {saved ? "Saved!" : "Save Entry"}
-              </button>
-            </div>
             
             {exerciseContent.prompts && (
               <div className="mt-4">
@@ -1434,62 +1405,54 @@ const ExerciseModal = ({ exercise, onClose }) => {
         
       case 'body-appreciation':
         return (
-          <div className="space-y-6">
-            {/* Centering Section */}
-            <div className="bg-[#0F172A]/70 p-5 rounded-xl border border-[#2A3547]">
-              <h3 className="text-white font-medium mb-3">1. Center Yourself</h3>
-              <p className="text-[#B8C7E0] text-sm mb-4">
-                Take a few deep breaths to arrive in your body. Click the button with each breath.
+          <div className="space-y-4">
+            {/* Breathing Section */}
+            <div className="bg-[#0F172A]/70 p-4 rounded-lg border border-[#2A3547]">
+              <h3 className="text-white font-medium mb-2">Take a Moment</h3>
+              <p className="text-[#B8C7E0] text-sm mb-3">
+                Begin with three deep breaths to center yourself.
               </p>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                  <button
-                    onClick={() => setBreathCount(prev => Math.min(prev + 1, 3))}
-                    className="px-4 py-2 bg-[#1E293B] hover:bg-[#2A3547] rounded-lg text-white transition-colors"
-                  >
-                    Take a Breath
-                  </button>
-                  <span className="text-[#B8C7E0]">
-                    {breathCount}/3 breaths
-                  </span>
-                </div>
+              <div className="flex items-center space-x-2">
+                <button
+                  onClick={() => setBreathCount(prev => Math.min(prev + 1, 3))}
+                  className="px-4 py-2 bg-[#3E60C1] hover:bg-[#5983FC] rounded-lg text-white transition-colors"
+                >
+                  Breathe {breathCount}/3
+                </button>
                 {breathCount >= 3 && (
-                  <span className="text-emerald-400 text-sm">✓ Ready to continue</span>
+                  <span className="text-emerald-400">✓ Ready</span>
                 )}
               </div>
             </div>
 
-            {/* Body Areas Gratitude Section */}
-            <div className="bg-[#0F172A]/70 p-5 rounded-xl border border-[#2A3547]">
-              <h3 className="text-white font-medium mb-3">2. Explore Areas of Gratitude</h3>
-              <p className="text-[#B8C7E0] text-sm mb-4">
-                Select different areas of your body and note what you appreciate about them.
-              </p>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Body Appreciation Section */}
+            <div className="bg-[#0F172A]/70 p-4 rounded-lg border border-[#2A3547]">
+              <h3 className="text-white font-medium mb-3">Body Appreciation</h3>
+              <div className="space-y-3">
                 {bodyAreas.map((item, index) => (
                   <div
                     key={index}
-                    className={`p-4 rounded-lg border transition-colors ${
+                    className={`p-3 rounded-lg border ${
                       item.checked
                         ? 'border-emerald-500/30 bg-emerald-500/10'
                         : 'border-[#2A3547] bg-[#1E293B]'
                     }`}
                   >
                     <div className="flex items-center justify-between mb-2">
-                      <label className="text-white font-medium">{item.area}</label>
+                      <label className="text-white">{item.area}</label>
                       <button
                         onClick={() => {
                           const newAreas = [...bodyAreas];
                           newAreas[index].checked = !newAreas[index].checked;
                           setBodyAreas(newAreas);
                         }}
-                        className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors ${
+                        className={`w-5 h-5 rounded flex items-center justify-center transition-colors ${
                           item.checked
-                            ? 'border-emerald-500 bg-emerald-500/20'
-                            : 'border-[#3E60C1]'
+                            ? 'bg-emerald-500 text-white'
+                            : 'border border-[#3E60C1]'
                         }`}
                       >
-                        {item.checked && <span className="text-emerald-500">✓</span>}
+                        {item.checked && "✓"}
                       </button>
                     </div>
                     {item.checked && (
@@ -1501,7 +1464,8 @@ const ExerciseModal = ({ exercise, onClose }) => {
                           setBodyAreas(newAreas);
                         }}
                         placeholder={`What do you appreciate about your ${item.area.toLowerCase()}?`}
-                        className="w-full bg-[#1E293B] border border-[#3E60C1]/30 rounded-lg p-2 text-white focus:outline-none focus:border-[#5983FC] min-h-[60px] text-sm"
+                        className="w-full bg-[#1E293B] border border-[#3E60C1]/30 rounded p-2 text-white focus:outline-none focus:border-[#5983FC] text-sm"
+                        rows="2"
                       />
                     )}
                   </div>
@@ -1509,36 +1473,16 @@ const ExerciseModal = ({ exercise, onClose }) => {
               </div>
             </div>
 
-            {/* General Gratitude Section */}
-            <div className="bg-[#0F172A]/70 p-5 rounded-xl border border-[#2A3547]">
-              <h3 className="text-white font-medium mb-3">3. Overall Appreciation</h3>
-              <textarea
-                value={generalGratitude}
-                onChange={(e) => setGeneralGratitude(e.target.value)}
-                placeholder="What are you most grateful for about your body's abilities and wisdom?"
-                className="w-full bg-[#1E293B] border border-[#3E60C1]/30 rounded-lg p-3 text-white focus:outline-none focus:border-[#5983FC] min-h-[100px]"
-              />
-            </div>
-
-            {/* Self-Care Intention Section */}
-            <div className="bg-[#0F172A]/70 p-5 rounded-xl border border-[#2A3547]">
-              <h3 className="text-white font-medium mb-3">4. Set an Intention</h3>
-              <p className="text-[#B8C7E0] text-sm mb-4">
-                Choose one way you'll honor your body today.
-              </p>
+            {/* Final Reflection */}
+            <div className="bg-[#0F172A]/70 p-4 rounded-lg border border-[#2A3547]">
+              <h3 className="text-white font-medium mb-2">Daily Intention</h3>
               <textarea
                 value={selfCareIntention}
                 onChange={(e) => setSelfCareIntention(e.target.value)}
-                placeholder="I will honor my body today by..."
-                className="w-full bg-[#1E293B] border border-[#3E60C1]/30 rounded-lg p-3 text-white focus:outline-none focus:border-[#5983FC] min-h-[80px]"
+                placeholder="Today, I will honor my body by..."
+                className="w-full bg-[#1E293B] border border-[#3E60C1]/30 rounded-lg p-3 text-white focus:outline-none focus:border-[#5983FC]"
+                rows="2"
               />
-            </div>
-
-            {/* Progress Indicator */}
-            <div className={`p-4 rounded-xl ${getProgressStyle()}`}>
-              <p className="text-sm">
-                {getProgressMessage()}
-              </p>
             </div>
           </div>
         );
