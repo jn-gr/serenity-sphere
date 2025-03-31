@@ -84,6 +84,11 @@ const ExerciseModal = ({ exercise, onClose }) => {
   const [thoughtBelief, setThoughtBelief] = useState(50);
   const [balancedThought, setBalancedThought] = useState('');
   const [newBelief, setNewBelief] = useState(50);
+  const [innerCriticThought, setInnerCriticThought] = useState('');
+  const [criticImpact, setCriticImpact] = useState('');
+  const [mentorResponse, setMentorResponse] = useState('');
+  const [balancedResponse, setBalancedResponse] = useState('');
+  const [practicePlan, setPracticePlan] = useState('');
 
   // Mindful Body Scan states
   const [currentBodyPart, setCurrentBodyPart] = useState(0);
@@ -106,6 +111,12 @@ const ExerciseModal = ({ exercise, onClose }) => {
   const [meaningConnection, setMeaningConnection] = useState('');
   const [futureImpact, setFutureImpact] = useState('');
   const [meaningStatement, setMeaningStatement] = useState('');
+  const [bondQuality, setBondQuality] = useState('');
+  const [bondMemories, setBondMemories] = useState('');
+  const [continuingAspects, setContinuingAspects] = useState('');
+  const [ritualDescription, setRitualDescription] = useState('');
+  const [identityIntegration, setIdentityIntegration] = useState('');
+  const [ongoingMessage, setOngoingMessage] = useState('');
 
   const timerRef = useRef(null);
   const audioRef = useRef(null);
@@ -225,7 +236,9 @@ const ExerciseModal = ({ exercise, onClose }) => {
            exerciseContent.type === 'anxious-thought' ||
            exerciseContent.type === 'body-scan' ||
            exerciseContent.type === 'loss-processing' ||
-           exerciseContent.type === 'meaning-making';
+           exerciseContent.type === 'meaning-making' ||
+           exerciseContent.type === 'continuing-bonds' ||
+           exerciseContent.type === 'inner-critic';
   };
 
   // Render the appropriate interactive component based on exercise type
@@ -333,23 +346,6 @@ const ExerciseModal = ({ exercise, onClose }) => {
                     <FaPlay />
                   </button>
                 )}
-
-                <div className="flex space-x-2">
-                  {['🌧️', '🌊', '🌳', '🔥'].map((sound, idx) => (
-                    <button
-                      key={idx}
-                      onClick={() => {
-                        if (audioRef.current) {
-                          audioRef.current.src = `/sounds/${['rain', 'ocean', 'forest', 'fire'][idx]}.mp3`;
-                          if (!audioRef.current.paused) audioRef.current.play();
-                        }
-                      }}
-                      className="w-8 h-8 flex items-center justify-center rounded-full bg-[#0F172A] hover:bg-[#2A3547] transition-colors"
-                    >
-                      {sound}
-                    </button>
-                  ))}
-                </div>
 
                 {exerciseContent.audioUrl && (
                   <button
@@ -2519,6 +2515,240 @@ const ExerciseModal = ({ exercise, onClose }) => {
             </div>
           </div>
         );
+      case 'continuing-bonds':
+        return (
+          <div className="space-y-6">
+            {/* Introduction */}
+            <div className="bg-[#0F172A]/70 p-5 rounded-xl border border-[#2A3547]">
+              <h4 className="text-white font-medium mb-3">Continuing Bonds Reflection</h4>
+              <p className="text-[#B8C7E0]">
+                This practice helps you maintain a healthy connection with what you've lost while allowing for adaptation and growth.
+              </p>
+            </div>
+
+            {/* Quality Reflection */}
+            <div className="bg-[#0F172A]/70 p-5 rounded-xl border border-[#2A3547]">
+              <h4 className="text-white font-medium mb-3">1. Quality Reflection</h4>
+              <p className="text-[#B8C7E0] mb-4">
+                What positive qualities or aspects of what you've lost do you most value and remember?
+              </p>
+              <textarea
+                value={bondQuality}
+                onChange={(e) => setBondQuality(e.target.value)}
+                placeholder="Reflect on the meaningful qualities..."
+                className="w-full bg-[#0F172A] border border-[#2A3547] rounded-lg p-3 text-[#B8C7E0] focus:outline-none focus:border-[#5983FC] min-h-[100px]"
+              />
+            </div>
+
+            {/* Memory Connection */}
+            <div className="bg-[#0F172A]/70 p-5 rounded-xl border border-[#2A3547]">
+              <h4 className="text-white font-medium mb-3">2. Memory Connection</h4>
+              <p className="text-[#B8C7E0] mb-4">
+                What specific memories or moments best capture these qualities?
+              </p>
+              <textarea
+                value={bondMemories}
+                onChange={(e) => setBondMemories(e.target.value)}
+                placeholder="Share meaningful memories..."
+                className="w-full bg-[#0F172A] border border-[#2A3547] rounded-lg p-3 text-[#B8C7E0] focus:outline-none focus:border-[#5983FC] min-h-[100px]"
+              />
+            </div>
+
+            {/* Continuing Presence */}
+            <div className="bg-[#0F172A]/70 p-5 rounded-xl border border-[#2A3547]">
+              <h4 className="text-white font-medium mb-3">3. Continuing Presence</h4>
+              <p className="text-[#B8C7E0] mb-4">
+                How do these qualities continue to be present in your life now?
+              </p>
+              <textarea
+                value={continuingAspects}
+                onChange={(e) => setContinuingAspects(e.target.value)}
+                placeholder="Reflect on how these qualities live on..."
+                className="w-full bg-[#0F172A] border border-[#2A3547] rounded-lg p-3 text-[#B8C7E0] focus:outline-none focus:border-[#5983FC] min-h-[100px]"
+              />
+            </div>
+
+            {/* Ritual Creation */}
+            <div className="bg-[#0F172A]/70 p-5 rounded-xl border border-[#2A3547]">
+              <h4 className="text-white font-medium mb-3">4. Ritual Creation</h4>
+              <p className="text-[#B8C7E0] mb-4">
+                What small ritual could you create to honor this continuing connection?
+              </p>
+              <textarea
+                value={ritualDescription}
+                onChange={(e) => setRitualDescription(e.target.value)}
+                placeholder="Describe a meaningful ritual..."
+                className="w-full bg-[#0F172A] border border-[#2A3547] rounded-lg p-3 text-[#B8C7E0] focus:outline-none focus:border-[#5983FC] min-h-[100px]"
+              />
+            </div>
+
+            {/* Identity Integration */}
+            <div className="bg-[#0F172A]/70 p-5 rounded-xl border border-[#2A3547]">
+              <h4 className="text-white font-medium mb-3">5. Identity Integration</h4>
+              <p className="text-[#B8C7E0] mb-4">
+                How might you incorporate these valued aspects into your own identity or life?
+              </p>
+              <textarea
+                value={identityIntegration}
+                onChange={(e) => setIdentityIntegration(e.target.value)}
+                placeholder="Reflect on integration possibilities..."
+                className="w-full bg-[#0F172A] border border-[#2A3547] rounded-lg p-3 text-[#B8C7E0] focus:outline-none focus:border-[#5983FC] min-h-[100px]"
+              />
+            </div>
+
+            {/* Ongoing Message */}
+            <div className="bg-[#0F172A]/70 p-5 rounded-xl border border-[#2A3547]">
+              <h4 className="text-white font-medium mb-3">6. Ongoing Message</h4>
+              <p className="text-[#B8C7E0] mb-4">
+                Write a brief message expressing your ongoing relationship and connection.
+              </p>
+              <textarea
+                value={ongoingMessage}
+                onChange={(e) => setOngoingMessage(e.target.value)}
+                placeholder="Write your message of connection..."
+                className="w-full bg-[#0F172A] border border-[#2A3547] rounded-lg p-3 text-[#B8C7E0] focus:outline-none focus:border-[#5983FC] min-h-[100px]"
+              />
+            </div>
+
+            {/* Summary */}
+            <div className="bg-[#0F172A]/70 p-5 rounded-xl border border-[#2A3547]">
+              <h4 className="text-white font-medium mb-3">Your Reflection Summary</h4>
+              <div className="space-y-3">
+                {bondQuality && (
+                  <div>
+                    <p className="text-[#B8C7E0] text-sm font-medium">Valued Qualities:</p>
+                    <p className="text-[#B8C7E0] text-sm">{bondQuality}</p>
+                  </div>
+                )}
+                {bondMemories && (
+                  <div>
+                    <p className="text-[#B8C7E0] text-sm font-medium">Meaningful Memories:</p>
+                    <p className="text-[#B8C7E0] text-sm">{bondMemories}</p>
+                  </div>
+                )}
+                {continuingAspects && (
+                  <div>
+                    <p className="text-[#B8C7E0] text-sm font-medium">Continuing Presence:</p>
+                    <p className="text-[#B8C7E0] text-sm">{continuingAspects}</p>
+                  </div>
+                )}
+                {ritualDescription && (
+                  <div>
+                    <p className="text-[#B8C7E0] text-sm font-medium">Honoring Ritual:</p>
+                    <p className="text-[#B8C7E0] text-sm">{ritualDescription}</p>
+                  </div>
+                )}
+                {identityIntegration && (
+                  <div>
+                    <p className="text-[#B8C7E0] text-sm font-medium">Identity Integration:</p>
+                    <p className="text-[#B8C7E0] text-sm">{identityIntegration}</p>
+                  </div>
+                )}
+                {ongoingMessage && (
+                  <div>
+                    <p className="text-[#B8C7E0] text-sm font-medium">Message of Connection:</p>
+                    <p className="text-[#B8C7E0] text-sm">{ongoingMessage}</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        );
+      case 'inner-critic':
+        return (
+          <div className="space-y-6">
+            <div className="bg-[#0F172A]/70 p-5 rounded-xl border border-[#2A3547]">
+              <h4 className="text-white font-medium mb-3">Identify Your Inner Critic</h4>
+              <p className="text-[#B8C7E0] mb-4">
+                What is a common self-critical thought that your inner critic tells you?
+              </p>
+              <textarea
+                value={innerCriticThought}
+                onChange={(e) => setInnerCriticThought(e.target.value)}
+                placeholder="Write down the exact words your inner critic uses..."
+                className="w-full bg-[#0F172A] border border-[#2A3547] rounded-lg p-3 text-[#B8C7E0] focus:outline-none focus:border-[#5983FC] min-h-[100px]"
+              />
+            </div>
+
+            <div className="bg-[#0F172A]/70 p-5 rounded-xl border border-[#2A3547]">
+              <h4 className="text-white font-medium mb-3">Impact Assessment</h4>
+              <p className="text-[#B8C7E0] mb-4">
+                How does this criticism affect your feelings and behaviors?
+              </p>
+              <textarea
+                value={criticImpact}
+                onChange={(e) => setCriticImpact(e.target.value)}
+                placeholder="Describe the emotional and behavioral impact..."
+                className="w-full bg-[#0F172A] border border-[#2A3547] rounded-lg p-3 text-[#B8C7E0] focus:outline-none focus:border-[#5983FC] min-h-[100px]"
+              />
+            </div>
+
+            <div className="bg-[#0F172A]/70 p-5 rounded-xl border border-[#2A3547]">
+              <h4 className="text-white font-medium mb-3">Mentor's Response</h4>
+              <p className="text-[#B8C7E0] mb-4">
+                Imagine a compassionate mentor responding to your inner critic. What would they say?
+              </p>
+              <textarea
+                value={mentorResponse}
+                onChange={(e) => setMentorResponse(e.target.value)}
+                placeholder="Write down what a supportive mentor might say..."
+                className="w-full bg-[#0F172A] border border-[#2A3547] rounded-lg p-3 text-[#B8C7E0] focus:outline-none focus:border-[#5983FC] min-h-[100px]"
+              />
+            </div>
+
+            <div className="bg-[#0F172A]/70 p-5 rounded-xl border border-[#2A3547]">
+              <h4 className="text-white font-medium mb-3">Balanced Response</h4>
+              <p className="text-[#B8C7E0] mb-4">
+                Create a balanced response that acknowledges challenges while being supportive.
+              </p>
+              <textarea
+                value={balancedResponse}
+                onChange={(e) => setBalancedResponse(e.target.value)}
+                placeholder="Write a balanced response that combines understanding with encouragement..."
+                className="w-full bg-[#0F172A] border border-[#2A3547] rounded-lg p-3 text-[#B8C7E0] focus:outline-none focus:border-[#5983FC] min-h-[100px]"
+              />
+            </div>
+
+            <div className="bg-[#0F172A]/70 p-5 rounded-xl border border-[#2A3547]">
+              <h4 className="text-white font-medium mb-3">Practice Plan</h4>
+              <p className="text-[#B8C7E0] mb-4">
+                How will you practice responding to your inner critic with this new balanced voice?
+              </p>
+              <textarea
+                value={practicePlan}
+                onChange={(e) => setPracticePlan(e.target.value)}
+                placeholder="Create a specific plan for practicing your new response..."
+                className="w-full bg-[#0F172A] border border-[#2A3547] rounded-lg p-3 text-[#B8C7E0] focus:outline-none focus:border-[#5983FC] min-h-[100px]"
+              />
+            </div>
+
+            <div className="bg-[#0F172A]/70 p-5 rounded-xl border border-[#2A3547]">
+              <h4 className="text-white font-medium mb-3">Exercise Summary</h4>
+              <div className="space-y-4">
+                <div>
+                  <p className="text-[#B8C7E0] font-medium mb-2">Your Inner Critic:</p>
+                  <p className="text-white">{innerCriticThought || 'Not yet specified'}</p>
+                </div>
+                <div>
+                  <p className="text-[#B8C7E0] font-medium mb-2">Impact:</p>
+                  <p className="text-white">{criticImpact || 'Not yet specified'}</p>
+                </div>
+                <div>
+                  <p className="text-[#B8C7E0] font-medium mb-2">Mentor's Response:</p>
+                  <p className="text-white">{mentorResponse || 'Not yet specified'}</p>
+                </div>
+                <div>
+                  <p className="text-[#B8C7E0] font-medium mb-2">Balanced Response:</p>
+                  <p className="text-white">{balancedResponse || 'Not yet specified'}</p>
+                </div>
+                <div>
+                  <p className="text-[#B8C7E0] font-medium mb-2">Practice Plan:</p>
+                  <p className="text-white">{practicePlan || 'Not yet specified'}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
 
       default:
         return null;
@@ -2573,7 +2803,9 @@ const ExerciseModal = ({ exercise, onClose }) => {
       if (exercise.link === 'meaning-making') {
         return 'meaning-making';
       }
-
+      if (exercise.link === 'continuing-bonds') {
+        return 'continuing-bonds';
+      }
       // Add direct check for anxious-thought
       if (exercise.link === 'anxious-thought') {
         return 'anxious-thought';

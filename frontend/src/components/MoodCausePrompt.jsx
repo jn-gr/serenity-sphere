@@ -1660,6 +1660,42 @@ const MoodCausePrompt = ({ notification, onClose }) => {
         }
       ];
     }
+    else if (recommendation.title === "Continuing Bonds Reflection") {
+      enhancedExercise.link = 'continuing-bonds';
+      enhancedExercise.type = 'continuing-bonds';
+      enhancedExercise.resources = [
+        {
+          type: "article",
+          title: "Understanding Continuing Bonds",
+          description: "Research on maintaining healthy connections after loss",
+          url: "https://www.psychologytoday.com/us/blog/understanding-grief/201901/continuing-bonds-after-loss"
+        },
+        {
+          type: "video",
+          title: "Maintaining Connection After Loss",
+          description: "Expert guidance on healthy continuing bonds",
+          url: "https://www.youtube.com/watch?v=example"
+        }
+      ];
+    }
+    else if (recommendation.title === "Inner Critic Dialogue") {
+      enhancedExercise.link = 'inner-critic';
+      enhancedExercise.type = 'inner-critic';
+      enhancedExercise.resources = [
+        {
+          type: "article",
+          title: "Understanding and Transforming Self-Criticism",
+          description: "Research on self-compassion and inner critic work",
+          url: "https://www.psychologytoday.com/us/blog/click-here-happiness/202101/how-transform-your-inner-critic"
+        },
+        {
+          type: "video",
+          title: "Working with Your Inner Critic",
+          description: "Expert guidance on developing self-compassion",
+          url: "https://www.youtube.com/watch?v=example"
+        }
+      ];
+    }
     
     // Ensure resources are available
     if (!enhancedExercise.resources || enhancedExercise.resources.length === 0) {
