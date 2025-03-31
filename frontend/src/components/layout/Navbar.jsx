@@ -6,9 +6,9 @@ import ThemeToggle from './ThemeToggle';
 import '../../styles/components/_navbar.css';
 import api from '../../services/api';
 import { FaSignOutAlt, FaBook, FaSignInAlt, FaHome, FaUser, FaChartLine } from 'react-icons/fa';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 
-const Navbar = () => {
+const Navbar = ({ onHoverChange }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
@@ -53,10 +53,19 @@ const Navbar = () => {
 
   // Render sidebar for authenticated users
   return (
-    <nav className="fixed left-0 top-0 h-screen w-64 bg-[#1A2335] border-r border-[#2A3547] flex flex-col p-6">
-      <div className="mb-10">
-        <span className="text-2xl font-bold bg-gradient-to-r from-[#5983FC] to-[#3E60C1] bg-clip-text text-transparent">
-          Serenity Sphere
+    <motion.nav 
+      className="fixed left-0 top-0 h-screen bg-[#1A2335] border-r border-[#2A3547] flex flex-col p-6 group z-50"
+      initial={{ width: '5rem' }}
+      whileHover={{ width: '16rem' }}
+      onHoverStart={() => onHoverChange?.(true)}
+      onHoverEnd={() => onHoverChange?.(false)}
+      transition={{ duration: 0.2 }}
+    >
+      <div className="mb-10 flex items-center">
+        <span className="text-2xl font-bold bg-gradient-to-r from-[#5983FC] to-[#3E60C1] bg-clip-text text-transparent whitespace-nowrap overflow-hidden">
+          <span className="inline-block group-hover:opacity-100 opacity-0 transition-opacity duration-200">
+            Serenity Sphere
+          </span>
         </span>
       </div>
 
@@ -66,8 +75,10 @@ const Navbar = () => {
             to="/"
             className="flex items-center space-x-3 p-3 rounded-xl hover:bg-[#2A3547] transition-colors text-[#B8C7E0]"
           >
-            <FaHome size={20} />
-            <span>Dashboard</span>
+            <FaHome size={20} className="flex-shrink-0" />
+            <span className="group-hover:opacity-100 opacity-0 transition-opacity duration-200 whitespace-nowrap">
+              Dashboard
+            </span>
           </Link>
         </li>
         <li>
@@ -75,8 +86,10 @@ const Navbar = () => {
             to="/journal"
             className="flex items-center space-x-3 p-3 rounded-xl hover:bg-[#2A3547] transition-colors text-[#B8C7E0]"
           >
-            <FaBook size={20} />
-            <span>Journal</span>
+            <FaBook size={20} className="flex-shrink-0" />
+            <span className="group-hover:opacity-100 opacity-0 transition-opacity duration-200 whitespace-nowrap">
+              Journal
+            </span>
           </Link>
         </li>
         <li>
@@ -84,8 +97,10 @@ const Navbar = () => {
             to="/mood"
             className="flex items-center space-x-3 p-3 rounded-xl hover:bg-[#2A3547] transition-colors text-[#B8C7E0]"
           >
-            <FaChartLine size={20} />
-            <span>Mood Trends</span>
+            <FaChartLine size={20} className="flex-shrink-0" />
+            <span className="group-hover:opacity-100 opacity-0 transition-opacity duration-200 whitespace-nowrap">
+              Mood Trends
+            </span>
           </Link>
         </li>
         <li>
@@ -93,8 +108,10 @@ const Navbar = () => {
             to="/profile"
             className="flex items-center space-x-3 p-3 rounded-xl hover:bg-[#2A3547] transition-colors text-[#B8C7E0]"
           >
-            <FaUser size={20} />
-            <span>Profile</span>
+            <FaUser size={20} className="flex-shrink-0" />
+            <span className="group-hover:opacity-100 opacity-0 transition-opacity duration-200 whitespace-nowrap">
+              Profile
+            </span>
           </Link>
         </li>
       </ul>
@@ -104,11 +121,13 @@ const Navbar = () => {
           onClick={handleLogout}
           className="w-full flex items-center space-x-3 p-3 rounded-xl hover:bg-[#2A3547] text-[#B8C7E0]"
         >
-          <FaSignOutAlt size={20} />
-          <span>Log Out</span>
+          <FaSignOutAlt size={20} className="flex-shrink-0" />
+          <span className="group-hover:opacity-100 opacity-0 transition-opacity duration-200 whitespace-nowrap">
+            Log Out
+          </span>
         </button>
       </div>
-    </nav>
+    </motion.nav>
   );
 };
 

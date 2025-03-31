@@ -461,20 +461,14 @@ const MoodLog = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#0F172A] ml-64">
-      <NotificationCenter />
-      {/* Remove this line that renders the ReduxDebug component */}
-      {/* <ReduxDebug /> */}
-      
-      <div className="max-w-7xl mx-auto px-8 py-12">
-        
-        <div className="mb-10">
+    <div className="p-6">
+      <div className="max-w-7xl mx-auto">
+        <div className="mb-8">
           <h1 className="text-3xl font-bold text-white mb-2">Mood Analytics</h1>
-          <p className="text-[#B8C7E0]">
-            Track and visualize your emotional journey over time
-          </p>
+          <p className="text-[#B8C7E0]">Track and visualize your emotional journey over time</p>
         </div>
 
+        <NotificationCenter />
         
         <div className="bg-[#1A2335] p-6 rounded-xl border border-[#2A3547] mb-8">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-4">

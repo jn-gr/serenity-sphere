@@ -54,8 +54,8 @@ const JournalList = () => {
   };
 
   return (
-    <div className="ml-64 min-h-screen bg-[#0F172A]">
-      <div className="max-w-7xl mx-auto px-8 py-12">
+    <div className="p-6">
+      <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex justify-between items-center mb-12">
           <div>

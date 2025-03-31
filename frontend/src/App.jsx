@@ -3,8 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { Provider, useSelector, useDispatch } from 'react-redux'
 import { store } from './store/store'
 import api from './services/api'
-import Navbar from './components/layout/Navbar'
-import Footer from './components/layout/Footer'
+import Layout from './components/layout/Layout'
 import Home from './features/home/Home'
 import Login from './features/auth/Login'
 import Register from './features/auth/Register'
@@ -51,21 +50,17 @@ const AppContent = () => {
   return (
     <Router>
       <ThemeProvider>
-        <div className="app-container">
-          <Navbar />
-          <main className="main-content">
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/login" element={!isAuthenticated ? <Login /> : <Navigate to="/" />} />
-              <Route path="/register" element={!isAuthenticated ? <Register /> : <Navigate to="/" />} />
-              <Route path="/journal" element={isAuthenticated ? <JournalList /> : <Navigate to="/login" />} />
-              <Route path="/mood" element={isAuthenticated ? <MoodLog /> : <Navigate to="/login" />} />
-              <Route path="/profile" element={isAuthenticated ? <Profile /> : <Navigate to="/login" />} />
-              {/* Add more routes as needed */}
-            </Routes>
-          </main>
-          <Footer />
-        </div>
+        <Layout>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/login" element={!isAuthenticated ? <Login /> : <Navigate to="/" />} />
+            <Route path="/register" element={!isAuthenticated ? <Register /> : <Navigate to="/" />} />
+            <Route path="/journal" element={isAuthenticated ? <JournalList /> : <Navigate to="/login" />} />
+            <Route path="/mood" element={isAuthenticated ? <MoodLog /> : <Navigate to="/login" />} />
+            <Route path="/profile" element={isAuthenticated ? <Profile /> : <Navigate to="/login" />} />
+            {/* Add more routes as needed */}
+          </Routes>
+        </Layout>
       </ThemeProvider>
     </Router>
   )

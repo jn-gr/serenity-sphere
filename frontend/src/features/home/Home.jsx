@@ -171,8 +171,8 @@ const Home = () => {
 
   // Authenticated Dashboard with animations
   return (
-    <div className="ml-64 min-h-screen bg-[#0F172A]">
-      <div className="max-w-7xl mx-auto px-8 py-12">
+    <div className="p-6">
+      <div className="max-w-7xl mx-auto">
         {/* Welcome Header with Stats */}
         <div className="mb-10">
           <motion.div 
@@ -187,7 +187,7 @@ const Home = () => {
                     src={avatar} 
                     alt="Profile" 
                     className="h-full w-full object-cover"
-                    key={user?.id || 'default'} // Add key to force re-render when user changes
+                    key={user?.id || 'default'}
                   />
                 </div>
               ) : (
@@ -283,7 +283,7 @@ const Home = () => {
                     src={avatar} 
                     alt="Profile" 
                     className="h-full w-full object-cover"
-                    key={`small-${user?.id || 'default'}`} // Add key to force re-render when user changes
+                    key={`small-${user?.id || 'default'}`}
                   />
                 </div>
               ) : (
