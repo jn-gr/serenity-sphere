@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaTimes, FaSave, FaRegLightbulb, FaCheck, FaArrowRight, FaArrowLeft, FaPlay, FaPause, FaExternalLinkAlt, FaVolumeMute, FaVolumeUp, FaStopwatch, FaLink, FaYoutube, FaFileAlt, FaBook } from 'react-icons/fa';
+import { FaTimes, FaSave, FaRegLightbulb, FaCheck, FaArrowRight, FaArrowLeft, FaPlay, FaPause, FaExternalLinkAlt, FaVolumeMute, FaVolumeUp, FaStopwatch, FaLink, FaYoutube, FaFileAlt, FaBook, FaEdit, FaTrash } from 'react-icons/fa';
 
 const ExerciseModal = ({ exercise, onClose }) => {
   const [journalEntry, setJournalEntry] = useState('');
@@ -45,6 +45,12 @@ const ExerciseModal = ({ exercise, onClose }) => {
   const [boundaryStatements, setBoundaryStatements] = useState(['', '', '']);
   const [obstacles, setObstacles] = useState(['', '', '']);
   const [selectedBoundary, setSelectedBoundary] = useState('');
+
+  // Add state for task management at the top of the component with other states
+  const [tasks, setTasks] = useState([]);
+  const [newTask, setNewTask] = useState('');
+  const [taskCategory, setTaskCategory] = useState('');
+  const [editingTask, setEditingTask] = useState(null);
 
   const timerRef = useRef(null);
   const audioRef = useRef(null);
@@ -155,7 +161,10 @@ const ExerciseModal = ({ exercise, onClose }) => {
            exerciseContent.type === 'coping' ||
            exerciseContent.type === 'physical' ||
            exerciseContent.type === 'relationship' ||
-           exerciseContent.type === 'work';
+           exerciseContent.type === 'work' ||
+           exercise.type === 'task' ||
+           exercise.link === 'task-prioritization' ||
+           exercise.title === "Task Prioritization Method";
   };
   
   // Render the appropriate interactive component based on exercise type
@@ -1251,6 +1260,158 @@ const ExerciseModal = ({ exercise, onClose }) => {
           </div>
         );
         
+      case 'task':
+        return (
+          <div className="space-y-6">
+            {/* Matrix explanation */}
+            <div className="bg-[#0F172A]/70 p-4 rounded-lg border border-[#2A3547] mb-4">
+              <h4 className="text-white font-medium mb-2">The Eisenhower Matrix</h4>
+              <div className="grid grid-cols-2 gap-2 text-sm">
+                <div className="bg-emerald-500/20 p-3 rounded-lg">
+                  <span className="text-emerald-400 font-medium">Urgent & Important</span>
+                  <p className="text-[#B8C7E0] text-xs mt-1">Do these tasks immediately</p>
+                </div>
+                <div className="bg-blue-500/20 p-3 rounded-lg">
+                  <span className="text-blue-400 font-medium">Important, Not Urgent</span>
+                  <p className="text-[#B8C7E0] text-xs mt-1">Schedule these tasks</p>
+                </div>
+                <div className="bg-amber-500/20 p-3 rounded-lg">
+                  <span className="text-amber-400 font-medium">Urgent, Not Important</span>
+                  <p className="text-[#B8C7E0] text-xs mt-1">Delegate if possible</p>
+                </div>
+                <div className="bg-red-500/20 p-3 rounded-lg">
+                  <span className="text-red-400 font-medium">Neither</span>
+                  <p className="text-[#B8C7E0] text-xs mt-1">Eliminate or postpone</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Task input - Updated layout */}
+            <div className="space-y-3">
+              <div className="flex flex-col gap-2">
+                <input
+                  type="text"
+                  value={newTask}
+                  onChange={(e) => setNewTask(e.target.value)}
+                  placeholder="Enter a task..."
+                  className="w-full bg-[#1A2335] border border-[#2A3547] rounded-lg p-2 text-[#B8C7E0] text-sm focus:outline-none focus:border-[#5983FC]"
+                />
+                <div className="flex gap-2">
+                  <select
+                    value={taskCategory}
+                    onChange={(e) => setTaskCategory(e.target.value)}
+                    className="flex-1 bg-[#1A2335] border border-[#2A3547] rounded-lg p-2 text-[#B8C7E0] text-sm focus:outline-none focus:border-[#5983FC]"
+                  >
+                    <option value="">Select Priority</option>
+                    <option value="urgent-important">Urgent & Important</option>
+                    <option value="important">Important, Not Urgent</option>
+                    <option value="urgent">Urgent, Not Important</option>
+                    <option value="neither">Neither</option>
+                  </select>
+                  <button
+                    onClick={() => {
+                      if (newTask && taskCategory) {
+                        setTasks([...tasks, { text: newTask, category: taskCategory, id: Date.now() }]);
+                        setNewTask('');
+                        setTaskCategory('');
+                      }
+                    }}
+                    className="px-4 py-2 bg-[#5983FC] text-white rounded-lg hover:bg-[#3E60C1] transition-colors whitespace-nowrap"
+                  >
+                    Add Task
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Task categories */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Urgent & Important */}
+              <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-lg p-4">
+                <h5 className="text-emerald-400 font-medium mb-3">Urgent & Important</h5>
+                <div className="space-y-2">
+                  {tasks
+                    .filter(task => task.category === 'urgent-important')
+                    .map(task => (
+                      <TaskItem
+                        key={task.id}
+                        task={task}
+                        onDelete={() => setTasks(tasks.filter(t => t.id !== task.id))}
+                        onEdit={() => setEditingTask(task)}
+                        color="emerald"
+                      />
+                    ))}
+                </div>
+              </div>
+
+              {/* Important, Not Urgent */}
+              <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4">
+                <h5 className="text-blue-400 font-medium mb-3">Important, Not Urgent</h5>
+                <div className="space-y-2">
+                  {tasks
+                    .filter(task => task.category === 'important')
+                    .map(task => (
+                      <TaskItem
+                        key={task.id}
+                        task={task}
+                        onDelete={() => setTasks(tasks.filter(t => t.id !== task.id))}
+                        onEdit={() => setEditingTask(task)}
+                        color="blue"
+                      />
+                    ))}
+                </div>
+              </div>
+
+              {/* Urgent, Not Important */}
+              <div className="bg-amber-500/10 border border-amber-500/20 rounded-lg p-4">
+                <h5 className="text-amber-400 font-medium mb-3">Urgent, Not Important</h5>
+                <div className="space-y-2">
+                  {tasks
+                    .filter(task => task.category === 'urgent')
+                    .map(task => (
+                      <TaskItem
+                        key={task.id}
+                        task={task}
+                        onDelete={() => setTasks(tasks.filter(t => t.id !== task.id))}
+                        onEdit={() => setEditingTask(task)}
+                        color="amber"
+                      />
+                    ))}
+                </div>
+              </div>
+
+              {/* Neither */}
+              <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-4">
+                <h5 className="text-red-400 font-medium mb-3">Neither</h5>
+                <div className="space-y-2">
+                  {tasks
+                    .filter(task => task.category === 'neither')
+                    .map(task => (
+                      <TaskItem
+                        key={task.id}
+                        task={task}
+                        onDelete={() => setTasks(tasks.filter(t => t.id !== task.id))}
+                        onEdit={() => setEditingTask(task)}
+                        color="red"
+                      />
+                    ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Task summary */}
+            <div className="bg-[#0F172A]/70 p-4 rounded-lg border border-[#2A3547]">
+              <h4 className="text-white font-medium mb-2">Action Plan</h4>
+              <div className="space-y-2 text-sm text-[#B8C7E0]">
+                <p>• Focus first on {tasks.filter(t => t.category === 'urgent-important').length} urgent and important tasks</p>
+                <p>• Schedule {tasks.filter(t => t.category === 'important').length} important but not urgent tasks</p>
+                <p>• Consider delegating {tasks.filter(t => t.category === 'urgent').length} urgent but not important tasks</p>
+                <p>• Review and possibly eliminate {tasks.filter(t => t.category === 'neither').length} tasks that are neither urgent nor important</p>
+              </div>
+            </div>
+          </div>
+        );
+        
       default:
         return null;
     }
@@ -1291,6 +1452,12 @@ const ExerciseModal = ({ exercise, onClose }) => {
   // Determine which exercise content to load based on the exercise props
   const determineExerciseKey = () => {
     if (!exercise) return 'default';
+    
+    if (exercise.link === 'task-prioritization' || 
+        (exercise.type === 'task') || 
+        exercise.title === "Task Prioritization Method") {
+      return 'task-prioritization';
+    }
     
     // First check if there's a direct link
     if (exercise.link && typeof exercise.link === 'string') {
@@ -1487,64 +1654,64 @@ const ExerciseModal = ({ exercise, onClose }) => {
   };
   
   // All exercise content definitions
-  const exerciseContents = {
-    // GRIEF EXERCISES
-    'grief-journal': {
-      title: "Grief Journaling Exercise",
-      description: "Writing about your grief can help process emotions and honor your memories.",
-      steps: [
-        {
-          title: "Prepare",
-          content: "Find a quiet space where you won't be interrupted. Take a few deep breaths to center yourself."
-        },
-        {
-          title: "Remember",
-          content: "Think of a memory with your loved one. It could be a special moment, a regular day, or something that captures their essence."
-        },
-        {
-          title: "Write",
-          content: "Write freely about this memory. What happened? What did you see, hear, or feel? What made this moment meaningful?"
-        },
-        {
-          title: "Reflect",
-          content: "How does remembering make you feel now? Notice your emotions without judgment. There's no right or wrong way to feel."
-        }
-      ],
-      prompts: [
-        "Describe a memory that brings you joy when you think of your loved one.",
-        "What qualities or traits do you miss most about them?",
-        "If you could tell them something now, what would you say?",
-        "How has your relationship with them shaped who you are today?",
-        "What traditions or activities remind you of them?"
-      ],
-      tips: [
-        "Don't worry about grammar or structure - just write from the heart.",
-        "It's okay if tears come while writing - that's a natural part of grief.",
-        "You can save your journal entries to revisit when you need to feel connected.",
-        "There's no timeline for grief. Be patient with yourself in this process."
-      ],
-      resources: [
-        {
+        const exerciseContents = {
+          // GRIEF EXERCISES
+          'grief-journal': {
+            title: "Grief Journaling Exercise",
+            description: "Writing about your grief can help process emotions and honor your memories.",
+            steps: [
+              {
+                title: "Prepare",
+                content: "Find a quiet space where you won't be interrupted. Take a few deep breaths to center yourself."
+              },
+              {
+                title: "Remember",
+                content: "Think of a memory with your loved one. It could be a special moment, a regular day, or something that captures their essence."
+              },
+              {
+                title: "Write",
+                content: "Write freely about this memory. What happened? What did you see, hear, or feel? What made this moment meaningful?"
+              },
+              {
+                title: "Reflect",
+                content: "How does remembering make you feel now? Notice your emotions without judgment. There's no right or wrong way to feel."
+              }
+            ],
+            prompts: [
+              "Describe a memory that brings you joy when you think of your loved one.",
+              "What qualities or traits do you miss most about them?",
+              "If you could tell them something now, what would you say?",
+              "How has your relationship with them shaped who you are today?",
+              "What traditions or activities remind you of them?"
+            ],
+            tips: [
+              "Don't worry about grammar or structure - just write from the heart.",
+              "It's okay if tears come while writing - that's a natural part of grief.",
+              "You can save your journal entries to revisit when you need to feel connected.",
+              "There's no timeline for grief. Be patient with yourself in this process."
+            ],
+            resources: [
+              {
           type: "article",
-          title: "What is Normal Grief? | Mayo Clinic",
-          description: "Expert information about grief processes and coping strategies",
+                title: "What is Normal Grief? | Mayo Clinic",
+                description: "Expert information about grief processes and coping strategies",
           url: "https://www.mayoclinic.org/patient-visitor-guide/support-groups/what-is-grief"
-        },
-        {
+              },
+              {
           type: "video",
-          title: "Coping with Grief and Loss | HelpGuide.org",
-          description: "Comprehensive guide to understanding and navigating grief",
+                title: "Coping with Grief and Loss | HelpGuide.org",
+                description: "Comprehensive guide to understanding and navigating grief",
           url: "https://www.helpguide.org/articles/grief/coping-with-grief-and-loss.htm"
         },
         {
           type: "website",
-          title: "What's Your Grief: 64 Journaling Prompts",
-          description: "Extensive list of journaling prompts specifically for grief",
+                title: "What's Your Grief: 64 Journaling Prompts",
+                description: "Extensive list of journaling prompts specifically for grief",
           url: "https://whatsyourgrief.com/64-journaling-prompts-for-coping-with-grief/"
-        }
-      ],
-      type: "journal"
-    },
+              }
+            ],
+            type: "journal"
+          },
     'memory-honor': {
       title: "Memory Honor Ritual",
       description: "Create a small ritual to honor what you've lost while acknowledging the need to move forward.",
@@ -1608,9 +1775,9 @@ const ExerciseModal = ({ exercise, onClose }) => {
     'grief-letter': {
       title: "Letter of Release",
       description: "Write a letter expressing unresolved feelings toward what you've lost.",
-      steps: [
-        {
-          title: "Prepare",
+            steps: [
+              {
+                title: "Prepare",
           content: "Find a quiet space and set aside 20-30 minutes of uninterrupted time. Have paper and pen ready, or open a document on your device."
         },
         {
@@ -1640,9 +1807,9 @@ const ExerciseModal = ({ exercise, onClose }) => {
         "What have I learned from this loss?",
         "How will I carry you/this forward with me?",
         "What am I ready to release now?"
-      ],
-      resources: [
-        {
+            ],
+            resources: [
+              {
           type: "article",
           title: "Writing to Heal | James Pennebaker Research",
           description: "Scientific evidence behind expressive writing for processing loss",
@@ -1705,59 +1872,59 @@ const ExerciseModal = ({ exercise, onClose }) => {
     },
     
     // ANXIETY EXERCISES
-    'grounding': {
-      title: "5-4-3-2-1 Grounding Exercise",
-      description: "A sensory awareness technique to help manage anxiety and bring you back to the present moment.",
-      steps: [
-        {
-          title: "Observe",
-          content: "Look around and identify 5 things you can SEE in the room. Say them out loud or note them mentally."
-        },
-        {
-          title: "Touch",
-          content: "Find 4 things you can TOUCH or FEEL. This could be the texture of your clothing, the surface of a table, or the feeling of the chair against your back."
-        },
-        {
-          title: "Listen",
-          content: "Focus on 3 things you can HEAR. These might be distant sounds, like birds outside, or closer sounds, like your own breathing."
-        },
-        {
-          title: "Smell",
-          content: "Notice 2 things you can SMELL. If you can't smell anything at first, move to another spot or find something with a scent, like hand lotion or a candle."
-        },
-        {
-          title: "Taste",
-          content: "Identify 1 thing you can TASTE. You might take a sip of a beverage, eat a small piece of food, or simply notice the current taste in your mouth."
-        }
-      ],
-      tips: [
-        "Take your time with each step – there's no rush.",
-        "If you're in a situation where you can't speak aloud, just note each observation silently.",
-        "For a shorter exercise, you can do a 3-2-1 version with just three senses.",
-        "Practice regularly to make this technique more effective during high-anxiety moments."
-      ],
-      resources: [
-        {
+          'grounding': {
+            title: "5-4-3-2-1 Grounding Exercise",
+            description: "A sensory awareness technique to help manage anxiety and bring you back to the present moment.",
+            steps: [
+              {
+                title: "Observe",
+                content: "Look around and identify 5 things you can SEE in the room. Say them out loud or note them mentally."
+              },
+              {
+                title: "Touch",
+                content: "Find 4 things you can TOUCH or FEEL. This could be the texture of your clothing, the surface of a table, or the feeling of the chair against your back."
+              },
+              {
+                title: "Listen",
+                content: "Focus on 3 things you can HEAR. These might be distant sounds, like birds outside, or closer sounds, like your own breathing."
+              },
+              {
+                title: "Smell",
+                content: "Notice 2 things you can SMELL. If you can't smell anything at first, move to another spot or find something with a scent, like hand lotion or a candle."
+              },
+              {
+                title: "Taste",
+                content: "Identify 1 thing you can TASTE. You might take a sip of a beverage, eat a small piece of food, or simply notice the current taste in your mouth."
+              }
+            ],
+            tips: [
+              "Take your time with each step – there's no rush.",
+              "If you're in a situation where you can't speak aloud, just note each observation silently.",
+              "For a shorter exercise, you can do a 3-2-1 version with just three senses.",
+              "Practice regularly to make this technique more effective during high-anxiety moments."
+            ],
+            resources: [
+              {
           type: "article",
-          title: "Grounding Techniques | University of Rochester Medical Center",
-          description: "Evidence-based grounding techniques from mental health experts",
+                title: "Grounding Techniques | University of Rochester Medical Center",
+                description: "Evidence-based grounding techniques from mental health experts",
           url: "https://www.urmc.rochester.edu/behavioral-health-partners/bhp-blog/april-2018/5-4-3-2-1-coping-technique-for-anxiety.aspx"
-        },
-        {
+              },
+              {
           type: "video",
-          title: "How to Ground Yourself During an Anxiety Attack | Healthline",
-          description: "Practical strategies for using grounding during high anxiety moments",
+                title: "How to Ground Yourself During an Anxiety Attack | Healthline",
+                description: "Practical strategies for using grounding during high anxiety moments",
           url: "https://www.healthline.com/health/grounding-techniques"
-        },
-        {
+              },
+              {
           type: "website",
-          title: "VA: PTSD Coach Online - Grounding Exercises",
-          description: "Collection of grounding exercises from the Veterans Administration",
+                title: "VA: PTSD Coach Online - Grounding Exercises",
+                description: "Collection of grounding exercises from the Veterans Administration",
           url: "https://www.ptsd.va.gov/apps/ptsdcoachonline/tools/index.htm"
-        }
-      ],
-      type: "sensory"
-    },
+              }
+            ],
+            type: "sensory"
+          },
     'breathing': {
       title: "4-7-8 Breathing Technique",
       description: "A calming breathing exercise to help reduce anxiety and stress.",
@@ -1856,62 +2023,62 @@ const ExerciseModal = ({ exercise, onClose }) => {
       ],
       type: "checklist"
     },
-    'muscle-relaxation': {
-      title: "Progressive Muscle Relaxation",
+          'muscle-relaxation': {
+            title: "Progressive Muscle Relaxation",
       description: "Systematically tense and release muscle groups to reduce physical tension.",
-      steps: [
-        {
-          title: "Prepare",
-          content: "Find a comfortable position sitting or lying down. Close your eyes if you feel comfortable doing so."
-        },
-        {
-          title: "Feet & Legs",
-          content: "Start with your feet and legs. Tense these muscles by pointing your toes and tightening your calves and thighs. Hold for 5 seconds, then release completely. Notice the difference between tension and relaxation."
-        },
-        {
-          title: "Abdomen & Chest",
-          content: "Move to your abdomen and chest. Tighten these muscles by taking a deep breath and holding it while clenching your stomach muscles. Hold for 5 seconds, then release, letting the breath go."
-        },
-        {
-          title: "Arms & Hands",
-          content: "Next, focus on your arms and hands. Make fists and tense your arms. Hold for 5 seconds, then release, letting your hands go limp."
-        },
-        {
-          title: "Shoulders & Neck",
-          content: "Move to your shoulders and neck. Raise your shoulders toward your ears and tighten your neck muscles. Hold for 5 seconds, then release, feeling the tension melt away."
-        },
-        {
-          title: "Face",
-          content: "Finally, tense the muscles in your face by squeezing your eyes shut and clenching your jaw. Hold for 5 seconds, then release, feeling your face soften."
-        },
-        {
-          title: "Complete Body",
-          content: "Now, become aware of your entire body. Notice any remaining tension and let it go. Feel a wave of relaxation flowing from the top of your head to the tips of your toes."
-        }
-      ],
-      resources: [
-        {
+            steps: [
+              {
+                title: "Prepare",
+                content: "Find a comfortable position sitting or lying down. Close your eyes if you feel comfortable doing so."
+              },
+              {
+                title: "Feet & Legs",
+                content: "Start with your feet and legs. Tense these muscles by pointing your toes and tightening your calves and thighs. Hold for 5 seconds, then release completely. Notice the difference between tension and relaxation."
+              },
+              {
+                title: "Abdomen & Chest",
+                content: "Move to your abdomen and chest. Tighten these muscles by taking a deep breath and holding it while clenching your stomach muscles. Hold for 5 seconds, then release, letting the breath go."
+              },
+              {
+                title: "Arms & Hands",
+                content: "Next, focus on your arms and hands. Make fists and tense your arms. Hold for 5 seconds, then release, letting your hands go limp."
+              },
+              {
+                title: "Shoulders & Neck",
+                content: "Move to your shoulders and neck. Raise your shoulders toward your ears and tighten your neck muscles. Hold for 5 seconds, then release, feeling the tension melt away."
+              },
+              {
+                title: "Face",
+                content: "Finally, tense the muscles in your face by squeezing your eyes shut and clenching your jaw. Hold for 5 seconds, then release, feeling your face soften."
+              },
+              {
+                title: "Complete Body",
+                content: "Now, become aware of your entire body. Notice any remaining tension and let it go. Feel a wave of relaxation flowing from the top of your head to the tips of your toes."
+              }
+            ],
+            resources: [
+              {
           type: "article",
-          title: "Progressive Muscle Relaxation | Anxiety Canada",
-          description: "Detailed guide with audio instructions for PMR",
+                title: "Progressive Muscle Relaxation | Anxiety Canada",
+                description: "Detailed guide with audio instructions for PMR",
           url: "https://www.anxietycanada.com/articles/how-to-do-progressive-muscle-relaxation/"
         },
         {
           type: "video",
-          title: "15-Minute Progressive Muscle Relaxation | YouTube",
-          description: "Guided video to follow along with a full PMR session",
+                title: "15-Minute Progressive Muscle Relaxation | YouTube",
+                description: "Guided video to follow along with a full PMR session",
           url: "https://www.youtube.com/watch?v=1nZEdqcGVzo"
-        }
-      ],
-      type: "physical"
-    },
-    
+              }
+            ],
+            type: "physical"
+          },
+          
     // ANGER MANAGEMENT EXERCISES
     'anger-stop': {
       title: "STOP Technique for Anger",
       description: "A quick method to interrupt anger before it escalates.",
-      steps: [
-        {
+            steps: [
+              {
           title: "S - STOP",
           content: "As soon as you notice anger rising, mentally tell yourself to STOP. Pause whatever you're doing or saying."
         },
@@ -1932,8 +2099,8 @@ const ExerciseModal = ({ exercise, onClose }) => {
           content: "Take three deep breaths before responding to the situation. Breathe in for 4 counts, hold for 1, and exhale for 5."
         }
       ],
-      resources: [
-        {
+            resources: [
+              {
           type: "article",
           title: "Anger Management: 10 Tips to Tame Your Temper | Mayo Clinic",
           description: "Evidence-based approaches for managing anger from medical experts",
@@ -1989,15 +2156,15 @@ const ExerciseModal = ({ exercise, onClose }) => {
           title: "Therapeutic Letters | GoodTherapy",
           description: "Guidelines for therapeutic letter writing",
           url: "https://www.goodtherapy.org/blog/therapeutic-letter-writing-healing-through-words-0712184"
-        }
-      ],
-      type: "journal"
-    },
+              }
+            ],
+            type: "journal"
+          },
     'anger-root-cause': {
       title: "Root Cause Anger Analysis",
       description: "Identify the deeper needs and values behind your anger.",
-      steps: [
-        {
+            steps: [
+              {
           title: "Describe the Trigger",
           content: "Write down the specific situation that triggered your anger. Be objective and focus on facts rather than interpretations."
         },
@@ -2023,9 +2190,9 @@ const ExerciseModal = ({ exercise, onClose }) => {
         "How might my past experiences be influencing my reaction to this situation?",
         "What would addressing my core need look like in this situation?",
         "How might I communicate my needs effectively rather than expressing raw anger?"
-      ],
-      resources: [
-        {
+            ],
+            resources: [
+              {
           type: "article",
           title: "Understanding Anger: How Psychologists Help With Anger Problems | APA",
           description: "Professional perspective on anger and its underlying causes",
@@ -2045,8 +2212,8 @@ const ExerciseModal = ({ exercise, onClose }) => {
     'perspective-taking': {
       title: "Perspective-Taking Practice",
       description: "Strengthen empathy by consciously considering another viewpoint.",
-      steps: [
-        {
+            steps: [
+              {
           title: "Identify the Situation",
           content: "Choose a specific relationship challenge or conflict you're currently experiencing. Briefly describe what happened and who was involved."
         },
@@ -2142,8 +2309,8 @@ const ExerciseModal = ({ exercise, onClose }) => {
     'work-boundaries': {
       title: "Work Boundaries Exercise",
       description: "Establish healthy boundaries to manage work-related stress.",
-      steps: [
-        {
+            steps: [
+              {
           title: "Current Boundary Assessment",
           content: "Make two columns: 'My Work Hours' (when you're officially supposed to work) and 'When Work Actually Happens' (including early mornings, evenings, weekends). Note the discrepancies."
         },
@@ -2168,8 +2335,8 @@ const ExerciseModal = ({ exercise, onClose }) => {
           content: "Choose one boundary to implement this week. Start small with something you feel confident you can maintain."
         }
       ],
-      resources: [
-        {
+            resources: [
+              {
           type: "article",
           title: "How to Set Boundaries at Work | Harvard Business Review",
           description: "Professional strategies for establishing effective work boundaries",
@@ -2224,8 +2391,8 @@ const ExerciseModal = ({ exercise, onClose }) => {
     'mindful-observation': {
       title: "Mindful Observation Practice",
       description: "Develop present-moment awareness by fully focusing on a single object.",
-      steps: [
-        {
+            steps: [
+              {
           title: "Choose an Object",
           content: "Find a natural object in your environment - a flower, insect, cloud formation, or any natural element that captures your attention."
         },
@@ -2266,8 +2433,8 @@ const ExerciseModal = ({ exercise, onClose }) => {
     'body-scan': {
       title: "Body Scan Meditation",
       description: "A guided practice to develop awareness of physical sensations throughout your body.",
-      steps: [
-        {
+            steps: [
+              {
           title: "Prepare",
           content: "Find a comfortable position lying down or sitting. Close your eyes if that feels comfortable. Take several deep breaths to settle in."
         },
@@ -2297,8 +2464,8 @@ const ExerciseModal = ({ exercise, onClose }) => {
         }
       ],
       audioUrl: "https://cdn.example.com/body-scan.mp3", // Replace with actual audio URL
-      resources: [
-        {
+            resources: [
+              {
           type: "video",
           title: "Body Scan Meditation | Greater Good in Action",
           description: "Guided body scan from UC Berkeley's Greater Good Science Center",
@@ -2416,8 +2583,8 @@ const ExerciseModal = ({ exercise, onClose }) => {
     'values-based-living': {
       title: "Values-Based Wellness Planning",
       description: "Design a personalized health plan aligned with your core values and meaningful goals.",
-      steps: [
-        {
+            steps: [
+              {
           title: "Values Reflection",
           content: "Consider what matters most to you in life. Why do you want to be healthy? Is it for family, independence, adventure, contribution, learning, or something else?"
         },
@@ -2440,10 +2607,10 @@ const ExerciseModal = ({ exercise, onClose }) => {
         {
           title: "Environment Setup",
           content: "Identify one change to your physical environment that would make your new habit easier. How can you make the healthy choice the obvious choice?"
-        }
-      ],
-      resources: [
-        {
+              }
+            ],
+            resources: [
+              {
           type: "book",
           title: "Tiny Habits | BJ Fogg",
           description: "Science-based approach to behavior change using small steps",
@@ -2675,10 +2842,10 @@ const ExerciseModal = ({ exercise, onClose }) => {
             className="w-8 h-8 rounded-full flex items-center justify-center text-[#B8C7E0] hover:bg-[#2A3547] transition-colors"
             aria-label="Close"
           >
-            <FaTimes />
-          </button>
-        </div>
-        
+              <FaTimes />
+            </button>
+          </div>
+          
         {/* Description */}
         <p className="text-[#B8C7E0] mb-4">{exerciseContent?.description || exercise.description}</p>
         
@@ -2688,30 +2855,30 @@ const ExerciseModal = ({ exercise, onClose }) => {
             <div className="flex items-center text-[#B8C7E0] text-sm">
               <FaStopwatch className="mr-2 text-[#5983FC]" />
               {exercise.duration}
-            </div>
-          )}
+          </div>
+        )}
           {(exerciseContent?.type || exercise.type) && (
             <div className="bg-[#0F172A] px-3 py-1 rounded-full text-[#B8C7E0] text-xs font-medium">
               {(exerciseContent?.type || exercise.type).charAt(0).toUpperCase() + (exerciseContent?.type || exercise.type).slice(1)}
-            </div>
-          )}
-        </div>
+          </div>
+        )}
+              </div>
         
         {/* Tabs: Steps / Resources */}
         <div className="flex border-b border-[#2A3547] mb-4">
-          <button
+                <button
             onClick={() => setShowResources(false)}
             className={`px-4 py-2 ${!showResources ? 'text-[#5983FC] border-b-2 border-[#5983FC]' : 'text-[#B8C7E0]'}`}
-          >
+                >
             Exercise
-          </button>
-          <button
+                </button>
+                <button
             onClick={() => setShowResources(true)}
             className={`px-4 py-2 ${showResources ? 'text-[#5983FC] border-b-2 border-[#5983FC]' : 'text-[#B8C7E0]'}`}
-          >
+                >
             Resources
-          </button>
-        </div>
+                </button>
+              </div>
         
         {!showResources ? (
           // Exercise view
@@ -2730,19 +2897,19 @@ const ExerciseModal = ({ exercise, onClose }) => {
                           className="h-1 bg-[#5983FC] rounded-full" 
                           style={{ width: `${((step + 1) / exerciseContent.steps.length) * 100}%` }}
                         ></div>
-                      </div>
-                    </div>
-                  </div>
-                )}
-                
+              </div>
+            </div>
+          </div>
+        )}
+        
                 {/* Current step display */}
                 <div className="bg-[#0F172A] p-4 rounded-lg border border-[#2A3547] mb-4">
                   <h3 className="text-[#5983FC] text-sm font-medium mb-2">
                     {exerciseContent?.steps?.[step]?.title || `Step ${step + 1}`}
                   </h3>
                   <p className="text-white">{getCurrentStep()}</p>
-                </div>
-                
+            </div>
+            
                 {/* Interactive component if applicable */}
                 {hasInteractiveComponent() && renderInteractiveComponent()}
                 
@@ -2752,20 +2919,20 @@ const ExerciseModal = ({ exercise, onClose }) => {
                     <h4 className="text-[#5983FC] text-sm font-medium mb-2 flex items-center">
                       <FaRegLightbulb className="mr-2" /> Helpful Tips:
                     </h4>
-                    <ul className="space-y-2">
+                  <ul className="space-y-2">
                       {exerciseContent.tips.map((tip, idx) => (
                         <li key={idx} className="text-[#B8C7E0] text-sm flex items-start">
                           <span className="text-[#5983FC] mr-2">•</span>
                           <span>{tip}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-                
+                      </li>
+                    ))}
+                  </ul>
+              </div>
+            )}
+            
                 {/* Navigation buttons */}
                 <div className="flex justify-between mt-6">
-                  <button
+              <button
                     onClick={prevStep}
                     disabled={step === 0}
                     className={`px-4 py-2 rounded-lg flex items-center ${
@@ -2775,7 +2942,7 @@ const ExerciseModal = ({ exercise, onClose }) => {
                     }`}
                   >
                     <FaArrowLeft className="mr-2" /> Previous
-                  </button>
+              </button>
                   
                   {step < (exerciseContent?.steps?.length - 1) ? (
                     <button
@@ -2791,8 +2958,8 @@ const ExerciseModal = ({ exercise, onClose }) => {
                     >
                       Complete <FaCheck className="ml-2" />
                     </button>
-                  )}
-                </div>
+            )}
+          </div>
               </>
             ) : (
               // Completion view
@@ -2806,12 +2973,12 @@ const ExerciseModal = ({ exercise, onClose }) => {
                 </p>
                 
                 {/* Reflection prompt */}
-                <div className="mb-6">
+          <div className="mb-6">
                   <textarea
                     className="w-full h-20 bg-[#0F172A] border border-[#2A3547] rounded-lg p-3 text-[#B8C7E0] focus:outline-none focus:border-[#5983FC] mb-4"
                     placeholder="Share your thoughts on how this exercise affected you..."
                   />
-                </div>
+            </div>
                 
                 <button
                   onClick={onClose}
@@ -2819,8 +2986,8 @@ const ExerciseModal = ({ exercise, onClose }) => {
                 >
                   Done
                 </button>
-              </div>
-            )}
+          </div>
+        )}
           </div>
         ) : (
           // Resources view
@@ -2833,8 +3000,8 @@ const ExerciseModal = ({ exercise, onClose }) => {
                   <a 
                     key={index}
                     href={resource.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                      target="_blank"
+                      rel="noopener noreferrer"
                     className="flex items-start bg-[#0F172A] p-3 rounded-lg border border-[#2A3547] hover:border-[#5983FC] transition-colors"
                   >
                     <div className="bg-[#2A3547] p-2 rounded-lg mr-3">
@@ -2855,7 +3022,7 @@ const ExerciseModal = ({ exercise, onClose }) => {
                     <FaExternalLinkAlt className="text-[#5983FC] ml-2 mt-1 flex-shrink-0" />
                   </a>
                 ))}
-              </div>
+            </div>
             ) : (
               <p className="text-[#B8C7E0] text-sm">
                 No external resources available for this exercise.
@@ -2869,3 +3036,24 @@ const ExerciseModal = ({ exercise, onClose }) => {
 };
 
 export default ExerciseModal;
+
+// Add this new TaskItem component at the bottom of the file
+const TaskItem = ({ task, onDelete, onEdit, color }) => (
+  <div className={`flex items-center justify-between bg-[#1A2335] p-2 rounded-lg border border-${color}-500/20`}>
+    <span className="text-[#B8C7E0] text-sm">{task.text}</span>
+    <div className="flex gap-2">
+              <button
+        onClick={onEdit}
+        className="text-[#5983FC] hover:text-[#3E60C1] transition-colors"
+              >
+        <FaEdit />
+              </button>
+            <button
+        onClick={onDelete}
+        className="text-red-400 hover:text-red-500 transition-colors"
+              >
+        <FaTrash />
+            </button>
+          </div>
+  </div>
+  );

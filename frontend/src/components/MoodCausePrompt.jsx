@@ -890,17 +890,32 @@ const MoodCausePrompt = ({ notification, onClose }) => {
       },
       {
         title: "Task Prioritization Method",
-        description: "Organize tasks to reduce overwhelm and increase productivity.",
+        description: "Organize tasks using the Eisenhower Matrix to reduce overwhelm and increase productivity.",
         steps: [
           "List all current tasks and commitments",
           "Categorize each as: Urgent & Important, Important but Not Urgent, Urgent but Not Important, or Neither",
           "Schedule Important tasks first, then address Urgent items",
           "Identify at least one task that can be delegated or eliminated",
-          "Create a focused plan for your top 3 priorities",
-          "Schedule specific time blocks for important work"
+          "Create a focused plan for your top 3 priorities"
         ],
         duration: "15-20 minutes",
-        benefits: "Reduces overwhelm, improves focus, aligns efforts with priorities"
+        benefits: "Reduces overwhelm, improves focus, aligns efforts with priorities",
+        type: "task",
+        link: "task-prioritization",
+        resources: [
+          {
+            type: "article",
+            title: "The Eisenhower Matrix: Time & Priority Management",
+            description: "Learn about effective task prioritization using the Eisenhower Matrix",
+            url: "https://www.eisenhower.me/eisenhower-matrix/"
+          },
+          {
+            type: "video",
+            title: "How to Prioritize Tasks Effectively",
+            description: "Practical guide to task management and prioritization",
+            url: "https://www.youtube.com/watch?v=czh3X0VgkuY"
+          }
+        ]
       },
       {
         title: "Values-Based Work Reflection",
@@ -1564,6 +1579,25 @@ const MoodCausePrompt = ({ notification, onClose }) => {
     else if (recommendation.title === "Work Boundaries Exercise") {
       enhancedExercise.link = 'work-boundaries';
       enhancedExercise.type = 'work';
+    }
+    // In the handleRecommendationClick function, add this case
+    else if (recommendation.title === "Task Prioritization Method") {
+      enhancedExercise.link = 'task-prioritization';
+      enhancedExercise.type = 'task';
+      enhancedExercise.resources = [
+        {
+          type: "article",
+          title: "The Eisenhower Matrix: Time & Priority Management",
+          description: "Learn about effective task prioritization using the Eisenhower Matrix",
+          url: "https://www.eisenhower.me/eisenhower-matrix/"
+        },
+        {
+          type: "video",
+          title: "How to Prioritize Tasks Effectively",
+          description: "Practical guide to task management and prioritization",
+          url: "https://www.youtube.com/watch?v=czh3X0VgkuY"
+        }
+      ];
     }
     
     // Ensure resources are available

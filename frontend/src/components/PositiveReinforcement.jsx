@@ -9,14 +9,14 @@ const PositiveReinforcement = ({ notification, onClose }) => {
     optimistic: "Your positive outlook is inspiring! 🌟",
     calm: "Your inner peace is admirable! 🧘♂️"
   };
-
+  
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4">
       <div className="bg-[#1A2335] rounded-xl p-6 max-w-md w-full text-center">
         <div className="text-6xl mb-4">🎉</div>
         <h3 className="text-xl font-semibold text-white mb-2">
           Amazing Consistency!
-        </h3>
+          </h3>
         <p className="text-[#B8C7E0] mb-4">
           {positiveMessages[notification.mood] || "Your positive mood trend is impressive!"}
         </p>
