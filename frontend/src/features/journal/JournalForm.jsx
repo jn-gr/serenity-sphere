@@ -288,72 +288,114 @@ const JournalForm = () => {
 
     return (
         <>
-            <div className="bg-[#1A2335] rounded-2xl border border-[#2A3547] p-6 w-full">
-                <h2 className="text-xl font-semibold text-white mb-4">
-                    {hasEntryToday ? "Edit Today's Journal Entry" : "Create Today's Journal Entry"}
-                </h2>
-                
-                {hasEntryToday && (
-                    <div className="mb-4 p-3 bg-[#2A3547] rounded-lg text-[#B8C7E0]">
-                        <p className="text-sm">
-                            You've already written an entry today. You can edit it below.
+            <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="bg-[#1A2335] rounded-2xl border border-[#2A3547] p-6 w-full shadow-lg hover:border-[#3E60C1]/50 transition-all duration-300"
+            >
+                <div className="flex items-center gap-3 mb-6">
+                    <div className="bg-[#3E60C1]/20 p-3 rounded-xl">
+                        <FaPaperPlane className="text-[#5983FC]" />
+                    </div>
+                    <div>
+                        <h2 className="text-2xl font-semibold text-white">
+                            {hasEntryToday ? "Today's Journal Entry" : "New Journal Entry"}
+                        </h2>
+                        <p className="text-[#B8C7E0] text-sm mt-1">
+                            {hasEntryToday ? "Edit and update your thoughts from today" : "Share your thoughts and feelings"}
                         </p>
                     </div>
+                </div>
+                
+                {hasEntryToday && (
+                    <motion.div 
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="mb-6 p-4 bg-[#2A3547] rounded-xl border border-[#3E60C1]/30"
+                    >
+                        <div className="flex items-start gap-3">
+                            <div className="bg-[#3E60C1]/20 p-2 rounded-lg">
+                                <FaCheck className="text-[#5983FC]" size={14} />
+                            </div>
+                            <div>
+                                <p className="text-[#B8C7E0] text-sm">
+                                    You've already written an entry today. Feel free to edit and refine your thoughts below.
+                                </p>
+                            </div>
+                        </div>
+                    </motion.div>
                 )}
                 
                 {isLoading ? (
-                    <div className="flex justify-center items-center py-12">
-                        <div className="animate-pulse text-[#B8C7E0]">Loading...</div>
+                    <div className="flex flex-col items-center justify-center py-12 space-y-4">
+                        <div className="w-10 h-10 border-4 border-[#3E60C1]/30 border-t-[#5983FC] rounded-full animate-spin"></div>
+                        <p className="text-[#B8C7E0] animate-pulse">Loading your journal...</p>
                     </div>
                 ) : (
                     <form onSubmit={handleSubmit} className="space-y-6">
                         <div>
-                            <textarea
-                                value={content}
-                                onChange={(e) => setContent(e.target.value)}
-                                placeholder="How are you feeling today? What's on your mind?"
-                                className={`w-full p-4 rounded-xl bg-[#0F172A] border ${
-                                    fieldErrors.content ? 'border-red-500' : 'border-[#2A3547]'
-                                } text-[#B8C7E0] min-h-[200px] focus:outline-none focus:border-[#3E60C1] transition-colors`}
-                                disabled={isSubmitting}
-                                aria-invalid={fieldErrors.content ? 'true' : 'false'}
-                                aria-describedby={fieldErrors.content ? "content-error" : undefined}
-                            ></textarea>
-                            
-                            {fieldErrors.content && (
-                                <FieldError message={fieldErrors.content} id="content-error" />
-                            )}
-                        </div>
-                        
-                        <div className="flex justify-between items-center mt-4">
-                            <div className="text-sm text-[#B8C7E0]">
-                                {content.length > 0 && (
-                                    <span className={content.length > 9000 ? 'text-yellow-400' : ''}>
-                                        {content.length} / 10,000 characters
-                                    </span>
-                                )}
+                            <div className="relative">
+                                <textarea
+                                    value={content}
+                                    onChange={(e) => setContent(e.target.value)}
+                                    placeholder="How are you feeling today? What's on your mind?"
+                                    className={`w-full p-5 rounded-xl bg-[#0F172A] border ${
+                                        fieldErrors.content ? 'border-red-500' : 'border-[#2A3547]'
+                                    } text-[#B8C7E0] min-h-[250px] focus:outline-none focus:border-[#3E60C1] focus:ring-2 focus:ring-[#3E60C1]/20 transition-all duration-200 text-base leading-relaxed`}
+                                    disabled={isSubmitting}
+                                    aria-invalid={fieldErrors.content ? 'true' : 'false'}
+                                    aria-describedby={fieldErrors.content ? "content-error" : undefined}
+                                ></textarea>
+                                
+                                <div className="absolute bottom-4 right-4 text-sm text-[#B8C7E0] opacity-70">
+                                    {content.length > 0 && (
+                                        <span className={`transition-colors duration-200 ${
+                                            content.length > 9000 ? 'text-yellow-400' : 
+                                            content.length > 8000 ? 'text-yellow-300/70' : ''
+                                        }`}>
+                                            {content.length} / 10,000
+                                        </span>
+                                    )}
+                                </div>
                             </div>
                             
+                            <AnimatePresence>
+                                {fieldErrors.content && (
+                                    <motion.div
+                                        initial={{ opacity: 0, y: -10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        exit={{ opacity: 0, y: -10 }}
+                                    >
+                                        <FieldError message={fieldErrors.content} id="content-error" />
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
+                        </div>
+                        
+                        <div className="flex justify-end items-center mt-6">
                             <motion.button
                                 whileHover={{ scale: 1.02 }}
                                 whileTap={{ scale: 0.98 }}
                                 type="submit"
-                                className="flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-[#3E60C1] to-[#5983FC] text-white disabled:opacity-70"
+                                className={`flex items-center gap-3 px-8 py-4 rounded-xl text-white font-medium shadow-lg ${
+                                    isSubmitting ? 'bg-[#3E60C1] cursor-not-allowed' :
+                                    'bg-gradient-to-r from-[#3E60C1] to-[#5983FC] hover:shadow-[#5983FC]/20'
+                                } transition-all duration-200 disabled:opacity-70`}
                                 disabled={isSubmitting}
                             >
                                 {isSubmitting ? (
                                     <>
-                                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
-                                        <span>Saving...</span>
+                                        <div className="w-5 h-5 border-3 border-white border-t-transparent rounded-full animate-spin"></div>
+                                        <span>Saving Entry...</span>
                                     </>
                                 ) : showSuccess ? (
                                     <>
-                                        <FaCheck size={16} />
-                                        <span>Saved!</span>
+                                        <FaCheck size={18} />
+                                        <span>Entry Saved!</span>
                                     </>
                                 ) : (
                                     <>
-                                        <FaPaperPlane size={16} />
+                                        <FaPaperPlane size={18} />
                                         <span>{hasEntryToday ? "Update Entry" : "Save Entry"}</span>
                                     </>
                                 )}
@@ -361,7 +403,7 @@ const JournalForm = () => {
                         </div>
                     </form>
                 )}
-            </div>
+            </motion.div>
 
             <SuccessModal 
                 isOpen={showSuccess} 
