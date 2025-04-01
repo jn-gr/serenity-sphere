@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaTimes, FaSave, FaRegLightbulb, FaCheck, FaArrowRight, FaArrowLeft, FaPlay, FaPause, FaExternalLinkAlt, FaVolumeMute, FaVolumeUp, FaStopwatch, FaLink, FaYoutube, FaFileAlt, FaBook, FaEdit, FaTrash, FaPlus, FaClock, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
+import { FaTimes, FaSave, FaRegLightbulb, FaCheck, FaArrowRight, FaArrowLeft, FaPlay, FaPause, FaExternalLinkAlt, FaVolumeMute, FaVolumeUp, FaStopwatch, FaLink, FaYoutube, FaFileAlt, FaBook, FaEdit, FaTrash, FaPlus, FaClock, FaChevronLeft, FaChevronRight, FaLightbulb, FaPencilAlt, FaSmile, FaMeh, FaFrown } from 'react-icons/fa';
+import { toast } from 'react-toastify';
 
 const ExerciseModal = ({ exercise, onClose }) => {
   const [journalEntry, setJournalEntry] = useState('');
@@ -126,6 +127,16 @@ const ExerciseModal = ({ exercise, onClose }) => {
   const timerRef = useRef(null);
   const audioRef = useRef(null);
 
+  // Add this near the top of the file with other state declarations
+  const [futurePossibilitiesData, setFuturePossibilitiesData] = useState({
+    situation: '',
+    scenarios: {
+      positive: { description: '', coping: '', resources: '' },
+      neutral: { description: '', coping: '', resources: '' },
+      challenging: { description: '', coping: '', resources: '' }
+    }
+  });
+
   // Extract duration in seconds from exercise duration string if available
   const getDurationInSeconds = () => {
     if (!exercise.duration) return 300; // Default 5 minutes
@@ -244,7 +255,8 @@ const ExerciseModal = ({ exercise, onClose }) => {
            exerciseContent.type === 'meaning-making' ||
            exerciseContent.type === 'continuing-bonds' ||
            exerciseContent.type === 'inner-critic' ||
-           exerciseContent.type === 'uncertainty-tolerance';
+           exerciseContent.type === 'uncertainty-tolerance' ||
+           exerciseContent.type === 'future-possibilities';
   };
 
   // Render the appropriate interactive component based on exercise type
@@ -2868,6 +2880,94 @@ const ExerciseModal = ({ exercise, onClose }) => {
           </div>
         );
 
+      case 'future-possibilities':
+        const updateScenario = (type, newData) => {
+          setFuturePossibilitiesData(prev => ({
+            ...prev,
+            scenarios: {
+              ...prev.scenarios,
+              [type]: newData
+            }
+          }));
+        };
+        
+        const isScenarioComplete = (scenario) => {
+          return scenario.description && scenario.coping && scenario.resources;
+        };
+        
+        const allScenariosComplete = () => {
+          return isScenarioComplete(futurePossibilitiesData.scenarios.positive) &&
+                 isScenarioComplete(futurePossibilitiesData.scenarios.neutral) &&
+                 isScenarioComplete(futurePossibilitiesData.scenarios.challenging);
+        };
+        
+        const handleSave = () => {
+          const exerciseData = {
+            situation: futurePossibilitiesData.situation,
+            scenarios: futurePossibilitiesData.scenarios,
+            completedAt: new Date().toISOString()
+          };
+          
+          console.log('Saving exercise data:', exerciseData);
+          
+          toast.success('Your visualization exercise has been saved!', {
+            position: 'bottom-right',
+            theme: 'dark'
+          });
+          
+          setCompleted(true);
+        };
+        
+        return (
+          <div className="space-y-6">
+            <div className="mb-6">
+              <h4 className="text-white font-medium mb-2">What situation are you uncertain about?</h4>
+              <textarea
+                value={futurePossibilitiesData.situation}
+                onChange={(e) => setFuturePossibilitiesData(prev => ({ ...prev, situation: e.target.value }))}
+                placeholder="Describe the situation you'd like to explore..."
+                className="w-full bg-[#0F172A] border border-[#2A3547] rounded-lg p-3 text-[#B8C7E0] focus:outline-none focus:border-[#5983FC] min-h-[100px] placeholder-[#4B5563]"
+              />
+            </div>
+            
+            {futurePossibilitiesData.situation && (
+              <>
+                <ScenarioInput
+                  type="positive"
+                  scenario={futurePossibilitiesData.scenarios.positive}
+                  onUpdate={(newData) => updateScenario('positive', newData)}
+                  isCompleted={isScenarioComplete(futurePossibilitiesData.scenarios.positive)}
+                />
+                
+                <ScenarioInput
+                  type="neutral"
+                  scenario={futurePossibilitiesData.scenarios.neutral}
+                  onUpdate={(newData) => updateScenario('neutral', newData)}
+                  isCompleted={isScenarioComplete(futurePossibilitiesData.scenarios.neutral)}
+                />
+                
+                <ScenarioInput
+                  type="challenging"
+                  scenario={futurePossibilitiesData.scenarios.challenging}
+                  onUpdate={(newData) => updateScenario('challenging', newData)}
+                  isCompleted={isScenarioComplete(futurePossibilitiesData.scenarios.challenging)}
+                />
+                
+                {allScenariosComplete() && (
+                  <div className="flex justify-end">
+                    <button
+                      onClick={handleSave}
+                      className="px-4 py-2 bg-[#5983FC] text-white rounded-lg hover:bg-[#3E60C1] transition-colors flex items-center"
+                    >
+                      <FaSave className="mr-2" /> Save Visualization
+                    </button>
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+        );
+
       default:
         return null;
     }
@@ -2917,6 +3017,10 @@ const ExerciseModal = ({ exercise, onClose }) => {
         (exercise.type === 'task') ||
         exercise.title === "Task Prioritization Method") {
         return 'task-prioritization';
+      }
+
+      if (exercise.link === 'future-possibilities') {
+        return 'future-possibilities';
       }
 
       if (exercise.link === 'uncertainty-tolerance') {
@@ -4221,6 +4325,19 @@ const ExerciseModal = ({ exercise, onClose }) => {
         "I've developed an implementation plan",
         "I've selected one boundary to start with"
       ]
+    },
+    'future-possibilities': {
+      type: 'future-possibilities',
+      title: 'Future Possibilities Visualization',
+      description: 'Explore different potential outcomes to reduce uncertainty anxiety.',
+      steps: [
+        "Choose a situation with an uncertain outcome",
+        "Visualize three different possible scenarios",
+        "Consider coping strategies for each scenario",
+        "Identify available resources and strengths",
+        "Recognize your capacity to handle different possibilities",
+        "Return to present moment awareness"
+      ]
     }
   };
 
@@ -4524,4 +4641,67 @@ const getProgressMessage = () => {
     return "Great progress! Consider exploring a few more areas of gratitude.";
   }
   return "Begin by selecting areas of your body and noting what you appreciate about them.";
+};
+
+// Add this new component for the scenario input
+const ScenarioInput = ({ type, scenario, onUpdate, isCompleted }) => {
+  const getScenarioIcon = () => {
+    switch (type) {
+      case 'positive':
+        return <FaSmile className="text-emerald-400" />;
+      case 'neutral':
+        return <FaMeh className="text-[#5983FC]" />;
+      case 'challenging':
+        return <FaFrown className="text-amber-400" />;
+      default:
+        return null;
+    }
+  };
+
+  const getScenarioLabel = () => {
+    switch (type) {
+      case 'positive':
+        return 'Positive Outcome';
+      case 'neutral':
+        return 'Neutral Outcome';
+      case 'challenging':
+        return 'Challenging Outcome';
+      default:
+        return '';
+    }
+  };
+
+  return (
+    <div className="mb-6">
+      <div className="flex items-center mb-2">
+        {getScenarioIcon()}
+        <h4 className="text-white font-medium ml-2">{getScenarioLabel()}</h4>
+      </div>
+      <div className="space-y-3">
+        <textarea
+          value={scenario.description || ''}
+          onChange={(e) => onUpdate({ ...scenario, description: e.target.value })}
+          placeholder={`Describe a ${type} possible outcome...`}
+          className="w-full bg-[#0F172A] border border-[#2A3547] rounded-lg p-3 text-[#B8C7E0] focus:outline-none focus:border-[#5983FC] min-h-[80px] placeholder-[#4B5563]"
+        />
+        <textarea
+          value={scenario.coping || ''}
+          onChange={(e) => onUpdate({ ...scenario, coping: e.target.value })}
+          placeholder="How would you cope with this outcome?"
+          className="w-full bg-[#0F172A] border border-[#2A3547] rounded-lg p-3 text-[#B8C7E0] focus:outline-none focus:border-[#5983FC] min-h-[80px] placeholder-[#4B5563]"
+        />
+        <textarea
+          value={scenario.resources || ''}
+          onChange={(e) => onUpdate({ ...scenario, resources: e.target.value })}
+          placeholder="What resources and strengths could help you?"
+          className="w-full bg-[#0F172A] border border-[#2A3547] rounded-lg p-3 text-[#B8C7E0] focus:outline-none focus:border-[#5983FC] min-h-[80px] placeholder-[#4B5563]"
+        />
+      </div>
+      {isCompleted && (
+        <div className="mt-2 text-emerald-400 flex items-center text-sm">
+          <FaCheck className="mr-1" /> Scenario completed
+        </div>
+      )}
+    </div>
+  );
 };

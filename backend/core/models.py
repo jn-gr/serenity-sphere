@@ -177,3 +177,17 @@ class UserRecommendation(models.Model):
     
     def __str__(self):
         return f"{self.user.username} - {self.recommendation.title}"
+
+class JournalReminder(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='journal_reminders')
+    sent_at = models.DateTimeField(auto_now_add=True)
+    reminder_type = models.CharField(max_length=20, choices=[
+        ('streak', 'Streak Reminder'),
+        ('regular', 'Regular Reminder')
+    ])
+    
+    class Meta:
+        unique_together = ['user', 'sent_at']
+        indexes = [
+            models.Index(fields=['user', 'sent_at']),
+        ]

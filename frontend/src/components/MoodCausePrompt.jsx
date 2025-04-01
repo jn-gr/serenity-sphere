@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 import { FaTimes, FaLightbulb, FaExternalLinkAlt, FaRegSmileBeam, FaRegSadTear, FaRegMeh, FaHeartbeat, FaStar, FaChevronRight, FaChevronLeft, FaClock, FaCheck, FaRegLightbulb } from 'react-icons/fa';
+import { FaBriefcase, FaBrain, FaUserFriends, FaRegCompass, FaUserCircle, FaQuestion } from 'react-icons/fa';
 import ExerciseModal from './ExerciseModal';
 
 const MoodCausePrompt = ({ notification, onClose }) => {
@@ -1050,6 +1051,22 @@ const MoodCausePrompt = ({ notification, onClose }) => {
     
     'uncertainty': [
       {
+        title: "Future Possibilities Visualization",
+        description: "Reduce uncertainty anxiety by exploring and visualizing different potential outcomes.",
+        steps: [
+          "Choose a situation with an uncertain outcome",
+          "Visualize three different possible scenarios (positive, neutral, challenging)",
+          "For each scenario, imagine how you would cope effectively",
+          "Note resources and strengths available to help you navigate each outcome",
+          "Recognize your capacity to handle different possibilities",
+          "Bring awareness back to the present moment"
+        ],
+        duration: "15 minutes",
+        benefits: "Builds confidence in coping abilities, reduces fear of unknown",
+        type: "future-possibilities",
+        link: 'future-possibilities'
+      },
+      {
         title: "Uncertainty Tolerance Practice",
         description: "Build comfort with not knowing through mindful awareness.",
         steps: [
@@ -1062,20 +1079,6 @@ const MoodCausePrompt = ({ notification, onClose }) => {
         ],
         duration: "10 minutes",
         benefits: "Reduces anxiety about unknowns, builds tolerance for ambiguity"
-      },
-      {
-        title: "Future Possibilities Visualization",
-        description: "Reduce uncertainty anxiety by exploring potential outcomes.",
-        steps: [
-          "Choose a situation with an uncertain outcome",
-          "Visualize three different possible scenarios (positive, neutral, challenging)",
-          "For each scenario, imagine how you would cope effectively",
-          "Note resources and strengths available to help you navigate each outcome",
-          "Recognize your capacity to handle different possibilities",
-          "Bring awareness back to the present moment"
-        ],
-        duration: "15 minutes",
-        benefits: "Builds confidence in coping abilities, reduces fear of unknown"
       },
       {
         title: "Anchoring in the Present",
@@ -1764,6 +1767,25 @@ const MoodCausePrompt = ({ notification, onClose }) => {
       }
     }
     
+    else if (recommendation.title === "Future Possibilities Visualization") {
+      enhancedExercise.link = 'future-possibilities';
+      enhancedExercise.type = 'future-possibilities';
+      enhancedExercise.resources = [
+        {
+          type: "article",
+          title: "Managing Uncertainty Through Visualization",
+          description: "Research on visualization techniques for anxiety management",
+          url: "https://www.psychologytoday.com/us/blog/anxiety-files/202101/managing-uncertainty"
+        },
+        {
+          type: "video",
+          title: "Guided Future Visualization Practice",
+          description: "Expert-led visualization for uncertainty",
+          url: "https://www.youtube.com/watch?v=example"
+        }
+      ];
+    }
+    
     setActiveExercise(enhancedExercise);
   };
   
@@ -1892,7 +1914,22 @@ const MoodCausePrompt = ({ notification, onClose }) => {
     return "Let's explore what might be contributing to your current emotional state and find some supportive exercises.";
   };
 
-  // Render the intermediate issue prompt screen
+  // Add this new function before the renderIssuePrompt function
+  const getCategoryIcon = (type) => {
+    const icons = {
+      'Relationship': <FaUserFriends className="w-5 h-5" />,
+      'Work': <FaBriefcase className="w-5 h-5" />,
+      'Health': <FaHeartbeat className="w-5 h-5" />,
+      'Anxiety': <FaBrain className="w-5 h-5" />,
+      'Loss': <FaRegSadTear className="w-5 h-5" />,
+      'Self-esteem': <FaUserCircle className="w-5 h-5" />,
+      'Uncertainty': <FaRegCompass className="w-5 h-5" />,
+      'Other': <FaQuestion className="w-5 h-5" />
+    };
+    return icons[type] || <FaQuestion className="w-5 h-5" />;
+  };
+
+  // Replace the existing renderIssuePrompt function
   const renderIssuePrompt = () => {
     return (
       <motion.div
@@ -1901,47 +1938,68 @@ const MoodCausePrompt = ({ notification, onClose }) => {
         transition={{ delay: 0.1 }}
       >
         <h4 className="text-white font-medium mb-3">What specifically are you dealing with?</h4>
-        <p className="text-[#B8C7E0] mb-4">
-          Sharing more details will help us provide targeted exercises.
+        <p className="text-[#B8C7E0] mb-6 text-sm">
+          Sharing more details will help us provide targeted exercises that better match your needs.
         </p>
         
-        <div className="space-y-3 mb-4">
-          <div className="grid grid-cols-2 gap-2">
+        <div className="space-y-4 mb-6">
+          <div className="grid grid-cols-2 gap-3">
             {['Relationship', 'Work', 'Health', 'Anxiety', 'Loss', 'Self-esteem', 'Uncertainty', 'Other'].map((type) => (
-              <div
+              <motion.div
                 key={type}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
                 onClick={() => setIssueType(type)}
-                className={`p-3 rounded-lg border cursor-pointer transition-all text-center ${
+                className={`p-4 rounded-xl border cursor-pointer transition-all duration-200 ${
                   issueType === type
-                    ? `${theme.selected} text-white`
-                    : 'bg-[#0F172A]/70 border-[#2A3547] text-[#B8C7E0] hover:border-[#3E60C1]'
+                    ? `${theme.selected} border-[#5983FC] shadow-lg shadow-[#3E60C1]/10`
+                    : 'bg-[#0F172A]/70 border-[#2A3547] hover:border-[#3E60C1]/50 hover:bg-[#1A2335]'
                 }`}
               >
-                {type}
-              </div>
+                <div className="flex flex-col items-center space-y-2 text-center">
+                  <div className={`p-2 rounded-lg ${
+                    issueType === type 
+                      ? 'bg-[#5983FC]/20 text-[#5983FC]' 
+                      : 'bg-[#1E293B] text-[#B8C7E0]'
+                  } transition-colors`}>
+                    {getCategoryIcon(type)}
+                  </div>
+                  <span className={`text-sm font-medium ${
+                    issueType === type 
+                      ? 'text-white' 
+                      : 'text-[#B8C7E0]'
+                  }`}>
+                    {type}
+                  </span>
+                </div>
+              </motion.div>
             ))}
           </div>
         </div>
         
-        <div className="mb-4">
-          <textarea
-            value={userIssue}
-            onChange={(e) => setUserIssue(e.target.value)}
-            placeholder="Describe what you're experiencing... (optional)"
-            className="w-full bg-[#0F172A] border border-[#2A3547] rounded-lg p-3 text-[#B8C7E0] focus:outline-none focus:border-[#5983FC] min-h-[100px]"
-          ></textarea>
+        <div className="mb-6">
+          <div className="relative">
+            <textarea
+              value={userIssue}
+              onChange={(e) => setUserIssue(e.target.value)}
+              placeholder="Would you like to share more about what you're experiencing? (optional)"
+              className="w-full bg-[#0F172A] border border-[#2A3547] rounded-xl p-4 text-[#B8C7E0] focus:outline-none focus:border-[#5983FC] focus:ring-1 focus:ring-[#5983FC]/20 min-h-[120px] placeholder-[#4B5563] text-sm transition-all"
+            ></textarea>
+            <div className="absolute bottom-3 right-3 text-xs text-[#4B5563]">
+              Optional
+            </div>
+          </div>
         </div>
         
         <div className="flex justify-end space-x-3">
           <button
             onClick={() => {
               setShowIssuePrompt(false);
-              // Go directly to recommendations with default options
               const exerciseOptions = getRecommendations(notification.currentMood, selectedCause);
               setRecommendations(exerciseOptions);
               setShowRecommendations(true);
             }}
-            className="px-4 py-2 rounded-lg text-[#B8C7E0] hover:text-white transition-colors flex items-center"
+            className="px-4 py-2 rounded-lg text-[#B8C7E0] hover:text-white transition-colors flex items-center hover:bg-[#1E293B]"
           >
             Skip
           </button>
@@ -1950,9 +2008,9 @@ const MoodCausePrompt = ({ notification, onClose }) => {
             disabled={!issueType || isLoading}
             className={`px-6 py-2 rounded-lg flex items-center shadow-md ${
               issueType && !isLoading
-                ? `${theme.primary} text-white ${theme.hover}`
-                : 'bg-[#2A3547] text-[#B8C7E0] cursor-not-allowed'
-            } transition-colors`}
+                ? `${theme.primary} text-white ${theme.hover} transform transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]`
+                : 'bg-[#2A3547] text-[#4B5563] cursor-not-allowed'
+            }`}
           >
             {isLoading ? (
               <>
