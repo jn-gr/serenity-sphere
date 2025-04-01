@@ -16,17 +16,19 @@ const NotificationCenter = () => {
   
   useEffect(() => {
     dispatch(fetchNotifications());
-    
-    const intervalId = setInterval(() => {
-      dispatch(fetchNotifications());
-    }, 300000);
-    
-    return () => clearInterval(intervalId);
   }, [dispatch]);
 
   useEffect(() => {
     if (items && items.length > 0 && !activeNotification) {
-      // First check for mood shift notifications
+      // Always prioritize positive reinforcement notifications
+      const positiveNotification = items.find(item => item.type === 'positive_reinforcement');
+      
+      if (positiveNotification) {
+        setActiveNotification(positiveNotification);
+        return;
+      }
+      
+      // Then check for mood shift notifications
       const moodShift = items.find(item => item.type === 'mood_shift' || 
                                          (item.isNegativeShift && item.type === 'mood_shift'));
       

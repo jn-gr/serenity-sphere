@@ -40,23 +40,21 @@ export const addPositiveReinforcement = createAsyncThunk(
       'angry': 1, 'grieving': 1, 'disgusted': 1, 'remorseful': 1
     };
     
-    // Safety check - only allow positive reinforcement for actually positive moods
     const mood = payload.mood || 'neutral';
     const moodValue = moodValues[mood] || 0;
     
-    // Only create notification if mood is actually positive (>=6)
+    // Create notification for any positive mood (>=6)
     if (moodValue >= 6) {
       return {
-        id: Date.now(),
+        id: payload.id || Date.now(),
         type: 'positive_reinforcement',
-        message: payload.message || 'Your positive mood trend is impressive!',
+        message: payload.message || `Great to see you're feeling ${mood}! Keep up the positive energy!`,
         mood: mood,
         created_at: new Date().toISOString(),
         read: false
       };
     }
     
-    // Return null if not a positive mood (will be filtered out)
     return null;
   }
 );

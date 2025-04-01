@@ -1,21 +1,45 @@
-import React from 'react';
-import { useSelector } from 'react-redux';
+import React, { useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import NotificationCenter from '../notifications/NotificationCenter';
 import PositiveReinforcement from '../../components/PositiveReinforcement';
 import MoodCausePrompt from '../../components/MoodCausePrompt';
+import { addPositiveReinforcement } from '../notifications/notificationSlice';
 
 const SmartNotificationCenter = () => {
-  // Access Redux state
+  const dispatch = useDispatch();
   const { notifications } = useSelector(state => state.notifications);
   const { logs } = useSelector(state => state.mood);
   
+  useEffect(() => {
+    if (logs && logs.length > 0) {
+      const sortedLogs = [...logs].sort((a, b) => 
+        new Date(b.date || b.created_at || 0) - new Date(a.date || a.created_at || 0)
+      );
+      const latestMood = sortedLogs[0]?.mood;
+      
+      // Define positive emotions
+      const positiveEmotions = ['happy', 'excited', 'loving', 'optimistic', 'proud', 'grateful', 'relieved', 'amused', 'calm', 'caring'];
+      
+      // If latest mood is positive, always dispatch positive reinforcement
+      if (latestMood && positiveEmotions.includes(latestMood)) {
+        // Create a unique ID for each visit
+        const notificationId = `positive-${Date.now()}`;
+        dispatch(addPositiveReinforcement({ 
+          mood: latestMood,
+          id: notificationId,
+          message: `Great to see you're feeling ${latestMood}! Keep up the positive energy!`
+        }));
+      }
+    }
+  }, [logs, dispatch]);
+
   // If there's no data yet, just render the regular NotificationCenter
   if (!notifications || !logs || logs.length === 0) {
     return <NotificationCenter />;
   }
 
   try {
-    // Get recent logs to determine current emotional state (safely)
+    // Get recent logs to determine current emotional state
     const sortedLogs = [...logs].sort((a, b) => 
       new Date(b.date || b.created_at || 0) - new Date(a.date || a.created_at || 0)
     );
@@ -29,60 +53,13 @@ const SmartNotificationCenter = () => {
     const currentMood = recentLogs[0]?.mood;
     const previousMood = recentLogs[1]?.mood;
     
-    // Check if user is in a consistently positive state
-    const isConsistentlyPositive = 
-      recentLogs.length >= 2 && 
-      currentMood && 
-      positiveEmotions.includes(currentMood) &&
-      positiveEmotions.includes(previousMood);
-    
     // Check if current mood is negative
     const isCurrentNegative = currentMood && negativeEmotions.includes(currentMood);
     
-    // Check if previous mood exists and is negative
-    const isPreviousNegative = previousMood && negativeEmotions.includes(previousMood);
-    
-    // Check if previous mood exists and is positive
-    const isPreviousPositive = previousMood && positiveEmotions.includes(previousMood);
-    
-    console.log("Mood status - Current:", currentMood, "Previous:", previousMood);
-    console.log("Current negative:", isCurrentNegative, "Previous negative:", isPreviousNegative, "Previous positive:", isPreviousPositive);
-    
-    // For users in consistently positive states, create a positive notification
-    if (isConsistentlyPositive) {
-      console.log("User is consistently positive - showing positive reinforcement");
-      
-      const positiveNotification = {
-        id: 'positive-reinforcement-' + Date.now(),
-        type: 'positive_reinforcement',
-        message: `Great job maintaining a positive mood! You've been feeling ${currentMood} recently.`,
-        severity: 'success',
-        timestamp: new Date().toISOString(),
-        seen: false
-      };
-      
-      return (
-        <>
-          <PositiveReinforcement 
-            notification={positiveNotification}
-            dominantEmotion={currentMood}
-            onClose={() => {}}
-          />
-          <NotificationCenter 
-            customNotifications={notifications.filter(notif => notif.type !== 'mood_shift')} 
-          />
-        </>
-      );
-    }
-    
     // For users experiencing negative emotions
     if (isCurrentNegative) {
-      console.log("User is experiencing negative emotions");
-      
       // Show mood shift UI when transitioning from positive to negative
-      if (isPreviousPositive) {
-        console.log("Detected positive to negative transition - showing mood shift UI");
-        
+      if (previousMood && positiveEmotions.includes(previousMood)) {
         const moodShiftNotification = {
           id: 'mood-shift-' + Date.now(),
           type: 'mood_shift',
@@ -101,43 +78,33 @@ const SmartNotificationCenter = () => {
               notification={moodShiftNotification}
               onClose={() => {}}
             />
-            <NotificationCenter 
-              customNotifications={notifications.filter(notif => notif.type !== 'mood_shift')} 
-            />
+            <NotificationCenter />
           </>
         );
       }
       
-      // Show emotional support UI when:
-      // 1. Only one mood entry exists and it's negative
-      // 2. Last two moods are both negative
-      if (!previousMood || isPreviousNegative) {
-        console.log("Showing emotional support UI for negative state");
-        
-        const supportNotification = {
-          id: 'emotional-support-' + Date.now(),
-          type: 'emotional_support',
-          message: `I notice you're feeling ${currentMood}. Would you like some support?`,
-          severity: 'info',
-          timestamp: new Date().toISOString(),
-          seen: false,
-          currentMood: currentMood,
-          previousMood: previousMood,
-          isNegativeShift: false
-        };
-        
-        return (
-          <>
-            <MoodCausePrompt 
-              notification={supportNotification}
-              onClose={() => {}}
-            />
-            <NotificationCenter 
-              customNotifications={notifications.filter(notif => notif.type !== 'mood_shift')} 
-            />
-          </>
-        );
-      }
+      // Show emotional support UI for negative states
+      const supportNotification = {
+        id: 'emotional-support-' + Date.now(),
+        type: 'emotional_support',
+        message: `I notice you're feeling ${currentMood}. Would you like some support?`,
+        severity: 'info',
+        timestamp: new Date().toISOString(),
+        seen: false,
+        currentMood: currentMood,
+        previousMood: previousMood,
+        isNegativeShift: false
+      };
+      
+      return (
+        <>
+          <MoodCausePrompt 
+            notification={supportNotification}
+            onClose={() => {}}
+          />
+          <NotificationCenter />
+        </>
+      );
     }
     
   } catch (error) {

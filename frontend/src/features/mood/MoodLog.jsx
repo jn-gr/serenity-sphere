@@ -225,10 +225,34 @@ const MoodLog = () => {
       .catch(err => console.error("Error fetching notifications directly:", err));
   }, [dispatch]);
 
+  // Add a new useEffect for positive notifications on mount
+  useEffect(() => {
+    if (status === 'succeeded' && logs && logs.length > 0) {
+      const latestPositive = isLatestMoodPositive();
+      console.log("Is latest mood positive?", latestPositive);
+      
+      if (latestPositive) {
+        const latestMood = logs[logs.length - 1].mood;
+        const message = getPositiveMessage(latestMood);
+        
+        // Clear any existing negative notifications
+        setActiveNotification(null);
+        localStorage.removeItem('lastNegativeNotification');
+        
+        dispatch(addPositiveReinforcement({
+          mood: latestMood,
+          message
+        }));
+      }
+    }
+  }, [status, logs, dispatch]); // Trigger when status changes or logs are loaded
+
   useEffect(() => {
     if (logs?.length > 4) {
-      // Check if we have a negative trend after positive moods 
-      if (detectNegativeTrend(logs)) {
+      const latestPositive = isLatestMoodPositive();
+      
+      // If latest mood is negative, show emotional support
+      if (!latestPositive) {
         const lastNegative = parseInt(localStorage.getItem('lastNegativeNotification') || 0);
         
         // Show notification if we haven't shown one in the last 12 hours
@@ -247,6 +271,10 @@ const MoodLog = () => {
             type: 'mood_shift'
           }));
         }
+      } else {
+        // If mood is positive, clear any negative notifications
+        setActiveNotification(null);
+        localStorage.removeItem('lastNegativeNotification');
       }
     }
   }, [logs, dispatch]);
@@ -399,30 +427,6 @@ const MoodLog = () => {
     return (moodValues[latestMood] || 0) >= 6;
   };
 
-  // Update the useEffect that shows positive reinforcement
-  useEffect(() => {
-    if (status === 'succeeded' && logs && logs.length > 0) {
-      const latestPositive = isLatestMoodPositive();
-      console.log("Is latest mood positive?", latestPositive);
-      
-      if (latestPositive) {
-        const latestMood = logs[logs.length - 1].mood;
-        const message = getPositiveMessage(latestMood);
-        
-        // Add a cooldown check to prevent spam
-        const lastShown = localStorage.getItem('lastPositiveShown');
-        const now = Date.now();
-        if (!lastShown || (now - parseInt(lastShown)) > 60000) { // 1 minute cooldown
-          dispatch(addPositiveReinforcement({
-            mood: latestMood,
-            message
-          }));
-          localStorage.setItem('lastPositiveShown', now);
-        }
-      }
-    }
-  }, [status, location.pathname]); // Trigger when location changes or status is succeeded
-  
   // Function to get personalized positive message
   const getPositiveMessage = (mood) => {
     const messages = {
@@ -474,23 +478,7 @@ const MoodLog = () => {
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-4">
             <div className="flex flex-wrap items-center gap-2">
               <button
-                onClick={() => {
-                  setSelectedView('chart');
-                  if (logs?.length > 0) {
-                    // Only check the latest mood entry with improved detection
-                    const latestPositive = isLatestMoodPositive();
-                    console.log("Charts view - Latest mood positive?", latestPositive);
-                    
-                    if (latestPositive) {
-                      const latestMood = logs[logs.length - 1].mood;
-                      // Dispatch a positive notification
-                      dispatch(addPositiveReinforcement({
-                        mood: latestMood,
-                        message: `Great job maintaining a positive ${latestMood} state!`,
-                      }));
-                    }
-                  }
-                }}
+                onClick={() => setSelectedView('chart')}
                 className={`px-4 py-2 rounded-lg transition-colors flex items-center gap-2 ${
                   selectedView === 'chart'
                     ? 'bg-[#3E60C1] text-white'
