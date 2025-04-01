@@ -1019,7 +1019,11 @@ const ExerciseModal = ({ exercise, onClose }) => {
                       <label className="text-[#5983FC] text-xs mb-1 block">Specific Boundary Issue:</label>
                       <textarea
                         value={boundaryIssues[index]}
-                        onChange={(e) => updateArrayAt(setBoundaryIssues, boundaryIssues, index, e.target.value)}
+                        onChange={(e) => {
+                          const newIssues = [...boundaryIssues];
+                          newIssues[index] = e.target.value;
+                          setBoundaryIssues(newIssues);
+                        }}
                         className="w-full h-12 bg-[#1A2335] border border-[#2A3547] rounded-lg p-2 text-[#B8C7E0] text-sm focus:outline-none focus:border-[#5983FC]"
                         placeholder="E.g., After-hours work emails, lunch breaks interrupted..."
                       />
@@ -1029,7 +1033,11 @@ const ExerciseModal = ({ exercise, onClose }) => {
                       <label className="text-[#5983FC] text-xs mb-1 block">Boundary Statement:</label>
                       <textarea
                         value={boundaryStatements[index]}
-                        onChange={(e) => updateArrayAt(setBoundaryStatements, boundaryStatements, index, e.target.value)}
+                        onChange={(e) => {
+                          const newStatements = [...boundaryStatements];
+                          newStatements[index] = e.target.value;
+                          setBoundaryStatements(newStatements);
+                        }}
                         className="w-full h-12 bg-[#1A2335] border border-[#2A3547] rounded-lg p-2 text-[#B8C7E0] text-sm focus:outline-none focus:border-[#5983FC]"
                         placeholder="E.g., I will not check email after 7pm..."
                       />
@@ -1039,7 +1047,11 @@ const ExerciseModal = ({ exercise, onClose }) => {
                       <label className="text-[#5983FC] text-xs mb-1 block">Potential Obstacles:</label>
                       <textarea
                         value={obstacles[index]}
-                        onChange={(e) => updateArrayAt(setObstacles, obstacles, index, e.target.value)}
+                        onChange={(e) => {
+                          const newObstacles = [...obstacles];
+                          newObstacles[index] = e.target.value;
+                          setObstacles(newObstacles);
+                        }}
                         className="w-full h-12 bg-[#1A2335] border border-[#2A3547] rounded-lg p-2 text-[#B8C7E0] text-sm focus:outline-none focus:border-[#5983FC]"
                         placeholder="E.g., Manager expectations, habit of checking phone..."
                       />
@@ -3766,56 +3778,6 @@ const ExerciseModal = ({ exercise, onClose }) => {
       ],
       type: "reflection"
     },
-
-    // WORK EXERCISES
-    'work-boundaries': {
-      title: "Work Boundaries Exercise",
-      description: "Establish healthy boundaries to manage work-related stress.",
-      steps: [
-        {
-          title: "Current Boundary Assessment",
-          content: "Make two columns: 'My Work Hours' (when you're officially supposed to work) and 'When Work Actually Happens' (including early mornings, evenings, weekends). Note the discrepancies."
-        },
-        {
-          title: "Identify Boundary Issues",
-          content: "List 2-3 specific boundary issues you face (e.g., after-hours emails, lunch breaks interrupted, difficulty saying no to extra tasks)."
-        },
-        {
-          title: "Create Boundary Statements",
-          content: "For each issue, write an ideal boundary statement. For example: 'I will not check email after 7pm' or 'I will take a full lunch break away from my desk each day.'"
-        },
-        {
-          title: "Anticipate Challenges",
-          content: "For each boundary, list potential obstacles or resistance you might face. What might make it difficult to maintain this boundary?"
-        },
-        {
-          title: "Implementation Plan",
-          content: "Create specific steps for implementing each boundary. Include any communication needed with colleagues, changes to technology, or personal habits to modify."
-        },
-        {
-          title: "Select One Boundary",
-          content: "Choose one boundary to implement this week. Start small with something you feel confident you can maintain."
-        }
-      ],
-      resources: [
-        {
-          type: "article",
-          title: "How to Set Boundaries at Work | Harvard Business Review",
-          description: "Professional strategies for establishing effective work boundaries",
-          url: "https://hbr.org/2021/02/how-to-set-boundaries-in-the-age-of-digital-distraction"
-        },
-        {
-          type: "video",
-          title: "Setting Boundaries | The Muse",
-          description: "Practical tips for establishing and maintaining healthy work boundaries",
-          url: "https://www.themuse.com/advice/setting-boundaries-at-work-expert-advice"
-        }
-      ],
-      type: "checklist"
-    },
-
-    // Add more exercise content definitions as needed...
-
     // Default for fallback
     'default': {
       title: "Wellness Exercise",

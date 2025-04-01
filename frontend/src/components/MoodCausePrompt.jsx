@@ -12,7 +12,6 @@ const MoodCausePrompt = ({ notification, onClose }) => {
   const [dominantEmotion, setDominantEmotion] = useState('');
   const [activeExercise, setActiveExercise] = useState(null);
   const [isFalsePositive, setIsFalsePositive] = useState(false);
-  const [showPositiveReinforcement, setShowPositiveReinforcement] = useState(false);
   
   // Add these new states
   const [showIssuePrompt, setShowIssuePrompt] = useState(false);
@@ -1986,11 +1985,7 @@ const MoodCausePrompt = ({ notification, onClose }) => {
                 {getMoodIcon()}
               </div>
               <h3 className="text-xl font-bold text-white">
-                {showRecommendations 
-                  ? 'Personalized Insights' 
-                  : showPositiveReinforcement 
-                  ? getPositiveHeader()
-                  : 'Mood Change Detected'}
+                {showRecommendations ? 'Personalized Insights' : 'Mood Change Detected'}
               </h3>
             </div>
             <button 
@@ -2002,76 +1997,7 @@ const MoodCausePrompt = ({ notification, onClose }) => {
             </button>
           </div>
 
-          {/* Positive reinforcement UI */}
-          {showPositiveReinforcement ? (
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 }}
-            >
-              <div className="mb-6">
-                <div className={`p-5 rounded-xl ${theme.secondary} ${theme.border} mb-5`}>
-                  <div className="flex items-start">
-                    <div className="bg-gradient-to-br from-emerald-400 to-emerald-600 p-3 rounded-lg shadow-md mr-4 flex-shrink-0">
-                      <FaRegSmileBeam className="text-white text-xl" />
-                    </div>
-                    <div>
-                      <h4 className="text-white font-semibold mb-2">
-                        {getTimeBasedGreeting()}, Wellness Champion!
-                      </h4>
-                      <p className="text-[#B8C7E0]">
-                        {getPositiveReinforcementMessage()}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="bg-[#0F172A]/70 p-5 rounded-xl border border-[#2A3547] mb-5">
-                  <h4 className="text-white font-semibold mb-3 flex items-center">
-                    <FaStar className="text-yellow-400 mr-2" /> Wellness Tip
-                  </h4>
-                  <p className="text-[#B8C7E0]">
-                    {getWellnessTip()}
-                  </p>
-                </div>
-
-                <div className="bg-[#0F172A]/70 p-5 rounded-xl border border-[#2A3547]">
-                  <h4 className="text-white font-semibold mb-3">Continue Your Journey</h4>
-                  <p className="text-[#B8C7E0] mb-4">
-                    Would you like to explore practices that can help maintain your positive state?
-                  </p>
-                  <div className="flex flex-wrap gap-3">
-                    {['Gratitude Practice', 'Mindfulness', 'Celebration Ritual'].map((practice, i) => (
-                      <div 
-                        key={i}
-                        className="bg-[#0F172A] border border-[#2A3547] rounded-lg py-2 px-4 text-[#B8C7E0] cursor-pointer hover:border-[#5983FC] transition-colors"
-                        onClick={() => {
-                          setActiveExercise({
-                            title: practice,
-                            description: `A practice to help maintain and enhance your ${dominantEmotion || 'positive'} feelings.`,
-                            link: practice === 'Gratitude Practice' 
-                              ? '/exercises/gratitude' 
-                              : practice === 'Mindfulness' 
-                              ? '/exercises/mindfulness'
-                              : '/exercises/three-good-things'
-                          });
-                        }}
-                      >
-                        {practice}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-              
-              <button
-                onClick={handlePositiveAcknowledgment}
-                className={`w-full py-3 rounded-lg ${theme.primary} text-white font-medium ${theme.hover} transition-colors shadow-md flex items-center justify-center`}
-              >
-                Got it, thanks!
-              </button>
-            </motion.div>
-          ) : !showIssuePrompt && !showRecommendations ? (
+          {!showIssuePrompt && !showRecommendations ? (
             // Mood change cause selection UI
             <motion.div
               initial={{ opacity: 0, y: 10 }}
@@ -2080,9 +2006,7 @@ const MoodCausePrompt = ({ notification, onClose }) => {
             >
               <div className="mb-6">
                 <p className={`text-[#B8C7E0] ${dominantEmotion ? 'mb-2' : 'mb-5'}`}>
-                  {emotionalChange.isPositive
-                    ? `That's wonderful! Understanding what improves your ${dominantEmotion || 'mood'} can help maintain positive emotions.`
-                    : emotionalChange.isNeutral
+                  {emotionalChange.isNeutral
                     ? "Understanding these emotional shifts can provide valuable insights for your well-being journey."
                     : `Understanding what affects your ${dominantEmotion || 'mood'} can help us provide better support.`}
                 </p>
@@ -2184,9 +2108,7 @@ const MoodCausePrompt = ({ notification, onClose }) => {
               transition={{ delay: 0.1 }}
             >
               <p className="text-[#B8C7E0] mb-6">
-                {emotionalChange.isPositive
-                  ? `Here are some ideas to help maintain your positive ${dominantEmotion || 'mood'}:`
-                  : emotionalChange.isNeutral
+                {emotionalChange.isNeutral
                   ? "Based on your input, here are some considerations that might be helpful:"
                   : `Based on what you shared, here are some suggestions that might help with your ${dominantEmotion || 'feelings'}:`}
               </p>
