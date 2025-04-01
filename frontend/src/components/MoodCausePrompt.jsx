@@ -11,7 +11,6 @@ const MoodCausePrompt = ({ notification, onClose }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [dominantEmotion, setDominantEmotion] = useState('');
   const [activeExercise, setActiveExercise] = useState(null);
-  const [isFalsePositive, setIsFalsePositive] = useState(false);
   
   // Add these new states
   const [showIssuePrompt, setShowIssuePrompt] = useState(false);
@@ -1518,7 +1517,7 @@ const MoodCausePrompt = ({ notification, onClose }) => {
           ]
         }]);
         setShowIssuePrompt(false);
-      setShowRecommendations(true);
+    setShowRecommendations(true);
     } finally {
       setIsLoading(false);
     }
@@ -1768,24 +1767,6 @@ const MoodCausePrompt = ({ notification, onClose }) => {
     setActiveExercise(enhancedExercise);
   };
   
-  // Add a function to let the user indicate this is a false positive
-  const handleFalsePositive = async () => {
-    console.log("User reported false positive mood shift notification");
-    try {
-      // You could add an API call here to report the false positive to your backend
-      await axios.post('/api/mood/report-false-positive/', {
-        notificationId: notification.id
-      }).catch(err => {
-        // Silent catch - don't break if endpoint doesn't exist yet
-        console.log("Note: False positive reporting endpoint not implemented yet");
-      });
-    } catch (error) {
-      console.error("Error reporting false positive:", error);
-    }
-    setIsFalsePositive(true);
-    onClose(); // Close the prompt
-  };
-  
   // Get an appropriate mood icon based on the dominant emotion
   const getMoodIcon = () => {
     if (!dominantEmotion) return <FaHeartbeat className="text-[#5983FC]" />;
@@ -2016,20 +1997,6 @@ const MoodCausePrompt = ({ notification, onClose }) => {
                     Feeling: {dominantEmotion.charAt(0).toUpperCase() + dominantEmotion.slice(1)}
                   </div>
                 )}
-                
-                {/* False positive notice - more friendly design */}
-                <div className="bg-[#0F172A]/70 p-4 rounded-xl border border-[#2A3547] mb-5">
-                  <p className="text-[#B8C7E0] text-sm">
-                    Not experiencing a mood change? If our detection doesn't match your experience, you can let us know.
-                  </p>
-                  <button
-                    onClick={handleFalsePositive}
-                    className="text-[#5983FC] hover:text-[#3E60C1] text-sm mt-2 flex items-center group"
-                  >
-                    <span>This isn't accurate for me</span>
-                    <FaChevronRight className="ml-1 text-xs transition-transform group-hover:translate-x-1" />
-                  </button>
-                </div>
                 
                 {/* Cause options with enhanced styling */}
                 <div className="mb-5">
