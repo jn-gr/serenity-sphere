@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
-import { FaTimes, FaLightbulb, FaExternalLinkAlt, FaRegSmileBeam, FaRegSadTear, FaRegMeh, FaHeartbeat, FaStar, FaChevronRight, FaChevronLeft, FaClock } from 'react-icons/fa';
+import { FaTimes, FaLightbulb, FaExternalLinkAlt, FaRegSmileBeam, FaRegSadTear, FaRegMeh, FaHeartbeat, FaStar, FaChevronRight, FaChevronLeft, FaClock, FaCheck, FaRegLightbulb } from 'react-icons/fa';
 import ExerciseModal from './ExerciseModal';
 
 const MoodCausePrompt = ({ notification, onClose }) => {

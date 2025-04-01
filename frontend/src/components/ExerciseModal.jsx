@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaTimes, FaSave, FaRegLightbulb, FaCheck, FaArrowRight, FaArrowLeft, FaPlay, FaPause, FaExternalLinkAlt, FaVolumeMute, FaVolumeUp, FaStopwatch, FaLink, FaYoutube, FaFileAlt, FaBook, FaEdit, FaTrash, FaPlus, FaClock } from 'react-icons/fa';
+import { FaTimes, FaSave, FaRegLightbulb, FaCheck, FaArrowRight, FaArrowLeft, FaPlay, FaPause, FaExternalLinkAlt, FaVolumeMute, FaVolumeUp, FaStopwatch, FaLink, FaYoutube, FaFileAlt, FaBook, FaEdit, FaTrash, FaPlus, FaClock, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 
 const ExerciseModal = ({ exercise, onClose }) => {
   const [journalEntry, setJournalEntry] = useState('');
@@ -4328,9 +4328,45 @@ const ExerciseModal = ({ exercise, onClose }) => {
 
                 {/* Current step display */}
                 <div className="bg-[#0F172A] p-4 rounded-lg border border-[#2A3547] mb-4">
-                  <h3 className="text-[#5983FC] text-sm font-medium mb-2">
-                    {exerciseContent?.steps?.[step]?.title || `Step ${step + 1}`}
-                  </h3>
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-[#5983FC] text-sm font-medium">
+                      {exerciseContent?.steps?.[step]?.title || `Step ${step + 1}`}
+                    </h3>
+                    <div className="flex items-center space-x-2">
+                      <button
+                        onClick={prevStep}
+                        disabled={step === 0}
+                        className={`p-2 rounded-lg transition-all ${
+                          step === 0
+                            ? 'bg-[#2A3547] text-[#B8C7E0]/50 cursor-not-allowed'
+                            : 'bg-[#1A2335] text-[#B8C7E0] hover:bg-[#2A3547] hover:text-white'
+                        }`}
+                        aria-label="Previous step"
+                      >
+                        <FaChevronLeft className="w-4 h-4" />
+                      </button>
+                      <span className="text-[#B8C7E0] text-sm">
+                        {step + 1} / {exerciseContent.steps.length}
+                      </span>
+                      {step < (exerciseContent?.steps?.length - 1) ? (
+                        <button
+                          onClick={nextStep}
+                          className="p-2 rounded-lg bg-[#1A2335] text-[#B8C7E0] hover:bg-[#2A3547] hover:text-white transition-all"
+                          aria-label="Next step"
+                        >
+                          <FaChevronRight className="w-4 h-4" />
+                        </button>
+                      ) : (
+                        <button
+                          onClick={handleComplete}
+                          className="p-2 rounded-lg bg-emerald-500 text-white hover:bg-emerald-600 transition-all"
+                          aria-label="Complete exercise"
+                        >
+                          <FaCheck className="w-4 h-4" />
+                        </button>
+                      )}
+                    </div>
+                  </div>
                   <p className="text-white">{getCurrentStep()}</p>
                 </div>
 
@@ -4355,26 +4391,8 @@ const ExerciseModal = ({ exercise, onClose }) => {
                 )}
 
                 {/* Navigation buttons */}
-                <div className="flex justify-between mt-6">
-                  <button
-                    onClick={prevStep}
-                    disabled={step === 0}
-                    className={`px-4 py-2 rounded-lg flex items-center ${step === 0
-                        ? 'bg-[#0F172A]/50 text-[#B8C7E0]/50 cursor-not-allowed'
-                        : 'bg-[#0F172A] text-[#B8C7E0] hover:bg-[#2A3547]'
-                      }`}
-                  >
-                    <FaArrowLeft className="mr-2" /> Previous
-                  </button>
-
-                  {step < (exerciseContent?.steps?.length - 1) ? (
-                    <button
-                      onClick={nextStep}
-                      className="px-4 py-2 rounded-lg bg-[#3E60C1] text-white hover:bg-[#5983FC] flex items-center"
-                    >
-                      Next <FaArrowRight className="ml-2" />
-                    </button>
-                  ) : (
+                <div className="flex justify-end mt-6">
+                  {step === (exerciseContent?.steps?.length - 1) && (
                     <button
                       onClick={handleComplete}
                       className="px-4 py-2 rounded-lg bg-emerald-500 text-white hover:bg-emerald-600 flex items-center"
