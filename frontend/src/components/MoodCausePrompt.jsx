@@ -1791,16 +1791,7 @@ const MoodCausePrompt = ({ notification, onClose }) => {
   
   // Get color theme based on emotional state for UI elements
   const getEmotionTheme = () => {
-    if (emotionalChange?.isPositive) {
-      return {
-        primary: 'bg-emerald-500',
-        secondary: 'bg-emerald-400/20',
-        border: 'border-emerald-500/30',
-        text: 'text-emerald-400',
-        hover: 'hover:bg-emerald-500/90',
-        selected: 'bg-emerald-500/20 border-emerald-500/50'
-      };
-    } else if (emotionalChange?.isNeutral) {
+    if (notification.isNegativeShift) {
       return {
         primary: 'bg-[#3E60C1]',
         secondary: 'bg-[#3E60C1]/20',
@@ -1863,6 +1854,43 @@ const MoodCausePrompt = ({ notification, onClose }) => {
 
   const shiftType = getShiftType(notification.currentMood, notification.previousMood);
   const [selectedExercise, setSelectedExercise] = useState(null);
+
+  // Add this new function to determine notification type and message
+  const getNotificationType = () => {
+    if (!notification) return 'mood_shift';
+    return notification.type;
+  };
+
+  // Add this new function to get appropriate header message
+  const getHeaderMessage = () => {
+    if (showRecommendations) return 'Personalized Insights';
+    
+    const notificationType = getNotificationType();
+    if (notificationType === 'emotional_support') {
+      return `I notice you're feeling ${notification.currentMood}`;
+    }
+    
+    if (notification.isNegativeShift) {
+      return 'Mood Change Detected';
+    }
+    
+    return 'Emotional Support';
+  };
+
+  // Add this new function to get appropriate subheader message
+  const getSubheaderMessage = () => {
+    const notificationType = getNotificationType();
+    
+    if (notificationType === 'emotional_support') {
+      return "Would you like to explore what might be contributing to these feelings and find some supportive exercises?";
+    }
+    
+    if (notification.isNegativeShift) {
+      return "Understanding these emotional shifts can provide valuable insights for your well-being journey.";
+    }
+    
+    return "Let's explore what might be contributing to your current emotional state and find some supportive exercises.";
+  };
 
   // Render the intermediate issue prompt screen
   const renderIssuePrompt = () => {
@@ -1966,7 +1994,7 @@ const MoodCausePrompt = ({ notification, onClose }) => {
                 {getMoodIcon()}
               </div>
               <h3 className="text-xl font-bold text-white">
-                {showRecommendations ? 'Personalized Insights' : 'Mood Change Detected'}
+                {getHeaderMessage()}
               </h3>
             </div>
             <button 
@@ -1987,9 +2015,7 @@ const MoodCausePrompt = ({ notification, onClose }) => {
             >
               <div className="mb-6">
                 <p className={`text-[#B8C7E0] ${dominantEmotion ? 'mb-2' : 'mb-5'}`}>
-                  {emotionalChange.isNeutral
-                    ? "Understanding these emotional shifts can provide valuable insights for your well-being journey."
-                    : `Understanding what affects your ${dominantEmotion || 'mood'} can help us provide better support.`}
+                  {getSubheaderMessage()}
                 </p>
                 
                 {dominantEmotion && (
@@ -2000,7 +2026,11 @@ const MoodCausePrompt = ({ notification, onClose }) => {
                 
                 {/* Cause options with enhanced styling */}
                 <div className="mb-5">
-                  <h4 className="text-white font-medium mb-3">What might be contributing to this?</h4>
+                  <h4 className="text-white font-medium mb-3">
+                    {getNotificationType() === 'emotional_support' 
+                      ? "What might be contributing to these feelings?"
+                      : "What might be contributing to this?"}
+                  </h4>
                   <div className="space-y-2">
                     {getCauseOptions().map(option => (
                       <motion.div 
@@ -2058,7 +2088,7 @@ const MoodCausePrompt = ({ notification, onClose }) => {
                     </>
                   ) : (
                     <>
-                      Submit <FaChevronRight className="ml-2" />
+                      Get Recommendations <FaChevronRight className="ml-2" />
                     </>
                   )}
                 </button>
