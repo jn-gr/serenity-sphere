@@ -16,41 +16,30 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'react-toastify';
 import { FaCheckCircle as FaCheckCircleIcon, FaSpinner, FaUser } from 'react-icons/fa';
+import { updateStart, updateSuccess, updateFailure, clearError, clearSuccess } from './profileSlice';
 
-// Create these action creators if they don't exist elsewhere
 const updateProfile = (data) => {
   return async (dispatch) => {
     try {
-      dispatch({ type: 'profile/updateStart' });
+      dispatch(updateStart());
       const response = await api.patch('/api/user-profile/', data);
-      dispatch({ 
-        type: 'profile/updateSuccess', 
-        payload: response.data 
-      });
+      dispatch(updateSuccess());
       dispatch(setCredentials({ user: response.data, isAuthenticated: true }));
       return response.data;
     } catch (error) {
       const errorMessage = error.response?.data?.message || "Failed to update profile";
-      dispatch({ 
-        type: 'profile/updateFailure', 
-        payload: errorMessage 
-      });
+      dispatch(updateFailure(errorMessage));
       throw new Error(errorMessage);
     }
   };
 };
-
-const clearError = () => ({ type: 'profile/clearError' });
-const clearSuccess = () => ({ type: 'profile/clearSuccess' });
 
 const Profile = () => {
   const { isDark } = useTheme();
   const user = useSelector((state) => state.auth.user);
   const dispatch = useDispatch();
   
-  // Create a default state if profile reducer doesn't exist
-  const profileState = useSelector(state => state.profile || { isLoading: false, error: null, success: false });
-  const { isLoading, error, success } = profileState;
+  const { isLoading, error, success } = useSelector(state => state.profile);
 
   const [formData, setFormData] = useState({
     username: '',
@@ -115,12 +104,23 @@ const Profile = () => {
     }
     
     if (success) {
-      toast.success('Profile updated successfully!');
+      // Check what was updated
+      const updatedFields = [];
+      if (formData.username !== user?.username) updatedFields.push('username');
+      if (formData.email !== user?.email) updatedFields.push('email');
+      if (formData.password) updatedFields.push('password');
+
+      let successMessage = 'Profile updated successfully!';
+      if (updatedFields.length > 0) {
+        successMessage = `Successfully updated ${updatedFields.join(', ')}!`;
+      }
+      
+      toast.success(successMessage);
       dispatch(clearSuccess());
       setSuccessAnimation(true);
       setTimeout(() => setSuccessAnimation(false), 2000);
     }
-  }, [error, success, dispatch]);
+  }, [error, success, dispatch, formData, user]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -136,9 +136,19 @@ const Profile = () => {
     }
     setMessage(null);
     
+    // Password validation
     if (name === 'password' || name === 'confirmPassword') {
-      if (formData.password && formData.confirmPassword && formData.password !== formData.confirmPassword) {
-        setPasswordError('Passwords do not match');
+      const newFormData = {
+        ...formData,
+        [name]: value
+      };
+      
+      if (newFormData.password && newFormData.confirmPassword) {
+        if (newFormData.password !== newFormData.confirmPassword) {
+          setPasswordError('Passwords do not match');
+        } else {
+          setPasswordError('');
+        }
       } else {
         setPasswordError('');
       }
@@ -204,7 +214,12 @@ const Profile = () => {
     } catch (err) {
       // If the error contains field-specific errors
       if (err.response?.data?.errors) {
-        setFieldErrors(err.response.data.errors);
+        const backendErrors = err.response.data.errors;
+        if (backendErrors.old_password) {
+          toast.error('Incorrect current password');
+        } else {
+          setFieldErrors(backendErrors);
+        }
       } else {
         setMessage({
           type: 'error',

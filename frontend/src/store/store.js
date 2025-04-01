@@ -3,6 +3,7 @@ import authReducer from '../features/auth/authSlice'
 import journalReducer from '../features/journal/journalSlice'
 import moodReducer from '../features/mood/moodSlice'
 import notificationReducer from '../features/notifications/notificationSlice'
+import profileReducer from '../features/profile/profileSlice'
 
 const rootReducer = (state, action) => {
   // Clear all data when RESET_STATE action is dispatched
@@ -15,6 +16,7 @@ const rootReducer = (state, action) => {
     journal: journalReducer(state?.journal, action),
     mood: moodReducer(state?.mood, action),
     notifications: notificationReducer(state?.notifications, action),
+    profile: profileReducer(state?.profile, action),
   }
 }
 

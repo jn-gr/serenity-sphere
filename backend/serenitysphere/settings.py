@@ -174,3 +174,15 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticated',
     ],
 }
+
+# Email settings for password reset
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'serenity.sph@gmail.com'
+EMAIL_HOST_PASSWORD = 'msny qqle zmbr qiro'  # Replace with the 16-character App Password you generated
+DEFAULT_FROM_EMAIL = 'serenity.sph@gmail.com'
+
+# Password reset settings
+PASSWORD_RESET_TIMEOUT = 3600  # 1 hour in seconds

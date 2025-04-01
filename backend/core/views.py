@@ -4,7 +4,7 @@ from rest_framework.decorators import api_view, permission_classes, action
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from .serializers import RegisterSerializer, LoginSerializer, UserSerializer, UserUpdateSerializer, JournalEntrySerializer, MoodLogSerializer
-from .models import JournalEntry, MoodLog
+from .models import JournalEntry, MoodLog, CustomUser
 from django.middleware.csrf import get_token
 from django.http import JsonResponse
 from .ai_services import predict_emotions
@@ -13,6 +13,11 @@ from django.contrib.auth.hashers import check_password
 from django.utils import timezone
 from datetime import datetime, timedelta
 from django.shortcuts import get_object_or_404
+from django.contrib.auth.tokens import default_token_generator
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.utils.encoding import force_bytes, force_str
+from django.core.mail import send_mail
+from django.conf import settings
 
 
 logger = logging.getLogger(__name__)
@@ -68,7 +73,7 @@ def logout_user(request):
 def get_user(request):
     return Response(UserSerializer(request.user).data)
 
-@api_view(['GET', 'PUT'])
+@api_view(['GET', 'PUT', 'PATCH'])
 @permission_classes([IsAuthenticated])
 def user_profile(request):
     user = request.user
@@ -76,16 +81,20 @@ def user_profile(request):
         if request.method == 'GET':
             serializer = UserSerializer(user)
             return Response(serializer.data)
-        elif request.method == 'PUT':
+        elif request.method in ['PUT', 'PATCH']:
             if 'old_password' in request.data:
                 if not check_password(request.data['old_password'], user.password):
                     return Response({'old_password': ['Old password is incorrect.']}, status=status.HTTP_400_BAD_REQUEST)
-            serializer = UserUpdateSerializer(user, data=request.data, partial=True)
+            serializer = UserUpdateSerializer(user, data=request.data, partial=True, context={'request': request})
             if serializer.is_valid():
-                serializer.save()
-                if 'password' in request.data:
-                    update_session_auth_hash(request, user)
-                return Response(serializer.data)
+                try:
+                    serializer.save()
+                    if 'password' in request.data:
+                        update_session_auth_hash(request, user)
+                    return Response(serializer.data)
+                except Exception as e:
+                    logger.error(f'Error saving user profile: {e}')
+                    return Response({'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     except Exception as e:
         logger.error(f'Profile update error: {e}')
@@ -322,3 +331,103 @@ def mood_cause_recommendation(request):
     # Other causes...
     
     return Response({"recommendations": recommendations})
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def password_reset_request(request):
+    """Request password reset"""
+    email = request.data.get('email')
+    if not email:
+        return Response({'detail': 'Email is required'}, status=400)
+    
+    try:
+        user = CustomUser.objects.get(email=email)
+        # Generate password reset token
+        uid = urlsafe_base64_encode(force_bytes(user.pk))
+        token = default_token_generator.make_token(user)
+        
+        # Create reset link with the correct frontend URL
+        reset_url = f"http://localhost:5173/reset-password/{uid}/{token}"
+        
+        # Send email
+        subject = 'Password Reset Requested'
+        message = f'''
+        Hello {user.username},
+
+        You have requested to reset your password. Click the link below to set a new password:
+
+        {reset_url}
+
+        If you did not request this password reset, please ignore this email.
+
+        This link will expire in 1 hour.
+
+        Best regards,
+        Serenity Sphere Team
+        '''
+        
+        try:
+            send_mail(
+                subject,
+                message,
+                settings.EMAIL_HOST_USER,
+                [user.email],
+                fail_silently=False,
+            )
+            return Response({'detail': 'Password reset email sent'})
+        except Exception as e:
+            logger.error(f"Failed to send password reset email: {str(e)}")
+            return Response({'detail': 'Failed to send password reset email'}, status=500)
+            
+    except CustomUser.DoesNotExist:
+        return Response({'detail': 'No account found with this email address'}, status=404)
+    except Exception as e:
+        logger.error(f"Password reset request error: {str(e)}")
+        return Response({'detail': 'An error occurred'}, status=500)
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def password_reset_verify(request, uidb64, token):
+    try:
+        uid = force_str(urlsafe_base64_decode(uidb64))
+        user = CustomUser.objects.get(pk=uid)
+    except (TypeError, ValueError, OverflowError, CustomUser.DoesNotExist):
+        return Response({'detail': 'Invalid reset link.'}, status=status.HTTP_400_BAD_REQUEST)
+    
+    if not default_token_generator.check_token(user, token):
+        return Response({'detail': 'Invalid or expired reset link.'}, status=status.HTTP_400_BAD_REQUEST)
+    
+    return Response({
+        'detail': 'Valid reset link.',
+        'email': user.email,
+        'username': user.username
+    })
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def password_reset_confirm(request):
+    try:
+        uid = request.data.get('uid')
+        token = request.data.get('token')
+        new_password = request.data.get('new_password')
+        
+        if not all([uid, token, new_password]):
+            return Response({'detail': 'Missing required fields.'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            uid = force_str(urlsafe_base64_decode(uid))
+            user = CustomUser.objects.get(pk=uid)
+        except (TypeError, ValueError, OverflowError, CustomUser.DoesNotExist):
+            return Response({'detail': 'Invalid reset link.'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        if not default_token_generator.check_token(user, token):
+            return Response({'detail': 'Invalid or expired reset link.'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Set new password
+        user.set_password(new_password)
+        user.save()
+        
+        return Response({'detail': 'Password has been reset successfully.'})
+    except Exception as e:
+        logger.error(f'Password reset confirmation error: {e}')
+        return Response({'detail': 'Failed to reset password.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

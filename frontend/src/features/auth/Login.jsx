@@ -1,11 +1,13 @@
 // frontend/src/features/auth/Login.jsx
-import React, { useState } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 import { setCredentials } from './authSlice';
 import api from '../../services/api';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiLock, FiMail, FiAlertCircle, FiX } from 'react-icons/fi';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -19,26 +21,37 @@ const Login = () => {
     email: false,
     password: false,
   });
+  const [shouldNavigate, setShouldNavigate] = useState(false);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const handleChange = (e) => {
+  // Handle navigation after successful login
+  useEffect(() => {
+    if (shouldNavigate) {
+      const timer = setTimeout(() => {
+        navigate('/', { replace: true });
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [shouldNavigate, navigate]);
+
+  const handleChange = useCallback((e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
     if (fieldErrors[name]) {
       setFieldErrors(prev => ({ ...prev, [name]: '' }));
     }
     setError(null);
-  };
+  }, [fieldErrors]);
 
-  const handleBlur = (e) => {
+  const handleBlur = useCallback((e) => {
     const { name } = e.target;
     setTouched(prev => ({ ...prev, [name]: true }));
-  };
+  }, []);
 
   // Validate form fields
-  const validateField = (name, value) => {
+  const validateField = useCallback((name, value) => {
     if (!touched[name]) return '';
     
     switch (name) {
@@ -52,14 +65,15 @@ const Login = () => {
       default:
         return '';
     }
-  };
+  }, [touched]);
 
   // Check each field validation
   const emailError = validateField('email', formData.email);
   const passwordError = validateField('password', formData.password);
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = useCallback(async (e) => {
     e.preventDefault();
+    e.stopPropagation();
     
     // Validate all fields before submission
     const touchedAll = {
@@ -84,35 +98,105 @@ const Login = () => {
 
     try {
       const response = await api.post('/api/auth/login/', formData);
+      
+      // Update credentials in Redux store
       dispatch(setCredentials(response.data));
-      navigate('/');
+      
+      // Show success notification
+      toast.success('Welcome back! Successfully logged in.', {
+        position: "top-center",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        theme: "dark"
+      });
+
+      // Set navigation flag instead of navigating immediately
+      setShouldNavigate(true);
     } catch (err) {
+      setIsLoading(false);
+      
       if (err.response?.data) {
-        // Format backend errors for better display
         const backendErrors = {};
         Object.entries(err.response.data).forEach(([key, value]) => {
           backendErrors[key] = Array.isArray(value) ? value[0] : value;
         });
-        setFieldErrors(backendErrors);
         
-        // Set a general error message if authentication failed
         if (err.response.status === 401 || backendErrors.detail) {
-          setError(backendErrors.detail || 'Invalid email or password. Please try again.');
+          const errorMessage = backendErrors.detail || 'Invalid email or password';
+          setError(errorMessage);
+          setFieldErrors({
+            email: 'Invalid email or password',
+            password: 'Invalid email or password'
+          });
+          
+          toast.error(errorMessage, {
+            position: "top-center",
+            autoClose: 3000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            theme: "dark"
+          });
         } else if (Object.keys(backendErrors).length > 0) {
-          setError('Please correct the errors below.');
+          const errorMessage = 'Please correct the errors below.';
+          setError(errorMessage);
+          setFieldErrors(backendErrors);
+          toast.error(errorMessage, {
+            position: "top-center",
+            autoClose: 3000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            theme: "dark"
+          });
         } else {
-          setError('Login failed. Please try again.');
+          const errorMessage = 'Login failed. Please try again.';
+          setError(errorMessage);
+          toast.error(errorMessage, {
+            position: "top-center",
+            autoClose: 3000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            theme: "dark"
+          });
         }
       } else {
-        setError('Unable to connect to the server. Please check your internet connection.');
+        const errorMessage = 'Unable to connect to the server. Please check your internet connection.';
+        setError(errorMessage);
+        toast.error(errorMessage, {
+          position: "top-center",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          theme: "dark"
+        });
       }
-    } finally {
-      setIsLoading(false);
     }
-  };
+  }, [formData, validateField, dispatch]);
 
   return (
     <div className="min-h-screen bg-[#0F172A] flex items-center justify-center px-4 py-12">
+      <ToastContainer
+        position="top-center"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="dark"
+      />
       <div className="absolute top-0 left-0 w-full h-64 bg-gradient-to-r from-[#3E60C1]/50 to-[#5983FC]/50 opacity-40 blur-3xl -z-10"></div>
       
       <motion.div 
@@ -141,10 +225,15 @@ const Login = () => {
           className="bg-[#1A2335] rounded-2xl border border-[#2A3547] shadow-xl shadow-black/20 overflow-hidden p-1"
         >
           <div className="bg-gradient-to-br from-[#1A2335] to-[#1A2335] p-8 rounded-xl backdrop-blur-sm">
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <AnimatePresence>
+            <form 
+              onSubmit={handleSubmit} 
+              className="space-y-6"
+              noValidate
+            >
+              <AnimatePresence mode="wait">
                 {error && (
                   <motion.div
+                    key="error"
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}

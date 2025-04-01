@@ -7,11 +7,13 @@ import Layout from './components/layout/Layout'
 import Home from './features/home/Home'
 import Login from './features/auth/Login'
 import Register from './features/auth/Register'
+import ForgotPassword from './features/auth/ForgotPassword'
 import JournalList from './features/journal/JournalList'
 import MoodLog from './features/mood/MoodLog'
 import { setCredentials, logout } from './features/auth/authSlice'
 import { ThemeProvider } from './context/ThemeContext'
 import Profile from './features/profile/Profile'
+import ResetPassword from './features/auth/ResetPassword'
 
 const AppContent = () => {
   const dispatch = useDispatch()
@@ -55,6 +57,8 @@ const AppContent = () => {
             <Route path="/" element={<Home />} />
             <Route path="/login" element={!isAuthenticated ? <Login /> : <Navigate to="/" />} />
             <Route path="/register" element={!isAuthenticated ? <Register /> : <Navigate to="/" />} />
+            <Route path="/forgot-password" element={!isAuthenticated ? <ForgotPassword /> : <Navigate to="/" />} />
+            <Route path="/reset-password/:uidb64/:token" element={!isAuthenticated ? <ResetPassword /> : <Navigate to="/" />} />
             <Route path="/journal" element={isAuthenticated ? <JournalList /> : <Navigate to="/login" />} />
             <Route path="/mood" element={isAuthenticated ? <MoodLog /> : <Navigate to="/login" />} />
             <Route path="/profile" element={isAuthenticated ? <Profile /> : <Navigate to="/login" />} />

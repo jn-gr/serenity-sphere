@@ -69,6 +69,18 @@ class UserUpdateSerializer(serializers.ModelSerializer):
         model = CustomUser
         fields = ['username', 'email', 'password']
 
+    def validate_username(self, value):
+        user = self.context['request'].user
+        if CustomUser.objects.exclude(pk=user.pk).filter(username=value).exists():
+            raise serializers.ValidationError("This username is already taken.")
+        return value
+
+    def validate_email(self, value):
+        user = self.context['request'].user
+        if CustomUser.objects.exclude(pk=user.pk).filter(email=value).exists():
+            raise serializers.ValidationError("This email is already in use.")
+        return value
+
     def update(self, instance, validated_data):
         if 'password' in validated_data:
             password = validated_data.pop('password')
