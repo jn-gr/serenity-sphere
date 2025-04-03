@@ -81,76 +81,6 @@
   - React Icons
   - Custom components
 
-### DevOps
-- **Version Control**: Git
-- **CI/CD**: GitHub Actions
-- **Containerization**: Docker
-- **Cloud Platform**: AWS/GCP
-
-## 🚀 Getting Started
-
-### Prerequisites
-- Python 3.8+
-- Node.js 16+
-- PostgreSQL 14
-- npm or yarn
-
-### Installation
-
-1. Clone the repository
-```bash
-git clone https://github.com/yourusername/serenity-sphere.git
-cd serenity-sphere
-```
-
-2. Set up the backend
-```bash
-cd backend
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-pip install -r requirements.txt
-python manage.py migrate
-python manage.py runserver
-```
-
-3. Set up the frontend
-```bash
-cd frontend
-npm install
-npm run dev
-```
-
-4. Set up environment variables
-```bash
-# backend/.env
-DEBUG=True
-SECRET_KEY=your-secret-key
-DATABASE_URL=postgresql://user:password@localhost:5432/serenity_sphere
-AI_MODEL_PATH=path/to/your/model
-
-# frontend/.env
-REACT_APP_API_URL=http://localhost:8000/api
-```
-
-## 📚 Documentation
-
-Detailed documentation is available in the [docs](docs/) directory:
-- [API Documentation](docs/api.md)
-- [AI Model Documentation](docs/ai-model.md)
-- [Frontend Architecture](docs/frontend.md)
-- [Backend Architecture](docs/backend.md)
-- [Deployment Guide](docs/deployment.md)
-
-## 🤝 Contributing
-
-We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.md) for details.
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
 ## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
@@ -161,12 +91,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - Django REST Framework team
 - React and Redux communities
 - All contributors and supporters
-
-## 📞 Support
-
-For support, email support@serenitysphere.com or join our [Discord community](https://discord.gg/serenitysphere).
-
----
 
 <div align="center">
   Made with ❤️ for better mental health
