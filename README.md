@@ -11,7 +11,7 @@
   [![Redux](https://img.shields.io/badge/redux-4.2.0-764ABC.svg)](https://redux.js.org/)
   [![RoBERTa](https://img.shields.io/badge/roberta-base-1.2GB-red.svg)](https://huggingface.co/roberta-base)
 
-  A comprehensive mental health platform leveraging AI to provide personalized support and therapeutic exercises.
+  A comprehensive mental health platform leveraging AI to provide personalised support and therapeutic exercises.
 </div>
 
 ## 🌟 Features
