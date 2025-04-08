@@ -113,23 +113,18 @@ class JournalEntryViewSet(viewsets.ModelViewSet):
         date = serializer.validated_data.get('date', timezone.now())
         
         try:
-            # Try to get existing entry for the given date
             existing_entry = JournalEntry.objects.get(
                 user=self.request.user,
                 date__date=date.date()
             )
-            # Update existing entry
             existing_entry.content = content
             existing_entry.emotions = emotions
             existing_entry.save()
             
-            # Update associated mood log
             self._update_or_create_mood_log(existing_entry, emotions)
             return existing_entry
         except JournalEntry.DoesNotExist:
-            # Create new entry if none exists
             journal_entry = serializer.save(user=self.request.user, emotions=emotions)
-            # Create associated mood log
             self._update_or_create_mood_log(journal_entry, emotions)
             return journal_entry
 
@@ -137,11 +132,9 @@ class JournalEntryViewSet(viewsets.ModelViewSet):
         if not emotions:
             return
             
-        # Sort emotions by confidence score (descending)
         sorted_emotions = sorted(emotions, key=lambda x: x[1], reverse=True)
         dominant_emotion = sorted_emotions[0][0].lower()
         
-        # Map the emotion to a mood
         emotion_to_mood = {
             # Positive emotions
             'amusement': 'amused',
@@ -178,10 +171,8 @@ class JournalEntryViewSet(viewsets.ModelViewSet):
             'disapproval': 'disapproving',
         }
         
-        # Default to neutral if emotion not in mapping
         mood = emotion_to_mood.get(dominant_emotion, 'neutral')
         
-        # Calculate intensity based on confidence score (scale 1-10)
         intensity = min(int(sorted_emotions[0][1] * 10), 10)
         
         # First, delete any existing mood logs for this journal entry to avoid duplicates
@@ -202,7 +193,6 @@ class JournalEntryViewSet(viewsets.ModelViewSet):
         if content is not None:
             emotions = predict_emotions(content)
             journal_entry = serializer.save(emotions=emotions)
-            # Update mood log when journal entry is updated
             self._update_or_create_mood_log(journal_entry, emotions)
         else:
             serializer.save()
@@ -233,7 +223,6 @@ class MoodLogViewSet(viewsets.ModelViewSet):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_mood_trends(request):
-    # Get mood logs for the last 30 days for the logged-in user only
     thirty_days_ago = timezone.now().date() - timezone.timedelta(days=30)
     mood_logs = MoodLog.objects.filter(
         user=request.user,
@@ -246,10 +235,7 @@ def get_mood_trends(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_mood_notifications(request):
-    # Your existing code for finding real notifications
     notifications = []
-    
-    # Always add a test notification for development
     notifications.append({
         'id': 999,
         'type': 'mood_shift',
@@ -279,7 +265,6 @@ def mood_cause_recommendation(request):
     
     recommendations = []
     
-    # Curated recommendations based on the cause
     if cause == 'loss':
         recommendations = [
             {
@@ -316,9 +301,6 @@ def mood_cause_recommendation(request):
                 "link": "/exercises/muscle-relaxation"
             }
         ]
-    # Add more cause-specific recommendations here
-    
-    # Add more mood causes
     elif cause == 'loneliness':
         recommendations = [
             {
@@ -326,9 +308,8 @@ def mood_cause_recommendation(request):
                 "description": "Reach out to one person today, even with a simple text message.",
                 "link": "/exercises/social-connection"
             },
-            # More recommendations...
         ]
-    # Other causes...
+
     
     return Response({"recommendations": recommendations})
 
@@ -342,14 +323,12 @@ def password_reset_request(request):
     
     try:
         user = CustomUser.objects.get(email=email)
-        # Generate password reset token
         uid = urlsafe_base64_encode(force_bytes(user.pk))
         token = default_token_generator.make_token(user)
         
         # Create reset link with the correct frontend URL
         reset_url = f"http://localhost:5173/reset-password/{uid}/{token}"
         
-        # Send email
         subject = 'Password Reset Requested'
         message = f'''
         Hello {user.username},
