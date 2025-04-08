@@ -12,9 +12,9 @@ if not os.path.exists(model_path):
 # Load the tokenizer and model
 tokenizer = RobertaTokenizer.from_pretrained(model_path)
 model = RobertaForSequenceClassification.from_pretrained(model_path)
-model.eval()  # Set the model to evaluation mode
+model.eval()
 
-# emotion labels from the model card
+# emotion labels
 
 EMOTION_LABELS = [
     "admiration", "amusement", "anger", "annoyance", "approval", 
