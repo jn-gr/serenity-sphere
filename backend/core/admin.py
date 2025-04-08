@@ -75,7 +75,6 @@ class JournalEntryAdmin(admin.ModelAdmin):
         if obj.emotions:
             # Format emotions for better display
             try:
-                # Assuming emotions is a list of [emotion, score] pairs
                 top_emotions = sorted(obj.emotions, key=lambda x: x[1], reverse=True)[:3]
                 return ", ".join([f"{e[0]}: {e[1]:.2f}" for e in top_emotions])
             except:
@@ -83,41 +82,34 @@ class JournalEntryAdmin(admin.ModelAdmin):
         return "No emotions detected"
     emotions_preview.short_description = 'Top Emotions'
     
-    # Add actions for creating test data with different dates
+    
     actions = ['set_date_yesterday', 'set_date_last_week', 'set_date_last_month']
     
     def set_date_yesterday(self, request, queryset):
         yesterday = timezone.now() - timezone.timedelta(days=1)
-        # Set time to start of day to avoid timezone issues
         yesterday = datetime.combine(yesterday.date(), time.min)
         queryset.update(date=yesterday)
     set_date_yesterday.short_description = "Set date to yesterday"
     
     def set_date_last_week(self, request, queryset):
         last_week = timezone.now() - timezone.timedelta(days=7)
-        # Set time to start of day to avoid timezone issues
         last_week = datetime.combine(last_week.date(), time.min)
         queryset.update(date=last_week)
     set_date_last_week.short_description = "Set date to last week"
     
     def set_date_last_month(self, request, queryset):
         last_month = timezone.now() - timezone.timedelta(days=30)
-        # Set time to start of day to avoid timezone issues
         last_month = datetime.combine(last_month.date(), time.min)
         queryset.update(date=last_month)
     set_date_last_month.short_description = "Set date to last month"
 
     def save_model(self, request, obj, form, change):
-        # Perform emotion analysis if content exists
         if obj.content:
-            # Use existing emotion analysis function
             emotions = predict_emotions(obj.content)
             obj.emotions = emotions
             
-            # Save the journal entry first
             super().save_model(request, obj, form, change)
             
-            # Create/update a corresponding mood log based on emotions
             self._update_or_create_mood_log(obj, emotions, request.user)
         else:
             super().save_model(request, obj, form, change)
