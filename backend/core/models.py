@@ -140,7 +140,7 @@ class MoodCause(models.Model):
 
 
 class RecommendationCategory(models.Model):
-    name = models.CharField(max_length=100)  # e.g., 'grief', 'stress', 'anger'
+    name = models.CharField(max_length=100)
     description = models.TextField(blank=True, null=True)
     
     def __str__(self):
@@ -171,8 +171,8 @@ class UserRecommendation(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='recommendations')
     recommendation = models.ForeignKey(Recommendation, on_delete=models.CASCADE)
     mood_cause = models.ForeignKey(MoodCause, on_delete=models.CASCADE, related_name='recommendations', null=True, blank=True)
-    is_helpful = models.BooleanField(null=True, blank=True)  # User feedback
-    feedback = models.TextField(blank=True, null=True)  # Additional feedback
+    is_helpful = models.BooleanField(null=True, blank=True)
+    feedback = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(default=timezone.now)
     
     def __str__(self):
