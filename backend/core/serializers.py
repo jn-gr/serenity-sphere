@@ -47,21 +47,18 @@ class JournalEntrySerializer(serializers.ModelSerializer):
         date = validated_data.get('date', timezone.now())
         
         try:
-            # Try to get existing entry for the same date
             existing_entry = JournalEntry.objects.get(
                 user=user,
                 date__date=date.date()
             )
-            # Update existing entry
             for attr, value in validated_data.items():
                 setattr(existing_entry, attr, value)
             existing_entry.save()
             return existing_entry
         except JournalEntry.DoesNotExist:
-            # Create new entry
             return super().create(validated_data)
 
-# New serializer for updating the user's profile
+#for updating the user's profile
 class UserUpdateSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, required=False, validators=[validate_password])
 
@@ -94,12 +91,12 @@ class MoodLogSerializer(serializers.ModelSerializer):
         read_only_fields = ['user']
         
     def create(self, validated_data):
-        # Ensure the user is set to the logged-in user
+        #ensure the user is set to the logged-in user
         validated_data['user'] = self.context['request'].user
         return super().create(validated_data)
 
     def validate_journal_entry(self, value):
-        # Ensure users can only link to their own journal entries
+        #ensure users can only link to their own journal entries
         if value and value.user != self.context['request'].user:
             raise serializers.ValidationError("You can only link to your own journal entries.")
         return value
