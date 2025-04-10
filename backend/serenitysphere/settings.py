@@ -153,7 +153,6 @@ SESSION_COOKIE_SAMESITE = 'Lax'
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",  # Your frontend development server
-    # Add your production domain when deploying
 ]
 
 # CSRF settings
@@ -181,7 +180,7 @@ EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'serenity.sph@gmail.com'
-EMAIL_HOST_PASSWORD = 'msny qqle zmbr qiro'  # Replace with the 16-character App Password you generated
+EMAIL_HOST_PASSWORD = 'msny qqle zmbr qiro' 
 DEFAULT_FROM_EMAIL = 'serenity.sph@gmail.com'
 
 # Password reset settings
