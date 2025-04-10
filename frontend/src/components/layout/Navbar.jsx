@@ -41,7 +41,6 @@ const Navbar = ({ onHoverChange }) => {
     }
   };
 
-  // Public navbar for unauthenticated users
   if (!isAuthenticated) {
     return (
       <nav className="fixed top-0 left-0 right-0 bg-[#1A2335] border-b border-[#2A3547] z-50">
@@ -68,7 +67,6 @@ const Navbar = ({ onHoverChange }) => {
     );
   }
 
-  // Sidebar navigation for authenticated users
   return (
     <motion.nav 
       className="fixed left-0 top-0 h-screen bg-[#1A2335] border-r border-[#2A3547] flex flex-col py-6 group z-50"
