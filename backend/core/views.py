@@ -402,7 +402,6 @@ def password_reset_confirm(request):
         if not default_token_generator.check_token(user, token):
             return Response({'detail': 'Invalid or expired reset link.'}, status=status.HTTP_400_BAD_REQUEST)
         
-        # Set new password
         user.set_password(new_password)
         user.save()
         
