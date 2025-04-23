@@ -1458,7 +1458,6 @@ const ExerciseModal = ({ exercise, onClose }) => {
               </div>
             </div>
 
-            {/* Final Reflection */}
             <div className="bg-[#0F172A]/70 p-4 rounded-lg border border-[#2A3547]">
               <h3 className="text-white font-medium mb-2">Daily Intention</h3>
               <textarea
@@ -1612,7 +1611,6 @@ const ExerciseModal = ({ exercise, onClose }) => {
       case 'work-values':
         return (
           <div className="space-y-6">
-            {/* Work Values Section */}
             <div className="bg-[#0F172A]/70 p-4 rounded-xl border border-[#2A3547]">
               <h3 className="text-white font-medium mb-4">Core Work Values</h3>
 
@@ -1691,7 +1689,6 @@ const ExerciseModal = ({ exercise, onClose }) => {
               )}
             </div>
 
-            {/* Meaningful Task Section */}
             <div className="bg-[#0F172A]/70 p-4 rounded-xl border border-[#2A3547]">
               <h3 className="text-white font-medium mb-2">Bringing More Meaning</h3>
               <textarea
@@ -1702,7 +1699,6 @@ const ExerciseModal = ({ exercise, onClose }) => {
               />
             </div>
 
-            {/* Mission Statement Section */}
             <div className="bg-[#0F172A]/70 p-4 rounded-xl border border-[#2A3547]">
               <h3 className="text-white font-medium mb-2">Personal Work Mission Statement</h3>
               <textarea
@@ -1713,7 +1709,6 @@ const ExerciseModal = ({ exercise, onClose }) => {
               />
             </div>
 
-            {/* Progress Indicator */}
             {workValues.some(v => v.value) && (
               <div className="bg-emerald-500/10 border border-emerald-500/30 p-4 rounded-xl">
                 <p className="text-emerald-400 text-sm">
@@ -1729,7 +1724,6 @@ const ExerciseModal = ({ exercise, onClose }) => {
       case 'health-worry':
         return (
           <div className="space-y-4">
-            {/* Main Worry Input */}
             <div className="bg-[#0F172A]/70 p-4 rounded-lg border border-[#2A3547]">
               <h3 className="text-white font-medium mb-2">Health Concern</h3>
               <textarea
@@ -1741,7 +1735,6 @@ const ExerciseModal = ({ exercise, onClose }) => {
               />
             </div>
 
-            {/* Worry Level */}
             <div className="bg-[#0F172A]/70 p-4 rounded-lg border border-[#2A3547]">
               <h3 className="text-white font-medium mb-2">Worry Level (1-10)</h3>
               <div className="flex items-center space-x-4">
@@ -1757,7 +1750,6 @@ const ExerciseModal = ({ exercise, onClose }) => {
               </div>
             </div>
 
-            {/* Supporting Evidence */}
             <div className="bg-[#0F172A]/70 p-4 rounded-lg border border-[#2A3547]">
               <h3 className="text-white font-medium mb-2">Evidence Supporting This Worry</h3>
               <div className="space-y-2">
