@@ -127,10 +127,7 @@ const ExerciseModal = ({ exercise, onClose }) => {
 
     return 300;
   };
-
   const totalDuration = getDurationInSeconds();
-
-  // Timer controls
   const startTimer = () => {
     if (!timerActive) {
       setTimerActive(true);
@@ -156,7 +153,6 @@ const ExerciseModal = ({ exercise, onClose }) => {
     setTimeElapsed(0);
   };
 
-  // Audio controls
   const toggleAudio = () => {
     if (audioRef.current) {
       if (audioRef.current.paused) {
@@ -167,7 +163,6 @@ const ExerciseModal = ({ exercise, onClose }) => {
     }
   };
 
-  // Clean up on unmount
   useEffect(() => {
     return () => {
       if (timerRef.current) {
@@ -179,14 +174,12 @@ const ExerciseModal = ({ exercise, onClose }) => {
     };
   }, []);
 
-  // Format time display (MM:SS)
   const formatTime = (seconds) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
-  // Get the current step content
   const getCurrentStep = () => {
     if (!exerciseContent?.steps || exerciseContent.steps.length === 0) {
       return "No steps available for this exercise.";
@@ -199,7 +192,6 @@ const ExerciseModal = ({ exercise, onClose }) => {
     return "Complete! How do you feel now?";
   };
 
-  // Handle completing the exercise
   const handleComplete = () => {
     pauseTimer();
     setCompleted(true);
