@@ -2953,49 +2953,37 @@ const ExerciseModal = ({ exercise, onClose }) => {
       if (titleLower.includes('root')) return 'anger-root-cause';
       return 'anger-management';
     }
-
-    // Work exercises
     if (titleLower.includes('work')) {
       if (titleLower.includes('boundar')) return 'work-boundaries';
       if (titleLower.includes('task') || titleLower.includes('priorit')) return 'task-prioritization';
       if (titleLower.includes('value')) return 'work-values';
       return 'work-stress';
     }
-
-    // Mindfulness exercises
     if (titleLower.includes('mindful')) {
       if (titleLower.includes('body') || titleLower.includes('scan')) return 'body-scan';
       if (titleLower.includes('breath')) return 'mindful-breathing';
       if (titleLower.includes('observ')) return 'mindful-observation';
       return 'mindfulness';
     }
-
-    // Loneliness exercises
     if (titleLower.includes('lonel') || titleLower.includes('connect')) {
       if (titleLower.includes('inventory')) return 'connection-inventory';
       if (titleLower.includes('self-connect')) return 'self-connection';
       return 'belonging-expansion';
     }
-
-    // Health exercises
     if (titleLower.includes('health') || titleLower.includes('body')) {
       if (titleLower.includes('appreciation')) return 'body-appreciation';
       if (titleLower.includes('worry')) return 'health-worry';
       return 'mindful-body-scan';
     }
-
-    // Check type
     if (exercise.type === 'journaling' || exercise.type === 'journal') return 'journaling';
     if (exercise.type === 'meditation') return 'mindfulness';
     if (exercise.type === 'breathing') return 'breathing';
     if (exercise.type === 'grounding') return 'grounding';
     if (exercise.type === 'reflection') return 'reflection';
 
-    // Default
     return 'default';
   };
 
-  // Create a default exercise if we can't determine the specific one
   const createDefaultExercise = () => {
     return {
       title: exercise.title || "Wellness Exercise",
