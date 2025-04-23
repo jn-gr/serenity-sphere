@@ -575,7 +575,6 @@ const ExerciseModal = ({ exercise, onClose }) => {
                   </div>
                 )}
 
-                {/* Common ground section always visible */}
                 <div className="mt-4 pt-4 border-t border-[#2A3547]">
                   <label className="text-[#5983FC] text-xs mb-1 block">Possible common ground:</label>
                   <textarea
@@ -586,7 +585,6 @@ const ExerciseModal = ({ exercise, onClose }) => {
                   />
                 </div>
 
-                {/* Summary section with insights */}
                 {(yourViewData.needs || theirViewData.needs) && (
                   <div className="mt-4 pt-4 border-t border-[#2A3547]">
                     <h4 className="text-white text-sm font-medium mb-2">Exercise Insights</h4>
@@ -785,12 +783,9 @@ const ExerciseModal = ({ exercise, onClose }) => {
         return (
           <div className="mt-4">
             <div className="flex flex-col items-center">
-              {/* Timer for physical exercises */}
               <div className="text-xl font-semibold text-white mb-3">
                 {formatTime(timeElapsed)} / {formatTime(totalDuration)}
               </div>
-
-              {/* Body parts highlight */}
               <div className="w-full max-w-[200px] relative mb-4">
                 <svg viewBox="0 0 100 220" className="w-full">
                   <rect x="30" y="30" width="40" height="60" rx="20"
@@ -811,8 +806,6 @@ const ExerciseModal = ({ exercise, onClose }) => {
                   />
                 </svg>
               </div>
-
-              {/* Visual guide for tension/release cycles */}
               <div className="w-full bg-[#0F172A] h-6 rounded-full mb-4 overflow-hidden relative">
                 <div
                   className={`h-6 ${timerActive && timeElapsed % 10 < 5
@@ -944,7 +937,6 @@ const ExerciseModal = ({ exercise, onClose }) => {
                 </div>
               </div>
 
-              {/* Time visualization */}
               <div className="mb-4 p-3 bg-[#1A2335]/50 rounded-lg">
                 <h5 className="text-white text-xs font-medium mb-2">Work-Life Time Visualization</h5>
                 <div className="h-6 bg-[#0F172A] rounded-full overflow-hidden mb-1">
@@ -1280,7 +1272,6 @@ const ExerciseModal = ({ exercise, onClose }) => {
               </div>
             </div>
 
-            {/* Task input - Updated layout */}
             <div className="space-y-3">
               <div className="flex flex-col gap-2">
                 <input
@@ -1318,9 +1309,7 @@ const ExerciseModal = ({ exercise, onClose }) => {
               </div>
             </div>
 
-            {/* Task categories */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Urgent & Important */}
               <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-lg p-4">
                 <h5 className="text-emerald-400 font-medium mb-3">Urgent & Important</h5>
                 <div className="space-y-2">
@@ -1338,7 +1327,6 @@ const ExerciseModal = ({ exercise, onClose }) => {
                 </div>
               </div>
 
-              {/* Important, Not Urgent */}
               <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4">
                 <h5 className="text-blue-400 font-medium mb-3">Important, Not Urgent</h5>
                 <div className="space-y-2">
