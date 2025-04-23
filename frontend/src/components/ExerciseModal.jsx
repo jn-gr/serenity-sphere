@@ -342,12 +342,9 @@ const ExerciseModal = ({ exercise, onClose }) => {
         return (
           <div className="mt-4">
             <div className="flex flex-col items-center">
-              {/* Timer display */}
               <div className="text-2xl font-semibold text-white mb-3">
                 {formatTime(timeElapsed)} / {formatTime(totalDuration)}
               </div>
-
-              {/* Body scan visualization */}
               <div className="w-full max-w-[200px] relative mb-6">
                 <svg viewBox="0 0 100 220" className="w-full">
                   <path d="M50,10 Q65,30 50,50 Q35,70 50,90 Q65,110 50,140 Q35,160 50,180 Q65,200 50,220"
@@ -377,16 +374,12 @@ const ExerciseModal = ({ exercise, onClose }) => {
                   }
                 </div>
               </div>
-
-              {/* Progress bar */}
               <div className="w-full bg-[#0F172A] h-2 rounded-full mb-4">
                 <div
                   className="bg-gradient-to-r from-[#3E60C1] to-[#5983FC] h-2 rounded-full"
                   style={{ width: `${(timeElapsed / totalDuration) * 100}%` }}
                 ></div>
               </div>
-
-              {/* Controls */}
               <div className="flex items-center space-x-4">
                 {timerActive ? (
                   <button
@@ -403,14 +396,12 @@ const ExerciseModal = ({ exercise, onClose }) => {
                     <FaPlay />
                   </button>
                 )}
-
                 <button
                   onClick={resetTimer}
                   className="bg-[#0F172A] p-3 rounded-full text-[#B8C7E0] hover:text-white transition-colors"
                 >
                   <FaArrowLeft />
                 </button>
-
                 {exerciseContent.audioUrl && (
                   <button
                     onClick={toggleAudio}
