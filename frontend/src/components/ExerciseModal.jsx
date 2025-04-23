@@ -2527,7 +2527,6 @@ const ExerciseModal = ({ exercise, onClose }) => {
               />
             </div>
 
-            {/* Summary */}
             <div className="bg-[#0F172A]/70 p-5 rounded-xl border border-[#2A3547]">
               <h4 className="text-white font-medium mb-3">Your Reflection Summary</h4>
               <div className="space-y-3">
@@ -2861,18 +2860,14 @@ const ExerciseModal = ({ exercise, onClose }) => {
   };
 
   useEffect(() => {
-    // Load exercise content based on the exercise properties
     const loadExerciseContent = async () => {
       setIsLoading(true);
 
       try {
-        // Determine which exercise to load based on title, type, or category
         const exerciseKey = determineExerciseKey();
 
-        // Set the exercise content
         setExerciseContent(exerciseContents[exerciseKey] || createDefaultExercise());
 
-        // Initialize checklist if needed
         if (exerciseContents[exerciseKey]?.checkItems) {
           const initialChecklist = {};
           exerciseContents[exerciseKey].checkItems.forEach((_, index) => {
@@ -2882,7 +2877,6 @@ const ExerciseModal = ({ exercise, onClose }) => {
         }
       } catch (error) {
         console.error("Error loading exercise content:", error);
-        // Fallback to default
         setExerciseContent(createDefaultExercise());
       } finally {
         setIsLoading(false);
@@ -2892,49 +2886,38 @@ const ExerciseModal = ({ exercise, onClose }) => {
     loadExerciseContent();
   }, [exercise]);
 
-  // Determine which exercise content to load based on the exercise props
   const determineExerciseKey = () => {
     if (!exercise) return 'default';
 
-    // First check if there's a direct link
     if (exercise.link && typeof exercise.link === 'string') {
-
 
       if (exercise.link === 'task-prioritization' ||
         (exercise.type === 'task') ||
         exercise.title === "Task Prioritization Method") {
         return 'task-prioritization';
       }
-
       if (exercise.link === 'future-possibilities') {
         return 'future-possibilities';
       }
-
       if (exercise.link === 'uncertainty-tolerance') {
         return 'uncertainty-tolerance';
       }
-
       if (exercise.link === 'meaning-making') {
         return 'meaning-making';
       }
       if (exercise.link === 'continuing-bonds') {
         return 'continuing-bonds';
       }
-      // Add direct check for anxious-thought
       if (exercise.link === 'anxious-thought') {
         return 'anxious-thought';
       }
-
       if (exercise.link === 'work-boundaries') {
         return 'work-boundaries';
       }
-
-      // Check for direct match with the link value
       if (exerciseContents[exercise.link]) {
         return exercise.link;
       }
 
-      // Check path segments if it's a full URL
       const pathSegments = exercise.link.split('/');
       const lastSegment = pathSegments[pathSegments.length - 1];
       if (exerciseContents[lastSegment]) {
@@ -2942,7 +2925,6 @@ const ExerciseModal = ({ exercise, onClose }) => {
       }
     }
 
-    // Next check title matches
     const titleLower = exercise.title?.toLowerCase() || '';
 
     // Relationship exercises
