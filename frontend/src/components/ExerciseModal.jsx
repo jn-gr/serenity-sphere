@@ -227,7 +227,6 @@ const ExerciseModal = ({ exercise, onClose }) => {
            exerciseContent.type === 'future-possibilities';
   };
 
-  // Render the appropriate interactive component based on exercise type
   const renderInteractiveComponent = () => {
     if (!exerciseContent) return null;
 
@@ -281,12 +280,9 @@ const ExerciseModal = ({ exercise, onClose }) => {
         return (
           <div className="mt-4">
             <div className="flex flex-col items-center">
-              {/* Timer display */}
               <div className="text-2xl font-semibold text-white mb-3">
                 {formatTime(timeElapsed)} / {formatTime(totalDuration)}
               </div>
-
-              {/* Visual breathing guide */}
               <div className="relative w-32 h-32 mb-6">
                 <div
                   className={`absolute inset-0 rounded-full border-2 border-[#5983FC] ${timerActive ? 'animate-pulse-slow' : ''
@@ -306,16 +302,12 @@ const ExerciseModal = ({ exercise, onClose }) => {
                       : "Exhale"}
                 </div>
               </div>
-
-              {/* Progress bar */}
               <div className="w-full bg-[#0F172A] h-2 rounded-full mb-4">
                 <div
                   className="bg-gradient-to-r from-[#3E60C1] to-[#5983FC] h-2 rounded-full"
                   style={{ width: `${(timeElapsed / totalDuration) * 100}%` }}
                 ></div>
               </div>
-
-              {/* Controls */}
               <div className="flex items-center space-x-4">
                 {timerActive ? (
                   <button
@@ -332,7 +324,6 @@ const ExerciseModal = ({ exercise, onClose }) => {
                     <FaPlay />
                   </button>
                 )}
-
                 {exerciseContent.audioUrl && (
                   <button
                     onClick={toggleAudio}
@@ -342,8 +333,6 @@ const ExerciseModal = ({ exercise, onClose }) => {
                   </button>
                 )}
               </div>
-
-              {/* Hidden audio element */}
               <audio ref={audioRef} src={exerciseContent.audioUrl} loop />
             </div>
           </div>
