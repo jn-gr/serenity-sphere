@@ -27,7 +27,6 @@ const ExerciseModal = ({ exercise, onClose }) => {
   });
   const [commonGround, setCommonGround] = useState('');
 
-  // Add these new state variables for the values exercise
   const [valuesList, setValuesList] = useState([
     { id: 1, value: '', rank: 1 },
     { id: 2, value: '', rank: 2 },
