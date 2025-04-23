@@ -87,7 +87,6 @@ const Navbar = ({ onHoverChange }) => {
         </motion.span>
       </div>
 
-      {/* Navigation Links */}
       <ul className="space-y-1 flex-1 px-2">
         <li>
           <NavLink to="/" icon={FaHome}>Dashboard</NavLink>
@@ -103,7 +102,6 @@ const Navbar = ({ onHoverChange }) => {
         </li>
       </ul>
 
-      {/* Logout Button */}
       <div className="pt-4 border-t border-[#2A3547] px-2">
         <button
           onClick={handleLogout}
