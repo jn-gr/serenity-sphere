@@ -47,13 +47,9 @@ const ExerciseModal = ({ exercise, onClose }) => {
   const [newTask, setNewTask] = useState('');
   const [taskCategory, setTaskCategory] = useState('');
   const [editingTask, setEditingTask] = useState(null);
-
-  // Add these state variables at the top with other useState declarations
   const [workValues, setWorkValues] = useState([{ value: '', rating: 5, alignment: '' }]);
   const [missionStatement, setMissionStatement] = useState('');
   const [meaningfulTask, setMeaningfulTask] = useState('');
-
-  // Add these state variables at the top with other useState declarations
   const [bodyAreas, setBodyAreas] = useState([
     { area: 'Heart', gratitude: '', checked: false },
     { area: 'Lungs', gratitude: '', checked: false },
@@ -68,8 +64,6 @@ const ExerciseModal = ({ exercise, onClose }) => {
   const [isBreathingComplete, setIsBreathingComplete] = useState(false);
   const [selectedBodyParts, setSelectedBodyParts] = useState([]);
   const [gratitudeText, setGratitudeText] = useState('');
-
-  // Health Worry Examination states
   const [healthWorry, setHealthWorry] = useState('');
   const [worryLevel, setWorryLevel] = useState(5);
   const [supportingEvidence, setSupportingEvidence] = useState(['']);
@@ -85,14 +79,10 @@ const ExerciseModal = ({ exercise, onClose }) => {
   const [mentorResponse, setMentorResponse] = useState('');
   const [balancedResponse, setBalancedResponse] = useState('');
   const [practicePlan, setPracticePlan] = useState('');
-
-  // Mindful Body Scan states
   const [currentBodyPart, setCurrentBodyPart] = useState(0);
   const [bodyScanNotes, setBodyScanNotes] = useState({});
   const [isScanning, setIsScanning] = useState(false);
   const [scanTimer, setScanTimer] = useState(null);
-
-  // Loss Processing Exercise states
   const [lossDescription, setLossDescription] = useState('');
   const [tangibleLosses, setTangibleLosses] = useState(['']);
   const [intangibleLosses, setIntangibleLosses] = useState(['']);
