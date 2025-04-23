@@ -2170,9 +2170,7 @@ const ExerciseModal = ({ exercise, onClose }) => {
               />
             </div>
 
-            {/* Tangible & Intangible Losses Section */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Tangible Losses */}
               <div className="space-y-3">
                 <h4 className="text-white text-sm font-medium">Tangible Losses</h4>
                 {tangibleLosses.map((loss, index) => (
@@ -2210,7 +2208,6 @@ const ExerciseModal = ({ exercise, onClose }) => {
                 </button>
               </div>
 
-              {/* Intangible Losses */}
               <div className="space-y-3">
                 <h4 className="text-white text-sm font-medium">Intangible Losses</h4>
                 {intangibleLosses.map((loss, index) => (
@@ -2249,7 +2246,6 @@ const ExerciseModal = ({ exercise, onClose }) => {
               </div>
             </div>
 
-            {/* What You Miss Most Section */}
             <div className="space-y-3">
               <h4 className="text-white text-sm font-medium">What You Miss Most</h4>
               <textarea
@@ -2260,7 +2256,6 @@ const ExerciseModal = ({ exercise, onClose }) => {
               />
             </div>
 
-            {/* Remaining Strengths Section */}
             <div className="space-y-3">
               <h4 className="text-white text-sm font-medium">What Remains</h4>
               {remainingStrengths.map((strength, index) => (
