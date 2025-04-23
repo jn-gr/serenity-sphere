@@ -37,16 +37,12 @@ const ExerciseModal = ({ exercise, onClose }) => {
   const [draggedValue, setDraggedValue] = useState(null);
   const [valueDefinition, setValueDefinition] = useState('');
   const [actionPlan, setActionPlan] = useState('');
-
-  // Add these state variables at the top of the component with other state variables
   const [workHours, setWorkHours] = useState('');
   const [actualHours, setActualHours] = useState('');
   const [boundaryIssues, setBoundaryIssues] = useState(['', '', '']);
   const [boundaryStatements, setBoundaryStatements] = useState(['', '', '']);
   const [obstacles, setObstacles] = useState(['', '', '']);
   const [selectedBoundary, setSelectedBoundary] = useState('');
-
-  // Add state for task management at the top of the component with other states
   const [tasks, setTasks] = useState([]);
   const [newTask, setNewTask] = useState('');
   const [taskCategory, setTaskCategory] = useState('');
