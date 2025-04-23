@@ -89,8 +89,6 @@ const ExerciseModal = ({ exercise, onClose }) => {
   const [missedMost, setMissedMost] = useState('');
   const [remainingStrengths, setRemainingStrengths] = useState(['']);
   const [adaptationStep, setAdaptationStep] = useState('');
-
-  // Meaning-Making Practice states
   const [perspectiveChange, setPerspectiveChange] = useState('');
   const [valueShifts, setValueShifts] = useState(['']);
   const [discoveredStrengths, setDiscoveredStrengths] = useState(['']);
@@ -103,16 +101,12 @@ const ExerciseModal = ({ exercise, onClose }) => {
   const [ritualDescription, setRitualDescription] = useState('');
   const [identityIntegration, setIdentityIntegration] = useState('');
   const [ongoingMessage, setOngoingMessage] = useState('');
-
   const [uncertaintySituation, setUncertaintySituation] = useState('');
   const [physicalSensations, setPhysicalSensations] = useState('');
   const [thoughts, setThoughts] = useState('');
   const [controlAspects, setControlAspects] = useState('');
-
   const timerRef = useRef(null);
   const audioRef = useRef(null);
-
-  // Add this near the top of the file with other state declarations
   const [futurePossibilitiesData, setFuturePossibilitiesData] = useState({
     situation: '',
     scenarios: {
@@ -121,10 +115,8 @@ const ExerciseModal = ({ exercise, onClose }) => {
       challenging: { description: '', coping: '', resources: '' }
     }
   });
-
-  // Extract duration in seconds from exercise duration string if available
   const getDurationInSeconds = () => {
-    if (!exercise.duration) return 300; // Default 5 minutes
+    if (!exercise.duration) return 300;
 
     const durationMatch = exercise.duration.match(/(\d+)[-–]?(\d+)?\s+minute/i);
     if (durationMatch) {
@@ -133,7 +125,7 @@ const ExerciseModal = ({ exercise, onClose }) => {
       return Math.max(minDuration, maxDuration) * 60;
     }
 
-    return 300; // Default 5 minutes
+    return 300;
   };
 
   const totalDuration = getDurationInSeconds();
