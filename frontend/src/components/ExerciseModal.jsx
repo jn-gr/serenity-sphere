@@ -1788,7 +1788,6 @@ const ExerciseModal = ({ exercise, onClose }) => {
               </div>
             </div>
 
-            {/* Contradicting Evidence */}
             <div className="bg-[#0F172A]/70 p-4 rounded-lg border border-[#2A3547]">
               <h3 className="text-white font-medium mb-2">Evidence That Contradicts This Worry</h3>
               <div className="space-y-2">
@@ -1827,7 +1826,6 @@ const ExerciseModal = ({ exercise, onClose }) => {
               </div>
             </div>
 
-            {/* Control Assessment */}
             <div className="bg-[#0F172A]/70 p-4 rounded-lg border border-[#2A3547]">
               <h3 className="text-white font-medium mb-2">Control Assessment</h3>
               <div className="space-y-4">
@@ -1862,7 +1860,6 @@ const ExerciseModal = ({ exercise, onClose }) => {
               </div>
             </div>
 
-            {/* Summary Section */}
             {(healthWorry || supportingEvidence.some(e => e) || contradictingEvidence.some(e => e)) && (
               <div className="bg-[#0F172A]/70 p-4 rounded-lg border border-[#2A3547]">
                 <h3 className="text-white font-medium mb-3">Reflection Summary</h3>
@@ -1880,7 +1877,6 @@ const ExerciseModal = ({ exercise, onClose }) => {
       case 'body-scan':
         return (
           <div className="space-y-4">
-            {/* Introduction */}
             <div className="bg-[#0F172A]/70 p-4 rounded-lg border border-[#2A3547]">
               <h3 className="text-white font-medium mb-2">Mindful Body Scan</h3>
               <p className="text-[#B8C7E0] text-sm mb-4">
@@ -1900,7 +1896,6 @@ const ExerciseModal = ({ exercise, onClose }) => {
               )}
             </div>
 
-            {/* Body Scan Progress */}
             {isScanning && (
               <div className="bg-[#0F172A]/70 p-4 rounded-lg border border-[#2A3547]">
                 <div className="flex justify-between items-center mb-4">
