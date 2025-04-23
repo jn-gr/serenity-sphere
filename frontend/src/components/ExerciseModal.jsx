@@ -1921,7 +1921,6 @@ const ExerciseModal = ({ exercise, onClose }) => {
                   </p>
                 </div>
 
-                {/* Notes Section */}
                 <div className="mb-4">
                   <textarea
                     value={bodyScanNotes[currentBodyPart] || ''}
@@ -1937,7 +1936,6 @@ const ExerciseModal = ({ exercise, onClose }) => {
                   />
                 </div>
 
-                {/* Navigation Controls */}
                 <div className="flex justify-between">
                   <button
                     onClick={() => {
@@ -1967,7 +1965,6 @@ const ExerciseModal = ({ exercise, onClose }) => {
               </div>
             )}
 
-            {/* Summary Section */}
             {!isScanning && Object.keys(bodyScanNotes).length > 0 && (
               <div className="bg-[#0F172A]/70 p-4 rounded-lg border border-[#2A3547]">
                 <h3 className="text-white font-medium mb-3">Body Scan Summary</h3>
@@ -1999,7 +1996,6 @@ const ExerciseModal = ({ exercise, onClose }) => {
       case 'anxious-thought':
         return (
           <div className="space-y-6">
-            {/* Introduction */}
             <div className="bg-[#0F172A]/70 p-5 rounded-xl border border-[#2A3547]">
               <h4 className="text-white font-medium mb-3">Anxious Thought Reframing</h4>
               <p className="text-[#B8C7E0]">
@@ -2007,7 +2003,6 @@ const ExerciseModal = ({ exercise, onClose }) => {
               </p>
             </div>
 
-            {/* Step 1: Identify the Thought */}
             <div className="bg-[#0F172A]/70 p-5 rounded-xl border border-[#2A3547]">
               <h4 className="text-white font-medium mb-3">Step 1: Identify Your Anxious Thought</h4>
               <textarea
@@ -2032,11 +2027,9 @@ const ExerciseModal = ({ exercise, onClose }) => {
               </div>
             </div>
 
-            {/* Step 2: Evidence Analysis */}
             <div className="bg-[#0F172A]/70 p-5 rounded-xl border border-[#2A3547]">
               <h4 className="text-white font-medium mb-3">Step 2: Examine the Evidence</h4>
 
-              {/* Supporting Evidence */}
               <div className="mb-4">
                 <label className="text-[#B8C7E0] text-sm block mb-2">Evidence Supporting This Thought</label>
                 {supportingEvidence.map((evidence, index) => (
@@ -2070,7 +2063,6 @@ const ExerciseModal = ({ exercise, onClose }) => {
                 </button>
               </div>
 
-              {/* Contradicting Evidence */}
               <div>
                 <label className="text-[#B8C7E0] text-sm block mb-2">Evidence That Contradicts This Thought</label>
                 {contradictingEvidence.map((evidence, index) => (
