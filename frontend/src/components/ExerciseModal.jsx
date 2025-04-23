@@ -2293,7 +2293,6 @@ const ExerciseModal = ({ exercise, onClose }) => {
               </button>
             </div>
 
-            {/* Adaptation Step Section */}
             <div className="space-y-3">
               <h4 className="text-white text-sm font-medium">Moving Forward</h4>
               <textarea
@@ -2309,7 +2308,6 @@ const ExerciseModal = ({ exercise, onClose }) => {
       case 'meaning-making':
         return (
           <div className="space-y-6">
-            {/* Perspective Change Section */}
             <div className="bg-[#1E293B] rounded-xl p-6 space-y-4">
               <h3 className="text-white font-medium">Perspective Changes</h3>
               <p className="text-[#94A3B8] text-sm mb-4">
@@ -2323,7 +2321,6 @@ const ExerciseModal = ({ exercise, onClose }) => {
               />
             </div>
 
-            {/* Values and Priorities Section */}
             <div className="bg-[#1E293B] rounded-xl p-6 space-y-4">
               <h3 className="text-white font-medium">Values & Priorities</h3>
               <p className="text-[#94A3B8] text-sm mb-4">
@@ -2363,7 +2360,6 @@ const ExerciseModal = ({ exercise, onClose }) => {
               </div>
             </div>
 
-            {/* Growth and Strengths Section */}
             <div className="bg-[#1E293B] rounded-xl p-6 space-y-4">
               <h3 className="text-white font-medium">Growth & Strengths</h3>
               <p className="text-[#94A3B8] text-sm mb-4">
@@ -2403,7 +2399,6 @@ const ExerciseModal = ({ exercise, onClose }) => {
               </div>
             </div>
 
-            {/* Connection and Meaning Section */}
             <div className="bg-[#1E293B] rounded-xl p-6 space-y-4">
               <h3 className="text-white font-medium">Connection & Meaning</h3>
               <p className="text-[#94A3B8] text-sm mb-4">
@@ -2417,7 +2412,6 @@ const ExerciseModal = ({ exercise, onClose }) => {
               />
             </div>
 
-            {/* Future Impact Section */}
             <div className="bg-[#1E293B] rounded-xl p-6 space-y-4">
               <h3 className="text-white font-medium">Future Impact</h3>
               <p className="text-[#94A3B8] text-sm mb-4">
@@ -2431,7 +2425,6 @@ const ExerciseModal = ({ exercise, onClose }) => {
               />
             </div>
 
-            {/* Meaning Statement Section */}
             <div className="bg-[#1E293B] rounded-xl p-6 space-y-4">
               <h3 className="text-white font-medium">Meaning Statement</h3>
               <p className="text-[#94A3B8] text-sm mb-4">
@@ -2449,7 +2442,6 @@ const ExerciseModal = ({ exercise, onClose }) => {
       case 'continuing-bonds':
         return (
           <div className="space-y-6">
-            {/* Introduction */}
             <div className="bg-[#0F172A]/70 p-5 rounded-xl border border-[#2A3547]">
               <h4 className="text-white font-medium mb-3">Continuing Bonds Reflection</h4>
               <p className="text-[#B8C7E0]">
@@ -2457,7 +2449,6 @@ const ExerciseModal = ({ exercise, onClose }) => {
               </p>
             </div>
 
-            {/* Quality Reflection */}
             <div className="bg-[#0F172A]/70 p-5 rounded-xl border border-[#2A3547]">
               <h4 className="text-white font-medium mb-3">1. Quality Reflection</h4>
               <p className="text-[#B8C7E0] mb-4">
@@ -2471,7 +2462,6 @@ const ExerciseModal = ({ exercise, onClose }) => {
               />
             </div>
 
-            {/* Memory Connection */}
             <div className="bg-[#0F172A]/70 p-5 rounded-xl border border-[#2A3547]">
               <h4 className="text-white font-medium mb-3">2. Memory Connection</h4>
               <p className="text-[#B8C7E0] mb-4">
@@ -2485,7 +2475,6 @@ const ExerciseModal = ({ exercise, onClose }) => {
               />
             </div>
 
-            {/* Continuing Presence */}
             <div className="bg-[#0F172A]/70 p-5 rounded-xl border border-[#2A3547]">
               <h4 className="text-white font-medium mb-3">3. Continuing Presence</h4>
               <p className="text-[#B8C7E0] mb-4">
@@ -2499,7 +2488,6 @@ const ExerciseModal = ({ exercise, onClose }) => {
               />
             </div>
 
-            {/* Ritual Creation */}
             <div className="bg-[#0F172A]/70 p-5 rounded-xl border border-[#2A3547]">
               <h4 className="text-white font-medium mb-3">4. Ritual Creation</h4>
               <p className="text-[#B8C7E0] mb-4">
@@ -2513,7 +2501,6 @@ const ExerciseModal = ({ exercise, onClose }) => {
               />
             </div>
 
-            {/* Identity Integration */}
             <div className="bg-[#0F172A]/70 p-5 rounded-xl border border-[#2A3547]">
               <h4 className="text-white font-medium mb-3">5. Identity Integration</h4>
               <p className="text-[#B8C7E0] mb-4">
@@ -2527,7 +2514,6 @@ const ExerciseModal = ({ exercise, onClose }) => {
               />
             </div>
 
-            {/* Ongoing Message */}
             <div className="bg-[#0F172A]/70 p-5 rounded-xl border border-[#2A3547]">
               <h4 className="text-white font-medium mb-3">6. Ongoing Message</h4>
               <p className="text-[#B8C7E0] mb-4">
