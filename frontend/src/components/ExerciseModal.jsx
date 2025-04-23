@@ -197,7 +197,6 @@ const ExerciseModal = ({ exercise, onClose }) => {
     setCompleted(true);
   };
 
-  // Determine if this exercise has an interactive component
   const hasInteractiveComponent = () => {
     if (!exerciseContent) return false;
     
