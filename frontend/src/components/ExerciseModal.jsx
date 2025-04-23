@@ -1344,7 +1344,6 @@ const ExerciseModal = ({ exercise, onClose }) => {
                 </div>
               </div>
 
-              {/* Urgent, Not Important */}
               <div className="bg-amber-500/10 border border-amber-500/20 rounded-lg p-4">
                 <h5 className="text-amber-400 font-medium mb-3">Urgent, Not Important</h5>
                 <div className="space-y-2">
@@ -1362,7 +1361,6 @@ const ExerciseModal = ({ exercise, onClose }) => {
                 </div>
               </div>
 
-              {/* Neither */}
               <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-4">
                 <h5 className="text-red-400 font-medium mb-3">Neither</h5>
                 <div className="space-y-2">
@@ -1381,7 +1379,6 @@ const ExerciseModal = ({ exercise, onClose }) => {
               </div>
             </div>
 
-            {/* Task summary */}
             <div className="bg-[#0F172A]/70 p-4 rounded-lg border border-[#2A3547]">
               <h4 className="text-white font-medium mb-2">Action Plan</h4>
               <div className="space-y-2 text-sm text-[#B8C7E0]">
@@ -1398,7 +1395,6 @@ const ExerciseModal = ({ exercise, onClose }) => {
       case 'body-appreciation':
         return (
           <div className="space-y-4">
-            {/* Breathing Section */}
             <div className="bg-[#0F172A]/70 p-4 rounded-lg border border-[#2A3547]">
               <h3 className="text-white font-medium mb-2">Take a Moment</h3>
               <p className="text-[#B8C7E0] text-sm mb-3">
@@ -1417,7 +1413,6 @@ const ExerciseModal = ({ exercise, onClose }) => {
               </div>
             </div>
 
-            {/* Body Appreciation Section */}
             <div className="bg-[#0F172A]/70 p-4 rounded-lg border border-[#2A3547]">
               <h3 className="text-white font-medium mb-3">Body Appreciation</h3>
               <div className="space-y-3">
