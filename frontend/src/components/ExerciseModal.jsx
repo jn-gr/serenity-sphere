@@ -2927,25 +2927,18 @@ const ExerciseModal = ({ exercise, onClose }) => {
 
     const titleLower = exercise.title?.toLowerCase() || '';
 
-    // Relationship exercises
     if (titleLower.includes('values clarification')) return 'values-clarification';
     if (titleLower.includes('appreciation expression')) return 'appreciation-expression';
     if (titleLower.includes('perspective-taking')) return 'perspective-taking';
-
-    // Self-esteem exercises
     if (titleLower.includes('self-compass')) return 'self-compassion';
     if (titleLower.includes('strengths inventory')) return 'strengths-inventory';
     if (titleLower.includes('inner critic')) return 'inner-critic';
-
-    // Grief exercises
     if (titleLower.includes('grief') || titleLower.includes('loss')) {
       if (titleLower.includes('journal')) return 'grief-journal';
       if (titleLower.includes('ritual') || titleLower.includes('honor')) return 'memory-honor';
       if (titleLower.includes('letter')) return 'grief-letter';
       return 'grief-processing';
     }
-
-    // Anxiety exercises
     if (titleLower.includes('anxiety') || titleLower.includes('stress')) {
       if (titleLower.includes('ground') || titleLower.includes('5-4-3-2-1')) return 'grounding';
       if (titleLower.includes('breath')) return 'breathing';
@@ -2954,8 +2947,6 @@ const ExerciseModal = ({ exercise, onClose }) => {
       if (titleLower.includes('thought') || titleLower.includes('reframing')) return 'anxious-thought';
       return 'anxiety-management';
     }
-
-    // Anger exercises
     if (titleLower.includes('anger')) {
       if (titleLower.includes('stop')) return 'anger-stop';
       if (titleLower.includes('letter')) return 'anger-letter';
