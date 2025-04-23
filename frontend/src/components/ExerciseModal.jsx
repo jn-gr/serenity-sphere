@@ -2097,7 +2097,6 @@ const ExerciseModal = ({ exercise, onClose }) => {
               </div>
             </div>
 
-            {/* Step 3: Create Balanced Thought */}
             <div className="bg-[#0F172A]/70 p-5 rounded-xl border border-[#2A3547]">
               <h4 className="text-white font-medium mb-3">Step 3: Create a Balanced Thought</h4>
               <textarea
@@ -2122,7 +2121,6 @@ const ExerciseModal = ({ exercise, onClose }) => {
               </div>
             </div>
 
-            {/* Summary */}
             <div className="bg-[#0F172A]/70 p-5 rounded-xl border border-[#2A3547]">
               <h4 className="text-white font-medium mb-3">Summary</h4>
               <div className="space-y-3">
@@ -2162,7 +2160,6 @@ const ExerciseModal = ({ exercise, onClose }) => {
       case 'loss-processing':
         return (
           <div className="mt-4 space-y-6">
-            {/* Loss Description Section */}
             <div className="space-y-3">
               <h4 className="text-white text-sm font-medium">Describe Your Loss</h4>
               <textarea
