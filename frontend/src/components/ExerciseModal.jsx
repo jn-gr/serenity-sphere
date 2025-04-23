@@ -3065,9 +3065,7 @@ const ExerciseModal = ({ exercise, onClose }) => {
     setValuesList(updatedList);
   };
 
-  // All exercise content definitions
   const exerciseContents = {
-    // GRIEF EXERCISES
     'grief-journal': {
       title: "Grief Journaling Exercise",
       description: "Writing about your grief can help process emotions and honor your memories.",
