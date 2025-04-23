@@ -3003,10 +3003,7 @@ const ExerciseModal = ({ exercise, onClose }) => {
 
   const handleSave = () => {
     if (journalEntry.trim()) {
-      // In a real application, you would save this to your backend
       console.log("Saving journal entry:", journalEntry);
-
-      // For now, just show a success message
       setSaved(true);
       setTimeout(() => {
         setSaved(false);
@@ -3033,14 +3030,12 @@ const ExerciseModal = ({ exercise, onClose }) => {
     });
   };
 
-  // Add this function to handle value input changes
   const handleValueChange = (id, newValue) => {
     setValuesList(valuesList.map(item =>
       item.id === id ? { ...item, value: newValue } : item
     ));
   };
 
-  // Add these drag and drop handlers
   const handleDragStart = (e, value) => {
     setDraggedValue(value);
     e.target.style.opacity = '0.6';
@@ -3058,24 +3053,15 @@ const ExerciseModal = ({ exercise, onClose }) => {
   const handleDrop = (e, targetValue) => {
     e.preventDefault();
 
-    // Don't do anything if dropping onto the same item
     if (draggedValue.id === targetValue.id) return;
 
-    // Reorder the list based on the drag and drop
     const updatedList = [...valuesList];
-
-    // Find indexes
     const draggedIndex = updatedList.findIndex(item => item.id === draggedValue.id);
     const targetIndex = updatedList.findIndex(item => item.id === targetValue.id);
-
-    // Swap ranks
     const draggedRank = updatedList[draggedIndex].rank;
     updatedList[draggedIndex].rank = updatedList[targetIndex].rank;
     updatedList[targetIndex].rank = draggedRank;
-
-    // Sort by rank
     updatedList.sort((a, b) => a.rank - b.rank);
-
     setValuesList(updatedList);
   };
 
