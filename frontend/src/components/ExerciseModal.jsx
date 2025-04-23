@@ -199,32 +199,32 @@ const ExerciseModal = ({ exercise, onClose }) => {
 
   const hasInteractiveComponent = () => {
     if (!exerciseContent) return false;
-    
-    return exerciseContent.type === 'journal' || 
-           exerciseContent.type === 'journaling' ||
-           exerciseContent.type === 'appreciation' ||
-           exerciseContent.type === 'meditation' || 
-           exerciseContent.type === 'breathing' ||
-           exerciseContent.type === 'reflection' ||
-           exerciseContent.type === 'checklist' ||
-           exerciseContent.type === 'sensory' ||
-           exerciseContent.type === 'coping' ||
-           exerciseContent.type === 'physical' ||
-           exerciseContent.type === 'relationship' ||
-           exerciseContent.type === 'work' ||
-           exerciseContent.type === 'task' ||
-           exerciseContent.type === 'work-values' ||
-           exerciseContent.type === 'appreciation' ||
-           exerciseContent.type === 'body-appreciation' ||
-           exerciseContent.type === 'health-worry' ||
-           exerciseContent.type === 'anxious-thought' ||
-           exerciseContent.type === 'body-scan' ||
-           exerciseContent.type === 'loss-processing' ||
-           exerciseContent.type === 'meaning-making' ||
-           exerciseContent.type === 'continuing-bonds' ||
-           exerciseContent.type === 'inner-critic' ||
-           exerciseContent.type === 'uncertainty-tolerance' ||
-           exerciseContent.type === 'future-possibilities';
+
+    return exerciseContent.type === 'journal' ||
+      exerciseContent.type === 'journaling' ||
+      exerciseContent.type === 'appreciation' ||
+      exerciseContent.type === 'meditation' ||
+      exerciseContent.type === 'breathing' ||
+      exerciseContent.type === 'reflection' ||
+      exerciseContent.type === 'checklist' ||
+      exerciseContent.type === 'sensory' ||
+      exerciseContent.type === 'coping' ||
+      exerciseContent.type === 'physical' ||
+      exerciseContent.type === 'relationship' ||
+      exerciseContent.type === 'work' ||
+      exerciseContent.type === 'task' ||
+      exerciseContent.type === 'work-values' ||
+      exerciseContent.type === 'appreciation' ||
+      exerciseContent.type === 'body-appreciation' ||
+      exerciseContent.type === 'health-worry' ||
+      exerciseContent.type === 'anxious-thought' ||
+      exerciseContent.type === 'body-scan' ||
+      exerciseContent.type === 'loss-processing' ||
+      exerciseContent.type === 'meaning-making' ||
+      exerciseContent.type === 'continuing-bonds' ||
+      exerciseContent.type === 'inner-critic' ||
+      exerciseContent.type === 'uncertainty-tolerance' ||
+      exerciseContent.type === 'future-possibilities';
   };
 
   const renderInteractiveComponent = () => {
@@ -290,8 +290,8 @@ const ExerciseModal = ({ exercise, onClose }) => {
                 ></div>
                 <div
                   className={`absolute inset-0 bg-[#5983FC]/20 rounded-full transform transition-all duration-4000 ${timerActive && timeElapsed % 8 < 4
-                      ? 'scale-100'
-                      : 'scale-50'
+                    ? 'scale-100'
+                    : 'scale-50'
                     }`}
                 ></div>
                 <div className="absolute inset-0 flex items-center justify-center text-white">
@@ -422,7 +422,6 @@ const ExerciseModal = ({ exercise, onClose }) => {
               <div className="bg-[#0F172A] p-4 rounded-lg border border-[#2A3547] mb-3">
                 <h4 className="text-white text-sm font-medium mb-3">Values Tracker</h4>
                 <p className="text-[#B8C7E0] text-xs mb-3">Enter your values and drag to reorder by importance:</p>
-
                 <div className="space-y-3 mb-4">
                   {valuesList.map((item) => (
                     <div
@@ -493,8 +492,8 @@ const ExerciseModal = ({ exercise, onClose }) => {
                   <button
                     onClick={() => setActivePerspective('your')}
                     className={`flex-1 py-2 ${activePerspective === 'your'
-                        ? 'bg-[#3E60C1] text-white rounded-l-lg'
-                        : 'bg-[#1A2335] text-[#B8C7E0] rounded-l-lg hover:bg-[#2A3547]'
+                      ? 'bg-[#3E60C1] text-white rounded-l-lg'
+                      : 'bg-[#1A2335] text-[#B8C7E0] rounded-l-lg hover:bg-[#2A3547]'
                       } transition-colors`}
                   >
                     Your View
@@ -502,8 +501,8 @@ const ExerciseModal = ({ exercise, onClose }) => {
                   <button
                     onClick={() => setActivePerspective('their')}
                     className={`flex-1 py-2 ${activePerspective === 'their'
-                        ? 'bg-[#3E60C1] text-white rounded-r-lg'
-                        : 'bg-[#1A2335] text-[#B8C7E0] rounded-r-lg hover:bg-[#2A3547]'
+                      ? 'bg-[#3E60C1] text-white rounded-r-lg'
+                      : 'bg-[#1A2335] text-[#B8C7E0] rounded-r-lg hover:bg-[#2A3547]'
                       } transition-colors`}
                   >
                     Their View
@@ -640,14 +639,14 @@ const ExerciseModal = ({ exercise, onClose }) => {
               <div
                 key={index}
                 className={`flex items-start p-3 rounded-lg border ${checklist[index]
-                    ? 'bg-[#3E60C1]/10 border-[#5983FC]/30'
-                    : 'bg-[#0F172A] border-[#2A3547]'
+                  ? 'bg-[#3E60C1]/10 border-[#5983FC]/30'
+                  : 'bg-[#0F172A] border-[#2A3547]'
                   } transition-colors`}
               >
                 <div
                   className={`w-5 h-5 rounded border mr-3 cursor-pointer flex-shrink-0 mt-0.5 ${checklist[index]
-                      ? 'border-[#5983FC] bg-[#5983FC]/10'
-                      : 'border-[#2A3547]'
+                    ? 'border-[#5983FC] bg-[#5983FC]/10'
+                    : 'border-[#2A3547]'
                     } transition-colors`}
                   onClick={() => toggleCheckItem(index)}
                 >
@@ -685,8 +684,8 @@ const ExerciseModal = ({ exercise, onClose }) => {
                   <button
                     key={idx}
                     className={`p-2 flex flex-col items-center justify-center rounded-lg border ${step % 5 === idx
-                        ? 'border-[#5983FC] bg-[#3E60C1]/10 text-white'
-                        : 'border-[#2A3547] text-[#B8C7E0]'
+                      ? 'border-[#5983FC] bg-[#3E60C1]/10 text-white'
+                      : 'border-[#2A3547] text-[#B8C7E0]'
                       }`}
                     onClick={() => setStep(idx)}
                   >
@@ -719,9 +718,9 @@ const ExerciseModal = ({ exercise, onClose }) => {
                       type="text"
                       className="flex-1 bg-[#1A2335] border border-[#2A3547] rounded-lg p-2 text-[#B8C7E0] text-sm focus:outline-none focus:border-[#5983FC]"
                       placeholder={`Enter something you can ${step % 5 === 0 ? "see" :
-                          step % 5 === 1 ? "hear" :
-                            step % 5 === 2 ? "smell" :
-                              step % 5 === 3 ? "taste" : "feel"
+                        step % 5 === 1 ? "hear" :
+                          step % 5 === 2 ? "smell" :
+                            step % 5 === 3 ? "taste" : "feel"
                         }...`}
                     />
                   </div>
@@ -817,8 +816,8 @@ const ExerciseModal = ({ exercise, onClose }) => {
               <div className="w-full bg-[#0F172A] h-6 rounded-full mb-4 overflow-hidden relative">
                 <div
                   className={`h-6 ${timerActive && timeElapsed % 10 < 5
-                      ? "bg-amber-500 transition-all duration-500"
-                      : "bg-[#5983FC] transition-all duration-500"
+                    ? "bg-amber-500 transition-all duration-500"
+                    : "bg-[#5983FC] transition-all duration-500"
                     }`}
                   style={{
                     width: `${(timeElapsed / totalDuration) * 100}%`,
@@ -1033,14 +1032,14 @@ const ExerciseModal = ({ exercise, onClose }) => {
                       key={index}
                       onClick={() => setSelectedBoundary(statement)}
                       className={`p-3 rounded-lg cursor-pointer ${selectedBoundary === statement
-                          ? 'bg-[#3E60C1]/20 border-[#5983FC]/50 border'
-                          : 'bg-[#1A2335] border border-[#2A3547] hover:border-[#3E60C1]/50'
+                        ? 'bg-[#3E60C1]/20 border-[#5983FC]/50 border'
+                        : 'bg-[#1A2335] border border-[#2A3547] hover:border-[#3E60C1]/50'
                         }`}
                     >
                       <div className="flex items-center">
                         <div className={`w-4 h-4 rounded-full mr-3 flex items-center justify-center ${selectedBoundary === statement
-                            ? 'border-[#5983FC] bg-[#5983FC]/10 border-2'
-                            : 'border border-[#3E60C1]'
+                          ? 'border-[#5983FC] bg-[#5983FC]/10 border-2'
+                          : 'border border-[#3E60C1]'
                           }`}>
                           {selectedBoundary === statement && (
                             <div className="w-2 h-2 rounded-full bg-[#5983FC]"></div>
@@ -1438,8 +1437,8 @@ const ExerciseModal = ({ exercise, onClose }) => {
                   <div
                     key={index}
                     className={`p-3 rounded-lg border ${item.checked
-                        ? 'border-emerald-500/30 bg-emerald-500/10'
-                        : 'border-[#2A3547] bg-[#1E293B]'
+                      ? 'border-emerald-500/30 bg-emerald-500/10'
+                      : 'border-[#2A3547] bg-[#1E293B]'
                       }`}
                   >
                     <div className="flex items-center justify-between mb-2">
@@ -1451,8 +1450,8 @@ const ExerciseModal = ({ exercise, onClose }) => {
                           setBodyAreas(newAreas);
                         }}
                         className={`w-5 h-5 rounded flex items-center justify-center transition-colors ${item.checked
-                            ? 'bg-emerald-500 text-white'
-                            : 'border border-[#3E60C1]'
+                          ? 'bg-emerald-500 text-white'
+                          : 'border border-[#3E60C1]'
                           }`}
                       >
                         {item.checked && "✓"}
@@ -2838,34 +2837,34 @@ const ExerciseModal = ({ exercise, onClose }) => {
             }
           }));
         };
-        
+
         const isScenarioComplete = (scenario) => {
           return scenario.description && scenario.coping && scenario.resources;
         };
-        
+
         const allScenariosComplete = () => {
           return isScenarioComplete(futurePossibilitiesData.scenarios.positive) &&
-                 isScenarioComplete(futurePossibilitiesData.scenarios.neutral) &&
-                 isScenarioComplete(futurePossibilitiesData.scenarios.challenging);
+            isScenarioComplete(futurePossibilitiesData.scenarios.neutral) &&
+            isScenarioComplete(futurePossibilitiesData.scenarios.challenging);
         };
-        
+
         const handleSave = () => {
           const exerciseData = {
             situation: futurePossibilitiesData.situation,
             scenarios: futurePossibilitiesData.scenarios,
             completedAt: new Date().toISOString()
           };
-          
+
           console.log('Saving exercise data:', exerciseData);
-          
+
           toast.success('Your visualization exercise has been saved!', {
             position: 'bottom-right',
             theme: 'dark'
           });
-          
+
           setCompleted(true);
         };
-        
+
         return (
           <div className="space-y-6">
             <div className="mb-6">
@@ -2877,7 +2876,7 @@ const ExerciseModal = ({ exercise, onClose }) => {
                 className="w-full bg-[#0F172A] border border-[#2A3547] rounded-lg p-3 text-[#B8C7E0] focus:outline-none focus:border-[#5983FC] min-h-[100px] placeholder-[#4B5563]"
               />
             </div>
-            
+
             {futurePossibilitiesData.situation && (
               <>
                 <ScenarioInput
@@ -2886,21 +2885,21 @@ const ExerciseModal = ({ exercise, onClose }) => {
                   onUpdate={(newData) => updateScenario('positive', newData)}
                   isCompleted={isScenarioComplete(futurePossibilitiesData.scenarios.positive)}
                 />
-                
+
                 <ScenarioInput
                   type="neutral"
                   scenario={futurePossibilitiesData.scenarios.neutral}
                   onUpdate={(newData) => updateScenario('neutral', newData)}
                   isCompleted={isScenarioComplete(futurePossibilitiesData.scenarios.neutral)}
                 />
-                
+
                 <ScenarioInput
                   type="challenging"
                   scenario={futurePossibilitiesData.scenarios.challenging}
                   onUpdate={(newData) => updateScenario('challenging', newData)}
                   isCompleted={isScenarioComplete(futurePossibilitiesData.scenarios.challenging)}
                 />
-                
+
                 {allScenariosComplete() && (
                   <div className="flex justify-end">
                     <button
@@ -4401,11 +4400,10 @@ const ExerciseModal = ({ exercise, onClose }) => {
                       <button
                         onClick={prevStep}
                         disabled={step === 0}
-                        className={`p-2 rounded-lg transition-all ${
-                          step === 0
+                        className={`p-2 rounded-lg transition-all ${step === 0
                             ? 'bg-[#2A3547] text-[#B8C7E0]/50 cursor-not-allowed'
                             : 'bg-[#1A2335] text-[#B8C7E0] hover:bg-[#2A3547] hover:text-white'
-                        }`}
+                          }`}
                         aria-label="Previous step"
                       >
                         <FaChevronLeft className="w-4 h-4" />
