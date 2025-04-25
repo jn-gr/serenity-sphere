@@ -8,6 +8,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { FiLock, FiMail, FiAlertCircle, FiX } from 'react-icons/fi';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import TermsOfService from '../../components/legal/TermsOfService';
+import PrivacyPolicy from '../../components/legal/PrivacyPolicy';
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -372,7 +374,7 @@ const Login = () => {
         
         {/* Footer text */}
         <p className="text-center mt-8 text-[#64748B] text-sm">
-          By signing in, you agree to our <a href="#" className="text-[#5983FC] hover:text-[#3E60C1]">Terms of Service</a> and <a href="#" className="text-[#5983FC] hover:text-[#3E60C1]">Privacy Policy</a>.
+          By signing in, you agree to our <TermsOfService /> and <PrivacyPolicy />.
         </p>
       </motion.div>
     </div>

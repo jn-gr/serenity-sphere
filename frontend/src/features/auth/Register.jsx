@@ -5,6 +5,8 @@ import { setCredentials } from './authSlice'
 import api from '../../services/api'
 import { motion, AnimatePresence } from 'framer-motion'
 import { FiMail, FiUser, FiLock, FiAlertCircle, FiCheckCircle, FiInfo, FiX } from 'react-icons/fi'
+import TermsOfService from '../../components/legal/TermsOfService'
+import PrivacyPolicy from '../../components/legal/PrivacyPolicy'
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -461,7 +463,7 @@ const Register = () => {
         
         {/* Footer text */}
         <p className="text-center mt-8 text-[#64748B] text-sm">
-          By creating an account, you agree to our <a href="#" className="text-[#5983FC] hover:text-[#3E60C1]">Terms of Service</a> and <a href="#" className="text-[#5983FC] hover:text-[#3E60C1]">Privacy Policy</a>.
+          By creating an account, you agree to our <TermsOfService /> and <PrivacyPolicy />.
         </p>
       </motion.div>
     </div>

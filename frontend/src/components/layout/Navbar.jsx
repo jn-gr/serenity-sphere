@@ -21,13 +21,15 @@ const SidebarNavLink = ({ to, icon: Icon, children }) => (
     to={to}
     className="w-full flex items-center justify-center rounded-xl text-[#B8C7E0] hover:bg-[#2A3547] hover:text-white transition-all duration-200 h-11 relative"
   >
-    {/* Icon with different positioning for collapsed vs expanded states */}
-    <Icon size={20} className="absolute left-1/2 -translate-x-1/2 group-hover:left-3 group-hover:translate-x-0 transition-all duration-200" />
-    
-    {/* Text only shown when expanded */}
-    <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 pl-10">
-      {children}
-    </span>
+    <div className="relative w-full h-full flex items-center justify-center">
+      {/* Icon with different positioning for collapsed vs expanded states */}
+      <Icon size={20} className="absolute left-1/2 -translate-x-1/2 group-hover:left-3 group-hover:translate-x-0 transition-all duration-200" />
+      
+      {/* Text only shown when expanded */}
+      <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 pl-10">
+        {children}
+      </span>
+    </div>
   </Link>
 );
 
@@ -64,7 +66,7 @@ const Navbar = () => {
       <nav className="fixed top-0 left-0 right-0 bg-[#1A2335]/80 backdrop-blur-md border-b border-[#2A3547] z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex justify-between items-center">
           <Link to="/" className="flex items-center">
-            <Logo width={28} height={28} className="mr-2" />
+            <Logo width={42} height={42} className="mr-2" />
             <span className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-[#5983FC] to-[#3E60C1] bg-clip-text text-transparent">
               Serenity Sphere
             </span>
@@ -97,15 +99,13 @@ const Navbar = () => {
         whileHover={{ width: '14rem' }}
         transition={{ duration: 0.2, ease: 'easeInOut' }}
       >
-        {/* Logo */}
-        <div className="mb-8 px-3 flex items-center h-[30px] overflow-hidden">
-          <Logo width={28} height={28} className="flex-shrink-0" />
-          <span className="ml-2 text-xl font-bold bg-gradient-to-r from-[#5983FC] to-[#3E60C1] bg-clip-text text-transparent whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200 delay-100">
-            erenity Sphere
-          </span>
+        <div className="mb-6 flex justify-center items-center h-[60px]">
+          <div className="relative w-full h-11 flex items-center justify-center"> 
+            <Logo width={42} height={42} className="absolute" />
+          </div>
         </div>
 
-        <ul className="space-y-1 flex-1 px-3">
+        <ul className="space-y-2 flex-1 px-3">
           <li>
             <SidebarNavLink to="/" icon={FaHome}>Dashboard</SidebarNavLink>
           </li>
@@ -125,13 +125,15 @@ const Navbar = () => {
             onClick={handleLogout}
             className="w-full flex items-center justify-center rounded-xl text-[#B8C7E0] hover:bg-[#2A3547] hover:text-white transition-all duration-200 h-11 relative"
           >
-            {/* Icon with different positioning for collapsed vs expanded states */}
-            <FaSignOutAlt size={20} className="absolute left-1/2 -translate-x-1/2 group-hover:left-3 group-hover:translate-x-0 transition-all duration-200" />
-            
-            {/* Text only shown when expanded */}
-            <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 pl-10">
-              Log Out
-            </span>
+            <div className="relative w-full h-full flex items-center justify-center">
+              {/* Icon with different positioning for collapsed vs expanded states */}
+              <FaSignOutAlt size={20} className="absolute left-1/2 -translate-x-1/2 group-hover:left-3 group-hover:translate-x-0 transition-all duration-200" />
+              
+              {/* Text only shown when expanded */}
+              <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 pl-10">
+                Log Out
+              </span>
+            </div>
           </button>
         </div>
       </motion.nav>
