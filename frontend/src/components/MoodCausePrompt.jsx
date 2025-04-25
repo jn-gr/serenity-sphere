@@ -1753,15 +1753,15 @@ const MoodCausePrompt = ({ notification, onClose }) => {
         enhancedExercise.resources = [
           {
             type: "article",
-            title: "Setting Healthy Boundaries at Work",
-            description: "Harvard Business Review guide to professional boundaries",
-            url: "https://hbr.org/2021/02/how-to-set-boundaries-in-the-age-of-digital-distraction"
+            title: "Setting Boundaries at Work",
+            description: "Practical guide from Mayo Clinic on establishing professional boundaries",
+            url: "https://www.mayoclinic.org/healthy-lifestyle/adult-health/in-depth/work-life-balance/art-20048134"
           },
           {
             type: "video",
-            title: "How to Set and Maintain Professional Boundaries",
-            description: "Practical techniques for work-life balance",
-            url: "https://www.youtube.com/watch?v=6NxB6c6d39A"
+            title: "How to Set Boundaries at Work",
+            description: "TEDx talk on establishing and maintaining professional boundaries",
+            url: "https://www.youtube.com/watch?v=rtsHUeKnkC8"
           }
         ];
       }

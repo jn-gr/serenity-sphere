@@ -937,145 +937,125 @@ const ExerciseModal = ({ exercise, onClose }) => {
                 </div>
               </div>
 
-              <div className="mb-4 p-3 bg-[#1A2335]/50 rounded-lg">
-                <h5 className="text-white text-xs font-medium mb-2">Work-Life Time Visualization</h5>
-                <div className="h-6 bg-[#0F172A] rounded-full overflow-hidden mb-1">
-                  <div className="h-full bg-gradient-to-r from-green-500 to-yellow-500 rounded-full" style={{ width: '60%' }}></div>
-                </div>
-                <div className="flex justify-between text-xs text-[#B8C7E0]">
-                  <span>12am</span>
-                  <span>6am</span>
-                  <span>12pm</span>
-                  <span>6pm</span>
-                  <span>12am</span>
-                </div>
-                <div className="text-xs text-[#B8C7E0] mt-1">
-                  <span className="inline-block w-3 h-3 bg-green-500 rounded-sm mr-1"></span>
-                  <span className="mr-3">Official Hours</span>
-                  <span className="inline-block w-3 h-3 bg-yellow-500 rounded-sm mr-1"></span>
-                  <span>Actual Hours</span>
-                </div>
-              </div>
-            </div>
+              <div className="bg-[#0F172A] p-4 rounded-lg border border-[#2A3547] mb-4">
+                <h4 className="text-white text-sm font-medium mb-3">Boundary Issues & Solutions</h4>
 
-            <div className="bg-[#0F172A] p-4 rounded-lg border border-[#2A3547] mb-4">
-              <h4 className="text-white text-sm font-medium mb-3">Boundary Issues & Solutions</h4>
+                <div className="space-y-4">
+                  {[0, 1, 2].map((index) => (
+                    <div key={index} className="p-3 bg-[#1A2335]/50 rounded-lg border border-[#2A3547]">
+                      <h5 className="text-white text-xs font-medium mb-2">Issue #{index + 1}</h5>
 
-              <div className="space-y-4">
-                {[0, 1, 2].map((index) => (
-                  <div key={index} className="p-3 bg-[#1A2335]/50 rounded-lg border border-[#2A3547]">
-                    <h5 className="text-white text-xs font-medium mb-2">Issue #{index + 1}</h5>
+                      <div className="mb-3">
+                        <label className="text-[#5983FC] text-xs mb-1 block">Specific Boundary Issue:</label>
+                        <textarea
+                          value={boundaryIssues[index]}
+                          onChange={(e) => {
+                            const newIssues = [...boundaryIssues];
+                            newIssues[index] = e.target.value;
+                            setBoundaryIssues(newIssues);
+                          }}
+                          className="w-full h-12 bg-[#1A2335] border border-[#2A3547] rounded-lg p-2 text-[#B8C7E0] text-sm focus:outline-none focus:border-[#5983FC]"
+                          placeholder="E.g., After-hours work emails, lunch breaks interrupted..."
+                        />
+                      </div>
 
-                    <div className="mb-3">
-                      <label className="text-[#5983FC] text-xs mb-1 block">Specific Boundary Issue:</label>
-                      <textarea
-                        value={boundaryIssues[index]}
-                        onChange={(e) => {
-                          const newIssues = [...boundaryIssues];
-                          newIssues[index] = e.target.value;
-                          setBoundaryIssues(newIssues);
-                        }}
-                        className="w-full h-12 bg-[#1A2335] border border-[#2A3547] rounded-lg p-2 text-[#B8C7E0] text-sm focus:outline-none focus:border-[#5983FC]"
-                        placeholder="E.g., After-hours work emails, lunch breaks interrupted..."
-                      />
-                    </div>
+                      <div className="mb-3">
+                        <label className="text-[#5983FC] text-xs mb-1 block">Boundary Statement:</label>
+                        <textarea
+                          value={boundaryStatements[index]}
+                          onChange={(e) => {
+                            const newStatements = [...boundaryStatements];
+                            newStatements[index] = e.target.value;
+                            setBoundaryStatements(newStatements);
+                          }}
+                          className="w-full h-12 bg-[#1A2335] border border-[#2A3547] rounded-lg p-2 text-[#B8C7E0] text-sm focus:outline-none focus:border-[#5983FC]"
+                          placeholder="E.g., I will not check email after 7pm..."
+                        />
+                      </div>
 
-                    <div className="mb-3">
-                      <label className="text-[#5983FC] text-xs mb-1 block">Boundary Statement:</label>
-                      <textarea
-                        value={boundaryStatements[index]}
-                        onChange={(e) => {
-                          const newStatements = [...boundaryStatements];
-                          newStatements[index] = e.target.value;
-                          setBoundaryStatements(newStatements);
-                        }}
-                        className="w-full h-12 bg-[#1A2335] border border-[#2A3547] rounded-lg p-2 text-[#B8C7E0] text-sm focus:outline-none focus:border-[#5983FC]"
-                        placeholder="E.g., I will not check email after 7pm..."
-                      />
-                    </div>
-
-                    <div>
-                      <label className="text-[#5983FC] text-xs mb-1 block">Potential Obstacles:</label>
-                      <textarea
-                        value={obstacles[index]}
-                        onChange={(e) => {
-                          const newObstacles = [...obstacles];
-                          newObstacles[index] = e.target.value;
-                          setObstacles(newObstacles);
-                        }}
-                        className="w-full h-12 bg-[#1A2335] border border-[#2A3547] rounded-lg p-2 text-[#B8C7E0] text-sm focus:outline-none focus:border-[#5983FC]"
-                        placeholder="E.g., Manager expectations, habit of checking phone..."
-                      />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="bg-[#0F172A] p-4 rounded-lg border border-[#2A3547] mb-4">
-              <h4 className="text-white text-sm font-medium mb-3">Implementation Plan</h4>
-
-              <p className="text-[#B8C7E0] text-sm mb-3">Select one boundary to implement first:</p>
-
-              <div className="space-y-2 mb-4">
-                {boundaryStatements.map((statement, index) => (
-                  statement && (
-                    <div
-                      key={index}
-                      onClick={() => setSelectedBoundary(statement)}
-                      className={`p-3 rounded-lg cursor-pointer ${selectedBoundary === statement
-                        ? 'bg-[#3E60C1]/20 border-[#5983FC]/50 border'
-                        : 'bg-[#1A2335] border border-[#2A3547] hover:border-[#3E60C1]/50'
-                        }`}
-                    >
-                      <div className="flex items-center">
-                        <div className={`w-4 h-4 rounded-full mr-3 flex items-center justify-center ${selectedBoundary === statement
-                          ? 'border-[#5983FC] bg-[#5983FC]/10 border-2'
-                          : 'border border-[#3E60C1]'
-                          }`}>
-                          {selectedBoundary === statement && (
-                            <div className="w-2 h-2 rounded-full bg-[#5983FC]"></div>
-                          )}
-                        </div>
-                        <span className="text-[#B8C7E0] text-sm">{statement}</span>
+                      <div>
+                        <label className="text-[#5983FC] text-xs mb-1 block">Potential Obstacles:</label>
+                        <textarea
+                          value={obstacles[index]}
+                          onChange={(e) => {
+                            const newObstacles = [...obstacles];
+                            newObstacles[index] = e.target.value;
+                            setObstacles(newObstacles);
+                          }}
+                          className="w-full h-12 bg-[#1A2335] border border-[#2A3547] rounded-lg p-2 text-[#B8C7E0] text-sm focus:outline-none focus:border-[#5983FC]"
+                          placeholder="E.g., Manager expectations, habit of checking phone..."
+                        />
                       </div>
                     </div>
-                  )
-                ))}
+                  ))}
+                </div>
               </div>
 
-              {selectedBoundary && (
-                <div className="p-3 bg-[#1A2335]/50 rounded-lg">
-                  <h5 className="text-white text-xs font-medium mb-2">Next Steps for Implementation</h5>
-                  <ol className="list-decimal pl-5 text-[#B8C7E0] text-sm space-y-1">
-                    <li>Communicate this boundary to necessary colleagues</li>
-                    <li>Modify technology to support this boundary (e.g., turn off notifications)</li>
-                    <li>Plan how you'll respond if the boundary is crossed</li>
-                    <li>Practice saying "no" or redirecting requests that violate this boundary</li>
-                    <li>Schedule a review in 1 week to assess how it's working</li>
-                  </ol>
-                </div>
-              )}
-            </div>
+              <div className="bg-[#0F172A] p-4 rounded-lg border border-[#2A3547] mb-4">
+                <h4 className="text-white text-sm font-medium mb-3">Implementation Plan</h4>
 
-            <div className="bg-[#0F172A]/70 p-3 rounded-lg border border-[#2A3547]">
-              <h4 className="text-[#5983FC] text-sm font-medium mb-2 flex items-center">
-                <FaRegLightbulb className="mr-2" /> Tips for Setting Work Boundaries:
-              </h4>
-              <ul className="space-y-2">
-                <li className="text-[#B8C7E0] text-sm flex items-start">
-                  <span className="text-[#5983FC] mr-2">•</span>
-                  <span>Start with one small, achievable boundary</span>
-                </li>
-                <li className="text-[#B8C7E0] text-sm flex items-start">
-                  <span className="text-[#5983FC] mr-2">•</span>
-                  <span>Use clear, direct language when communicating boundaries</span>
-                </li>
-                <li className="text-[#B8C7E0] text-sm flex items-start">
-                  <span className="text-[#5983FC] mr-2">•</span>
-                  <span>Remember that setting boundaries improves your productivity and wellbeing</span>
-                </li>
-              </ul>
+                <p className="text-[#B8C7E0] text-sm mb-3">Select one boundary to implement first:</p>
+
+                <div className="space-y-2 mb-4">
+                  {boundaryStatements.map((statement, index) => (
+                    statement && (
+                      <div
+                        key={index}
+                        onClick={() => setSelectedBoundary(statement)}
+                        className={`p-3 rounded-lg cursor-pointer ${selectedBoundary === statement
+                          ? 'bg-[#3E60C1]/20 border-[#5983FC]/50 border'
+                          : 'bg-[#1A2335] border border-[#2A3547] hover:border-[#3E60C1]/50'
+                          }`}
+                      >
+                        <div className="flex items-center">
+                          <div className={`w-4 h-4 rounded-full mr-3 flex items-center justify-center ${selectedBoundary === statement
+                            ? 'border-[#5983FC] bg-[#5983FC]/10 border-2'
+                            : 'border border-[#3E60C1]'
+                            }`}>
+                            {selectedBoundary === statement && (
+                              <div className="w-2 h-2 rounded-full bg-[#5983FC]"></div>
+                            )}
+                          </div>
+                          <span className="text-[#B8C7E0] text-sm">{statement}</span>
+                        </div>
+                      </div>
+                    )
+                  ))}
+                </div>
+
+                {selectedBoundary && (
+                  <div className="p-3 bg-[#1A2335]/50 rounded-lg">
+                    <h5 className="text-white text-xs font-medium mb-2">Next Steps for Implementation</h5>
+                    <ol className="list-decimal pl-5 text-[#B8C7E0] text-sm space-y-1">
+                      <li>Communicate this boundary to necessary colleagues</li>
+                      <li>Modify technology to support this boundary (e.g., turn off notifications)</li>
+                      <li>Plan how you'll respond if the boundary is crossed</li>
+                      <li>Practice saying "no" or redirecting requests that violate this boundary</li>
+                      <li>Schedule a review in 1 week to assess how it's working</li>
+                    </ol>
+                  </div>
+                )}
+              </div>
+
+              <div className="bg-[#0F172A]/70 p-3 rounded-lg border border-[#2A3547]">
+                <h4 className="text-[#5983FC] text-sm font-medium mb-2 flex items-center">
+                  <FaRegLightbulb className="mr-2" /> Tips for Setting Work Boundaries:
+                </h4>
+                <ul className="space-y-2">
+                  <li className="text-[#B8C7E0] text-sm flex items-start">
+                    <span className="text-[#5983FC] mr-2">•</span>
+                    <span>Start with one small, achievable boundary</span>
+                  </li>
+                  <li className="text-[#B8C7E0] text-sm flex items-start">
+                    <span className="text-[#5983FC] mr-2">•</span>
+                    <span>Use clear, direct language when communicating boundaries</span>
+                  </li>
+                  <li className="text-[#B8C7E0] text-sm flex items-start">
+                    <span className="text-[#5983FC] mr-2">•</span>
+                    <span>Remember that setting boundaries improves your productivity and wellbeing</span>
+                  </li>
+                </ul>
+              </div>
             </div>
           </div>
         );
@@ -1552,57 +1532,34 @@ const ExerciseModal = ({ exercise, onClose }) => {
           <div className="space-y-6">
             <div className="bg-[#0F172A]/70 p-5 rounded-xl border border-[#2A3547]">
               <div className="mb-4">
-                <input
-                  type="text"
-                  value={newTask.title}
-                  onChange={(e) => setNewTask({ ...newTask, title: e.target.value })}
-                  placeholder="Enter a task..."
-                  className="w-full bg-[#1E293B] border border-[#3E60C1]/30 rounded-lg p-2 text-white mb-2"
-                />
-                <select
-                  value={newTask.category}
-                  onChange={(e) => setNewTask({ ...newTask, category: e.target.value })}
-                  className="w-full bg-[#1E293B] border border-[#3E60C1]/30 rounded-lg p-2 text-white"
-                >
-                  <option value="">Select category...</option>
-                  {categories.map(cat => (
-                    <option key={cat.id} value={cat.id}>{cat.label}</option>
+                <div className="flex gap-2 mb-4">
+                  <input
+                    type="text"
+                    value={newTask}
+                    onChange={(e) => setNewTask(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter' && handleAddTask()}
+                    placeholder="Enter a task..."
+                    className="flex-1 bg-[#1E293B] border border-[#3E60C1]/30 rounded-lg p-2 text-white"
+                  />
+                  <button
+                    onClick={handleAddTask}
+                    className="px-4 py-2 bg-[#5983FC] text-white rounded-lg hover:bg-[#3E60C1] transition-colors"
+                  >
+                    Add Task
+                  </button>
+                </div>
+                
+                <div className="grid grid-cols-1 gap-2">
+                  {tasks.map((task) => (
+                    <TaskItem
+                      key={task.id}
+                      task={task}
+                      onDelete={() => handleDeleteTask(task.id)}
+                      onEdit={handleEditTask}
+                      color="blue"
+                    />
                   ))}
-                </select>
-                <button
-                  onClick={() => {
-                    if (newTask.title && newTask.category) {
-                      setTasks([...tasks, newTask]);
-                      setNewTask({ title: '', category: '' });
-                    }
-                  }}
-                  className="mt-2 px-4 py-2 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600"
-                >
-                  Add Task
-                </button>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                {categories.map(category => (
-                  <div key={category.id} className="border border-[#2A3547] rounded-lg p-4">
-                    <h4 className="text-white font-medium mb-2">{category.label}</h4>
-                    <div className="space-y-2">
-                      {tasks
-                        .filter(task => task.category === category.id)
-                        .map((task, index) => (
-                          <div key={index} className="flex justify-between items-center bg-[#1E293B] p-2 rounded">
-                            <span className="text-[#B8C7E0]">{task.title}</span>
-                            <button
-                              onClick={() => setTasks(tasks.filter((_, i) => i !== index))}
-                              className="text-red-400 hover:text-red-500"
-                            >
-                              <FaTrash size={12} />
-                            </button>
-                          </div>
-                        ))}
-                    </div>
-                  </div>
-                ))}
+                </div>
               </div>
             </div>
           </div>
@@ -3065,899 +3022,6 @@ const ExerciseModal = ({ exercise, onClose }) => {
     setValuesList(updatedList);
   };
 
-  const exerciseContents = {
-
-    // ANXIETY EXERCISES
-    'grounding': {
-      title: "5-4-3-2-1 Grounding Exercise",
-      description: "A sensory awareness technique to help manage anxiety and bring you back to the present moment.",
-      steps: [
-        {
-          title: "Observe",
-          content: "Look around and identify 5 things you can SEE in the room. Say them out loud or note them mentally."
-        },
-        {
-          title: "Touch",
-          content: "Find 4 things you can TOUCH or FEEL. This could be the texture of your clothing, the surface of a table, or the feeling of the chair against your back."
-        },
-        {
-          title: "Listen",
-          content: "Focus on 3 things you can HEAR. These might be distant sounds, like birds outside, or closer sounds, like your own breathing."
-        },
-        {
-          title: "Smell",
-          content: "Notice 2 things you can SMELL. If you can't smell anything at first, move to another spot or find something with a scent, like hand lotion or a candle."
-        },
-        {
-          title: "Taste",
-          content: "Identify 1 thing you can TASTE. You might take a sip of a beverage, eat a small piece of food, or simply notice the current taste in your mouth."
-        }
-      ],
-      tips: [
-        "Take your time with each step – there's no rush.",
-        "If you're in a situation where you can't speak aloud, just note each observation silently.",
-        "For a shorter exercise, you can do a 3-2-1 version with just three senses.",
-        "Practice regularly to make this technique more effective during high-anxiety moments."
-      ],
-      resources: [
-        {
-          type: "article",
-          title: "Grounding Techniques | University of Rochester Medical Center",
-          description: "Evidence-based grounding techniques from mental health experts",
-          url: "https://www.urmc.rochester.edu/behavioral-health-partners/bhp-blog/april-2018/5-4-3-2-1-coping-technique-for-anxiety.aspx"
-        },
-        {
-          type: "video",
-          title: "How to Ground Yourself During an Anxiety Attack | Healthline",
-          description: "Practical strategies for using grounding during high anxiety moments",
-          url: "https://www.healthline.com/health/grounding-techniques"
-        },
-        {
-          type: "website",
-          title: "VA: PTSD Coach Online - Grounding Exercises",
-          description: "Collection of grounding exercises from the Veterans Administration",
-          url: "https://www.ptsd.va.gov/apps/ptsdcoachonline/tools/index.htm"
-        }
-      ],
-      type: "sensory"
-    },
-    'breathing': {
-      title: "4-7-8 Breathing Technique",
-      description: "A calming breathing exercise to help reduce anxiety and stress.",
-      steps: [
-        {
-          title: "Prepare",
-          content: "Find a comfortable sitting position. Place the tip of your tongue against the ridge behind your upper front teeth."
-        },
-        {
-          title: "Inhale",
-          content: "Close your mouth and inhale quietly through your nose for a count of 4."
-        },
-        {
-          title: "Hold",
-          content: "Hold your breath for a count of 7."
-        },
-        {
-          title: "Exhale",
-          content: "Exhale completely through your mouth with a whooshing sound for a count of 8."
-        }
-      ],
-      tips: [
-        "Repeat this cycle 4 times initially, and work up to 8 cycles with practice.",
-        "This exercise is especially helpful before bed or during moments of stress.",
-        "The ratio of 4:7:8 is important, but you can adjust the actual time if needed.",
-        "You may feel lightheaded at first - this is normal and will pass with practice."
-      ],
-      resources: [
-        {
-          type: "article",
-          title: "The 4-7-8 Breathing Technique | Dr. Andrew Weil",
-          description: "Video demonstration by Dr. Weil who popularized this technique",
-          url: "https://www.drweil.com/videos-features/videos/breathing-exercises-4-7-8-breath/"
-        },
-        {
-          type: "website",
-          title: "Harvard Health: Relaxation techniques",
-          description: "Scientific explanation of how breathing exercises affect stress",
-          url: "https://www.health.harvard.edu/mind-and-mood/relaxation-techniques-breath-control-helps-quell-errant-stress-response"
-        },
-        {
-          type: "video",
-          title: "Guided 4-7-8 Breathing Exercise | YouTube",
-          description: "Follow along with this guided video for proper technique",
-          url: "https://www.youtube.com/watch?v=PmBYdfv5RSk"
-        }
-      ],
-      type: "breathing",
-      audioUrl: "https://cdn.example.com/guided-breathing.mp3" // Replace with actual audio URL
-    },
-    'worry-time': {
-      title: "Worry Time Technique",
-      description: "Contain anxious thoughts by scheduling a dedicated time for them.",
-      steps: [
-        {
-          title: "Schedule Worry Time",
-          content: "Set aside 15-20 minutes at the same time each day specifically for worrying. Choose a time that's not too close to bedtime."
-        },
-        {
-          title: "Create a Worry List",
-          content: "Throughout the day, when worries arise, write them down in a dedicated 'worry notebook' or note on your phone."
-        },
-        {
-          title: "Postpone Worrying",
-          content: "When you notice yourself worrying outside your designated worry time, remind yourself: 'I'll think about this during my worry time, not now.'"
-        },
-        {
-          title: "During Worry Time",
-          content: "When your scheduled worry time arrives, set a timer and review your list. Think about each worry and potential solutions or perspectives."
-        },
-        {
-          title: "End Worry Time",
-          content: "When your timer goes off, put your worry list away and intentionally transition to another activity, even if you haven't addressed all worries."
-        }
-      ],
-      checkItems: [
-        "I've scheduled my worry time for: _____ (time of day)",
-        "I have a dedicated place to write down worries",
-        "I've practiced postponing worries at least 3 times today",
-        "I limited my worry time to the scheduled duration",
-        "I transitioned to a different activity after worry time"
-      ],
-      resources: [
-        {
-          type: "article",
-          title: "How to stop worrying | NHS",
-          description: "Evidence-based approaches to managing worry, including worry time",
-          url: "https://www.nhs.uk/mental-health/self-help/guides-tools-and-activities/how-to-stop-worrying/"
-        },
-        {
-          type: "video",
-          title: "Scheduling Worry Time | Anxiety Canada",
-          description: "How and why scheduled worry time works for anxiety management",
-          url: "https://www.anxietycanada.com/articles/how-to-schedule-worry-time/"
-        }
-      ],
-      type: "checklist"
-    },
-    'muscle-relaxation': {
-      title: "Progressive Muscle Relaxation",
-      description: "Systematically tense and release muscle groups to reduce physical tension.",
-      steps: [
-        {
-          title: "Prepare",
-          content: "Find a comfortable position sitting or lying down. Close your eyes if you feel comfortable doing so."
-        },
-        {
-          title: "Feet & Legs",
-          content: "Start with your feet and legs. Tense these muscles by pointing your toes and tightening your calves and thighs. Hold for 5 seconds, then release completely. Notice the difference between tension and relaxation."
-        },
-        {
-          title: "Abdomen & Chest",
-          content: "Move to your abdomen and chest. Tighten these muscles by taking a deep breath and holding it while clenching your stomach muscles. Hold for 5 seconds, then release, letting the breath go."
-        },
-        {
-          title: "Arms & Hands",
-          content: "Next, focus on your arms and hands. Make fists and tense your arms. Hold for 5 seconds, then release, letting your hands go limp."
-        },
-        {
-          title: "Shoulders & Neck",
-          content: "Move to your shoulders and neck. Raise your shoulders toward your ears and tighten your neck muscles. Hold for 5 seconds, then release, feeling the tension melt away."
-        },
-        {
-          title: "Face",
-          content: "Finally, tense the muscles in your face by squeezing your eyes shut and clenching your jaw. Hold for 5 seconds, then release, feeling your face soften."
-        },
-        {
-          title: "Complete Body",
-          content: "Now, become aware of your entire body. Notice any remaining tension and let it go. Feel a wave of relaxation flowing from the top of your head to the tips of your toes."
-        }
-      ],
-      resources: [
-        {
-          type: "article",
-          title: "Progressive Muscle Relaxation | Anxiety Canada",
-          description: "Detailed guide with audio instructions for PMR",
-          url: "https://www.anxietycanada.com/articles/how-to-do-progressive-muscle-relaxation/"
-        },
-        {
-          type: "video",
-          title: "15-Minute Progressive Muscle Relaxation | YouTube",
-          description: "Guided video to follow along with a full PMR session",
-          url: "https://www.youtube.com/watch?v=1nZEdqcGVzo"
-        }
-      ],
-      type: "physical"
-    },
-
-    // ANGER MANAGEMENT EXERCISES
-    'anger-stop': {
-      title: "STOP Technique for Anger",
-      description: "A quick method to interrupt anger before it escalates.",
-      steps: [
-        {
-          title: "S - STOP",
-          content: "As soon as you notice anger rising, mentally tell yourself to STOP. Pause whatever you're doing or saying."
-        },
-        {
-          title: "T - TAKE a step back",
-          content: "Physically take a step back if possible, or mentally step back from the situation. Create distance between yourself and the trigger."
-        },
-        {
-          title: "O - OBSERVE",
-          content: "Notice what's happening in your body (racing heart, tight chest, clenched fists?), your mind (what thoughts are present?), and the situation itself."
-        },
-        {
-          title: "P - PROCEED mindfully",
-          content: "Choose how to respond rather than react. What response will serve you best in this situation?"
-        },
-        {
-          title: "Breathe",
-          content: "Take three deep breaths before responding to the situation. Breathe in for 4 counts, hold for 1, and exhale for 5."
-        }
-      ],
-      resources: [
-        {
-          type: "article",
-          title: "Anger Management: 10 Tips to Tame Your Temper | Mayo Clinic",
-          description: "Evidence-based approaches for managing anger from medical experts",
-          url: "https://www.mayoclinic.org/healthy-lifestyle/adult-health/in-depth/anger-management/art-20045434"
-        },
-        {
-          type: "website",
-          title: "The STOP Skill | DBT Self Help",
-          description: "Detailed explanation of the STOP technique from Dialectical Behavior Therapy",
-          url: "https://www.dbtselfhelp.com/html/stop_skill.html"
-        }
-      ],
-      type: "coping"
-    },
-    'anger-letter': {
-      title: "Anger Letter Exercise",
-      description: "Write an uncensored letter expressing your anger (that you won't send).",
-      steps: [
-        {
-          title: "Prepare",
-          content: "Find a private space where you can write without interruption. Have paper and pen ready, or open a document on your device."
-        },
-        {
-          title: "Express Freely",
-          content: "Begin writing a letter to the person or situation you're angry with. Express EVERYTHING you feel without censoring yourself. This letter is for your eyes only."
-        },
-        {
-          title: "Be Specific",
-          content: "Detail exactly what made you angry and why. Include specific examples or incidents that triggered your feelings."
-        },
-        {
-          title: "Describe Impact",
-          content: "Explain how the situation has affected you. What consequences have you experienced because of it?"
-        },
-        {
-          title: "State Desires",
-          content: "Write what you wish would happen or what you wanted instead. Be honest about what would feel satisfying to you."
-        },
-        {
-          title: "Release",
-          content: "When you've finished expressing everything, destroy or delete the letter as a symbolic release. Tear it up, burn it safely, or delete the digital file."
-        }
-      ],
-      resources: [
-        {
-          type: "article",
-          title: "Writing About Emotions May Ease Stress and Trauma | Harvard Health",
-          description: "Research on how expressive writing helps process difficult emotions",
-          url: "https://www.health.harvard.edu/healthbeat/writing-about-emotions-may-ease-stress-and-trauma"
-        },
-        {
-          type: "website",
-          title: "Therapeutic Letters | GoodTherapy",
-          description: "Guidelines for therapeutic letter writing",
-          url: "https://www.goodtherapy.org/blog/therapeutic-letter-writing-healing-through-words-0712184"
-        }
-      ],
-      type: "journal"
-    },
-    'anger-root-cause': {
-      title: "Root Cause Anger Analysis",
-      description: "Identify the deeper needs and values behind your anger.",
-      steps: [
-        {
-          title: "Describe the Trigger",
-          content: "Write down the specific situation that triggered your anger. Be objective and focus on facts rather than interpretations."
-        },
-        {
-          title: "Identify Initial Thoughts",
-          content: "What were your immediate thoughts about this situation? What did you tell yourself about what happened?"
-        },
-        {
-          title: "Uncover Threatened Values",
-          content: "Ask yourself: 'What important value or need of mine was threatened or violated?' (e.g., respect, fairness, safety, control, competence)"
-        },
-        {
-          title: "Explore Underlying Fears",
-          content: "Ask: 'What am I afraid might happen or be true in this situation?' Try to identify core fears beneath the anger."
-        },
-        {
-          title: "Identify Core Needs",
-          content: "Based on the values and fears you've identified, what do you truly need in this situation? What would help you feel secure, respected, or at peace?"
-        }
-      ],
-      reflectionPrompts: [
-        "When have I felt similar anger before? Is there a pattern?",
-        "How might my past experiences be influencing my reaction to this situation?",
-        "What would addressing my core need look like in this situation?",
-        "How might I communicate my needs effectively rather than expressing raw anger?"
-      ],
-      resources: [
-        {
-          type: "article",
-          title: "Understanding Anger: How Psychologists Help With Anger Problems | APA",
-          description: "Professional perspective on anger and its underlying causes",
-          url: "https://www.apa.org/topics/anger/understanding"
-        },
-        {
-          type: "video",
-          title: "Why We Get Mad — and Why It's Healthy | TED Talk",
-          description: "Ryan Martin's research on the positive functions of anger",
-          url: "https://www.ted.com/talks/ryan_martin_why_we_get_mad_and_why_it_s_healthy"
-        }
-      ],
-      type: "reflection"
-    },
-
-    // RELATIONSHIP EXERCISES
-    'perspective-taking': {
-      title: "Perspective-Taking Practice",
-      description: "Strengthen empathy by consciously considering another viewpoint.",
-      steps: [
-        {
-          title: "Identify the Situation",
-          content: "Choose a specific relationship challenge or conflict you're currently experiencing. Briefly describe what happened and who was involved."
-        },
-        {
-          title: "Your Perspective",
-          content: "Write down your perspective of the situation. What did you feel, think, and want? What was important to you?"
-        },
-        {
-          title: "Step Into Their Shoes",
-          content: "Now imagine being the other person involved. Based on what you know about them, how might they have experienced the same situation? What might they have felt, thought, or wanted?"
-        },
-        {
-          title: "Consider Context",
-          content: "Think about what might be happening in the other person's life. What stressors, past experiences, or values might be influencing their perspective?"
-        },
-        {
-          title: "Find Common Ground",
-          content: "Look for areas of shared concern or values between your perspective and theirs. Where might there be alignment beneath the surface disagreement?"
-        },
-        {
-          title: "Apply Insights",
-          content: "Based on this exercise, identify one way you might approach the situation differently, incorporating your new understanding."
-        }
-      ],
-      resources: [
-        {
-          type: "article",
-          title: "The Science of Empathy | Greater Good Magazine",
-          description: "Research on how perspective-taking builds empathy and improves relationships",
-          url: "https://greatergood.berkeley.edu/topic/empathy/definition"
-        },
-        {
-          type: "video",
-          title: "How to Change People's Minds | Psychology Today",
-          description: "Research-based strategies for effective perspective-taking in disagreements",
-          url: "https://www.psychologytoday.com/us/blog/think-act-be/201905/how-change-peoples-minds"
-        }
-      ],
-      type: "reflection",
-      reflectionPrompts: [
-        "How does considering the other person's perspective change your feelings about the situation?",
-        "What new insights have you gained about their needs or concerns?",
-        "What might be a new approach that addresses both perspectives?"
-      ]
-    },
-    'relationship-values': {
-      title: "Values Clarification",
-      description: "Identify what matters most to you in relationships to guide your responses.",
-      steps: [
-        {
-          title: "List Your Values",
-          content: "Write down 5-7 values that are important to you in relationships (e.g., honesty, respect, autonomy, support, growth, fun, intimacy)."
-        },
-        {
-          title: "Rank Your Values",
-          content: "Arrange these values in order of importance to you. This might be difficult, but try to be honest with yourself about your priorities."
-        },
-        {
-          title: "Define Each Value",
-          content: "For each value, write what it specifically means to you. For example, 'respect' might mean different things to different people."
-        },
-        {
-          title: "Identify Expressions",
-          content: "For each value, note one specific way you can express this value in your relationships. How do you show it?"
-        },
-        {
-          title: "Evaluate Current Alignment",
-          content: "Think about your current relationship challenges. Which values might be compromised or in conflict? How does this insight help explain tensions?"
-        },
-        {
-          title: "Create a Values-Aligned Response",
-          content: "Choose one relationship challenge and plan how to address it in a way that honors your top values."
-        }
-      ],
-      resources: [
-        {
-          type: "article",
-          title: "Defining Your Core Values in Relationships | Psychology Today",
-          description: "How values awareness improves relationship satisfaction",
-          url: "https://www.psychologytoday.com/us/blog/fulfillment-any-age/201809/defining-your-core-values-in-relationships"
-        },
-        {
-          type: "website",
-          title: "Personal Values Assessment | Barrett Values Centre",
-          description: "Free online assessment to help identify your core values",
-          url: "https://www.valuescentre.com/tools-assessments/pva/"
-        }
-      ],
-      type: "reflection"
-    },
-    // Default for fallback
-    'default': {
-      title: "Wellness Exercise",
-      description: "A practice to support your well-being.",
-      steps: [
-        {
-          title: "Prepare",
-          content: "Find a comfortable space where you won't be interrupted."
-        },
-        {
-          title: "Focus",
-          content: "Bring your attention to the present moment and your current needs."
-        },
-        {
-          title: "Practice",
-          content: "Follow the specific guidance for your selected exercise."
-        },
-        {
-          title: "Reflect",
-          content: "Consider what you learned or experienced during this practice."
-        }
-      ],
-      resources: [
-        {
-          type: "website",
-          title: "Mental Health Resources | National Institute of Mental Health",
-          description: "Comprehensive collection of evidence-based mental health information",
-          url: "https://www.nimh.nih.gov/health"
-        }
-      ],
-      type: "general"
-    },
-
-    // MINDFULNESS EXERCISES
-    'mindful-observation': {
-      title: "Mindful Observation Practice",
-      description: "Develop present-moment awareness by fully focusing on a single object.",
-      steps: [
-        {
-          title: "Choose an Object",
-          content: "Find a natural object in your environment - a flower, insect, cloud formation, or any natural element that captures your attention."
-        },
-        {
-          title: "Focus Completely",
-          content: "Hold or observe the object for 1-2 minutes. Examine it as if you're seeing it for the very first time."
-        },
-        {
-          title: "Engage Your Senses",
-          content: "Notice the object's colors, textures, patterns, and shapes. How does light reflect off it? What subtle details emerge as you continue looking?"
-        },
-        {
-          title: "Notice Distractions",
-          content: "When your mind wanders (which is normal), gently bring your attention back to the object. Notice the tendency to label, analyze, or think about the object rather than simply observing it."
-        },
-        {
-          title: "Connect Deeper",
-          content: "Consider how this object came to be. What natural processes formed it? How does it connect to the larger environment around you?"
-        }
-      ],
-      resources: [
-        {
-          type: "article",
-          title: "Mindful Awareness Practice | UCLA Mindful Awareness Research Center",
-          description: "Guidelines for developing mindful observation skills",
-          url: "https://www.uclahealth.org/marc/mindful-awareness-practice"
-        },
-        {
-          type: "audio",
-          title: "Guided Mindfulness Meditation Practices | Jon Kabat-Zinn",
-          description: "Audio recordings by the founder of Mindfulness-Based Stress Reduction",
-          url: "https://www.mindfulnesscds.com/collections/cds"
-        }
-      ],
-      type: "meditation"
-    },
-
-    'body-scan': {
-      title: "Body Scan Meditation",
-      description: "A guided practice to develop awareness of physical sensations throughout your body.",
-      steps: [
-        {
-          title: "Prepare",
-          content: "Find a comfortable position lying down or sitting. Close your eyes if that feels comfortable. Take several deep breaths to settle in."
-        },
-        {
-          title: "Feet & Legs",
-          content: "Bring your attention to your feet. Notice any sensations: warmth, coolness, pressure, tingling. Without trying to change anything, simply observe. Gradually move your awareness up through your legs."
-        },
-        {
-          title: "Hips & Abdomen",
-          content: "Continue moving your awareness up through your hips, lower back, and abdomen. Notice the sensations of your breath as your abdomen rises and falls."
-        },
-        {
-          title: "Chest & Upper Body",
-          content: "Bring awareness to your chest, upper back, and shoulders. Notice areas of tension or ease. Feel your heart beating and your lungs expanding and contracting."
-        },
-        {
-          title: "Arms & Hands",
-          content: "Scan down your arms to your hands and fingertips. Notice sensations of temperature, pressure, or tingling."
-        },
-        {
-          title: "Neck & Head",
-          content: "Bring awareness to your neck, face, and head. Notice sensations in your jaw, eyes, forehead, and scalp."
-        },
-        {
-          title: "Whole Body",
-          content: "Finally, expand your awareness to your entire body as a whole. Notice how all parts are connected and functioning together."
-        }
-      ],
-      audioUrl: "https://cdn.example.com/body-scan.mp3", // Replace with actual audio URL
-      resources: [
-        {
-          type: "video",
-          title: "Body Scan Meditation | Greater Good in Action",
-          description: "Guided body scan from UC Berkeley's Greater Good Science Center",
-          url: "https://ggia.berkeley.edu/practice/body_scan_meditation"
-        },
-        {
-          type: "article",
-          title: "The Body Scan Practice | Mindful",
-          description: "Detailed instructions and science behind the body scan meditation",
-          url: "https://www.mindful.org/beginners-body-scan-meditation/"
-        }
-      ],
-      type: "meditation"
-    },
-
-    // SELF-ESTEEM EXERCISES
-    'self-compassion': {
-      title: "Self-Compassion Practice",
-      description: "Learn to treat yourself with kindness rather than criticism when facing difficulties.",
-      steps: [
-        {
-          title: "Acknowledge Suffering",
-          content: "Notice a moment of difficulty, discomfort, or failure you're experiencing. Say to yourself: 'This is a moment of suffering' or 'This is painful.'"
-        },
-        {
-          title: "Recognize Common Humanity",
-          content: "Remind yourself that suffering is part of the shared human experience. Say: 'I'm not alone in this feeling' or 'Many others have felt this way.'"
-        },
-        {
-          title: "Offer Self-Kindness",
-          content: "Place a hand on your heart or use another soothing touch. Speak to yourself with warmth: 'May I be kind to myself in this moment' or 'I'm here for you.'"
-        },
-        {
-          title: "Compassionate Reframe",
-          content: "Ask yourself: 'What would I say to a good friend facing this situation?' Then offer those same compassionate words to yourself."
-        },
-        {
-          title: "Mindful Awareness",
-          content: "Notice how your body feels after these steps. Has anything shifted in your emotional experience? Simply observe without judgment."
-        }
-      ],
-      resources: [
-        {
-          type: "website",
-          title: "Self-Compassion Exercises | Dr. Kristin Neff",
-          description: "Collection of practices from the leading researcher on self-compassion",
-          url: "https://self-compassion.org/category/exercises/"
-        },
-        {
-          type: "video",
-          title: "The Space Between Self-Esteem and Self-Compassion | TED Talk",
-          description: "Kristin Neff explains why self-compassion works better than self-esteem",
-          url: "https://www.youtube.com/watch?v=IvtZBUSplr4"
-        }
-      ],
-      type: "reflection",
-      reflectionPrompts: [
-        "When do you find it most difficult to be kind to yourself?",
-        "What would change if you treated yourself with the same compassion you offer others?",
-        "What words of kindness do you most need to hear right now?"
-      ]
-    },
-
-    'strengths-inventory': {
-      title: "Strengths Inventory Exercise",
-      description: "Identify and appreciate your authentic personal strengths to build confidence.",
-      steps: [
-        {
-          title: "Brainstorm Strengths",
-          content: "Create a list of your strengths, talents, and positive qualities. Include skills, character traits, values, and accomplishments. Aim for at least 10 items."
-        },
-        {
-          title: "Find Evidence",
-          content: "For each strength, identify a specific example of when you demonstrated it. What situation showed this strength in action?"
-        },
-        {
-          title: "Recognize Impact",
-          content: "For each strength, note how it has benefited you or others. How has this quality made a positive difference?"
-        },
-        {
-          title: "Identify Core Strengths",
-          content: "Review your list and circle 3-5 strengths that feel most authentic and energizing to you. These are your signature strengths."
-        },
-        {
-          title: "Plan for Use",
-          content: "Choose one signature strength and plan how you'll intentionally use it in the next 24 hours. How might you apply this strength in a new or deliberate way?"
-        }
-      ],
-      resources: [
-        {
-          type: "website",
-          title: "VIA Character Strengths Survey | VIA Institute on Character",
-          description: "Free scientific assessment to identify your character strengths",
-          url: "https://www.viacharacter.org/character-strengths-via"
-        },
-        {
-          type: "article",
-          title: "Using Personal Strengths in a Positive Way | Psychology Today",
-          description: "How to leverage your strengths for greater well-being",
-          url: "https://www.psychologytoday.com/us/blog/click-here-happiness/201904/using-personal-strengths-in-positive-way"
-        }
-      ],
-      type: "checklist",
-      checkItems: [
-        "I've identified at least 10 personal strengths",
-        "I've found specific examples for each strength",
-        "I've noted how my strengths benefit myself and others",
-        "I've identified my 3-5 signature strengths",
-        "I've created a plan to use one strength today",
-        "I've scheduled a time to review and update my strengths inventory"
-      ]
-    },
-
-    // HEALTH AND WELLNESS EXERCISES
-    'values-based-living': {
-      title: "Values-Based Wellness Planning",
-      description: "Design a personalized health plan aligned with your core values and meaningful goals.",
-      steps: [
-        {
-          title: "Values Reflection",
-          content: "Consider what matters most to you in life. Why do you want to be healthy? Is it for family, independence, adventure, contribution, learning, or something else?"
-        },
-        {
-          title: "Current Assessment",
-          content: "Rate your satisfaction (1-10) in key wellness areas: physical activity, nutrition, sleep, stress management, social connection, and meaning/purpose."
-        },
-        {
-          title: "Meaningful Goals",
-          content: "Based on your values, set 1-2 specific wellness goals that would be most meaningful to improve. Focus on the areas with lowest satisfaction that align with your values."
-        },
-        {
-          title: "Behavior Design",
-          content: "For each goal, design a tiny habit that takes less than 2 minutes and connects to an existing routine. Example: 'After I brush my teeth, I will do 2 minutes of stretching.'"
-        },
-        {
-          title: "Celebration Plan",
-          content: "Plan how you'll celebrate immediately after completing your tiny habit. This could be a physical gesture, saying 'Yes!', or another brief positive emotion boost."
-        },
-        {
-          title: "Environment Setup",
-          content: "Identify one change to your physical environment that would make your new habit easier. How can you make the healthy choice the obvious choice?"
-        }
-      ],
-      resources: [
-        {
-          type: "book",
-          title: "Tiny Habits | BJ Fogg",
-          description: "Science-based approach to behavior change using small steps",
-          url: "https://tinyhabits.com/book/"
-        },
-        {
-          type: "article",
-          title: "Values-Based Self-Care | Mental Health America",
-          description: "Guide to developing meaningful wellness practices",
-          url: "https://www.mhanational.org/blog/values-based-self-care"
-        }
-      ],
-      type: "checklist",
-      checkItems: [
-        "I've identified my core wellness values",
-        "I've assessed my current satisfaction in key areas",
-        "I've set 1-2 meaningful goals aligned with my values",
-        "I've designed tiny habit steps for each goal",
-        "I've created a celebration plan for completing my habits",
-        "I've identified one environment change to support my habits"
-      ]
-    },
-
-    'values-clarification': {
-      title: "Values Clarification Exercise",
-      description: "Identify what matters most to you in relationships to guide your responses.",
-      steps: [
-        {
-          title: "List Your Values",
-          content: "Write down 5-7 values that are important to you in relationships (e.g., honesty, respect, autonomy, support, growth, fun, intimacy)."
-        },
-        {
-          title: "Rank Your Values",
-          content: "Arrange these values in order of importance to you. This might be difficult, but try to be honest with yourself about your priorities."
-        },
-        {
-          title: "Define Each Value",
-          content: "For each value, write what it specifically means to you. For example, 'respect' might mean different things to different people."
-        },
-        {
-          title: "Identify Expressions",
-          content: "For each value, note one specific way you can express this value in your relationships. How do you show it?"
-        },
-        {
-          title: "Evaluate Current Alignment",
-          content: "Think about your current relationship challenges. Which values might be compromised or in conflict? How does this insight help explain tensions?"
-        },
-        {
-          title: "Create a Values-Aligned Response",
-          content: "Choose one relationship challenge and plan how to address it in a way that honors your top values."
-        }
-      ],
-      type: "reflection",
-      reflectionPrompts: [
-        "What does it feel like when your actions align with your core values?",
-        "When have you compromised your values in relationships? What happened?",
-        "How might clearly understanding your values improve your communication?",
-        "Which value feels most challenging to honor consistently, and why?"
-      ],
-      resources: [
-        {
-          type: "article",
-          title: "How Personal Values Shape Your Life",
-          description: "Psychology Today's research on values and relationships",
-          url: "https://www.psychologytoday.com/us/blog/click-here-happiness/202101/what-are-personal-values"
-        },
-        {
-          type: "website",
-          title: "Personal Values Assessment",
-          description: "Free assessment tool to identify core values",
-          url: "https://www.valuescentre.com/tools-assessments/pva/"
-        },
-        {
-          type: "video",
-          title: "The Importance of Values in Relationships",
-          description: "TEDx Talk on values-based connections",
-          url: "https://www.youtube.com/watch?v=UkdZ0apVSdY"
-        }
-      ]
-    },
-
-    'appreciation-expression': {
-      title: "Appreciation Expression",
-      description: "Strengthen connection through deliberate appreciation.",
-      steps: [
-        {
-          title: "Choose a Person",
-          content: "Think of someone significant in your life whom you would like to express appreciation to. This could be a partner, friend, family member, or colleague."
-        },
-        {
-          title: "List Appreciations",
-          content: "Write down 3 specific things you appreciate about this person. Be as concrete and detailed as possible."
-        },
-        {
-          title: "Explore Personal Impact",
-          content: "For each item on your list, reflect on why it matters to you personally. How does this quality or action affect your life?"
-        },
-        {
-          title: "Select and Prepare",
-          content: "Choose one appreciation to express to this person. Plan how you will express it in a specific, sincere way."
-        },
-        {
-          title: "Practice Expression",
-          content: "Practice what you want to say, either writing it out or saying it aloud. Include: what they did/do, how it affects you, and genuine gratitude."
-        },
-        {
-          title: "Deliver Your Appreciation",
-          content: "Share your appreciation with the person, either verbally or in writing. Notice how it feels to express gratitude explicitly."
-        }
-      ],
-      type: "journaling",
-      prompts: [
-        "What specific behavior or quality do I appreciate about this person?",
-        "How has this person's presence or actions positively affected my life?",
-        "What difference does this person make in my day-to-day experience?",
-        "What might this person not know about how much I value them?",
-        "How would I feel if I never told this person what I appreciate about them?"
-      ],
-      resources: [
-        {
-          type: "article",
-          title: "The Science of Gratitude in Relationships",
-          description: "Research from Greater Good Science Center",
-          url: "https://greatergood.berkeley.edu/article/item/how_gratitude_strengthens_relationships"
-        },
-        {
-          type: "book",
-          title: "The 5 Love Languages",
-          description: "Understanding different ways people express and receive appreciation",
-          url: "https://www.5lovelanguages.com/book/the-5-love-languages/"
-        }
-      ]
-    },
-
-    'work-boundaries': {
-      title: "Work Boundaries Exercise",
-      description: "Establish healthy boundaries to manage work-related stress.",
-      steps: [
-        {
-          title: "Current Boundary Assessment",
-          content: "Make two columns: 'My Work Hours' (when you're officially supposed to work) and 'When Work Actually Happens' (including early mornings, evenings, weekends). Note the discrepancies."
-        },
-        {
-          title: "Identify Boundary Issues",
-          content: "List 2-3 specific boundary issues you face (e.g., after-hours emails, lunch breaks interrupted, difficulty saying no to extra tasks)."
-        },
-        {
-          title: "Create Boundary Statements",
-          content: "For each issue, write an ideal boundary statement. For example: 'I will not check email after 7pm' or 'I will take a full lunch break away from my desk each day.'"
-        },
-        {
-          title: "Anticipate Challenges",
-          content: "For each boundary, list potential obstacles or resistance you might face. What might make it difficult to maintain this boundary?"
-        },
-        {
-          title: "Implementation Plan",
-          content: "Create specific steps for implementing each boundary. Include any communication needed with colleagues, changes to technology, or personal habits to modify."
-        },
-        {
-          title: "Select One Boundary",
-          content: "Choose one boundary to implement this week. Start small with something you feel confident you can maintain."
-        }
-      ],
-      resources: [
-        {
-          type: "article",
-          title: "How to Set Boundaries at Work | Harvard Business Review",
-          description: "Professional strategies for establishing effective work boundaries",
-          url: "https://hbr.org/2021/02/how-to-set-boundaries-in-the-age-of-digital-distraction"
-        },
-        {
-          type: "video",
-          title: "Setting Boundaries | The Muse",
-          description: "Practical tips for establishing and maintaining healthy work boundaries",
-          url: "https://www.themuse.com/advice/setting-boundaries-at-work-expert-advice"
-        }
-      ],
-      type: "work",
-      checkItems: [
-        "I've identified my current work hour patterns",
-        "I've listed 2-3 specific boundary issues",
-        "I've created clear boundary statements",
-        "I've anticipated potential obstacles",
-        "I've developed an implementation plan",
-        "I've selected one boundary to start with"
-      ]
-    },
-    'future-possibilities': {
-      type: 'future-possibilities',
-      title: 'Future Possibilities Visualization',
-      description: 'Explore different potential outcomes to reduce uncertainty anxiety.',
-      steps: [
-        "Choose a situation with an uncertain outcome",
-        "Visualize three different possible scenarios",
-        "Consider coping strategies for each scenario",
-        "Identify available resources and strengths",
-        "Recognize your capacity to handle different possibilities",
-        "Return to present moment awareness"
-      ]
-    }
-  };
 
   if (loading) {
     return (
@@ -4213,25 +3277,90 @@ const ExerciseModal = ({ exercise, onClose }) => {
 export default ExerciseModal;
 
 // Add this new TaskItem component at the bottom of the file
-const TaskItem = ({ task, onDelete, onEdit, color }) => (
-  <div className={`flex items-center justify-between bg-[#1A2335] p-2 rounded-lg border border-${color}-500/20`}>
-    <span className="text-[#B8C7E0] text-sm">{task.text}</span>
-    <div className="flex gap-2">
-      <button
-        onClick={onEdit}
-        className="text-[#5983FC] hover:text-[#3E60C1] transition-colors"
-      >
-        <FaEdit />
-      </button>
-      <button
-        onClick={onDelete}
-        className="text-red-400 hover:text-red-500 transition-colors"
-      >
-        <FaTrash />
-      </button>
+const TaskItem = ({ task, onDelete, onEdit, color }) => {
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedText, setEditedText] = useState(task.text);
+
+  const handleEdit = () => {
+    setIsEditing(true);
+    setEditedText(task.text);
+  };
+
+  const handleSave = () => {
+    if (editedText.trim()) {
+      onEdit({ ...task, text: editedText.trim() });
+      setIsEditing(false);
+    }
+  };
+
+  const handleCancel = () => {
+    setEditedText(task.text);
+    setIsEditing(false);
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSave();
+    } else if (e.key === 'Escape') {
+      handleCancel();
+    }
+  };
+
+  return (
+    <div className={`group relative bg-[#1A2335] rounded-lg border border-${color}-500/20 transition-all duration-200 hover:border-${color}-500/40 min-h-[40px] overflow-visible`}>
+      {isEditing ? (
+        <div className="flex items-center gap-2 p-2">
+          <input
+            type="text"
+            value={editedText}
+            onChange={(e) => setEditedText(e.target.value)}
+            onKeyDown={handleKeyDown}
+            className="flex-1 min-w-0 bg-[#0F172A] border border-[#2A3547] rounded-lg px-2 py-1 text-[#B8C7E0] text-sm focus:outline-none focus:border-[#5983FC] focus:ring-1 focus:ring-[#5983FC] transition-all duration-200"
+            placeholder="Enter task..."
+            autoFocus
+          />
+          <div className="flex items-center gap-1 flex-shrink-0">
+            <button
+              onClick={handleSave}
+              className="flex items-center justify-center w-6 h-6 rounded bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 hover:text-emerald-300 transition-all duration-200"
+              title="Save"
+            >
+              <FaCheck className="w-3 h-3" />
+            </button>
+            <button
+              onClick={handleCancel}
+              className="flex items-center justify-center w-6 h-6 rounded bg-red-500/10 text-red-400 hover:bg-red-500/20 hover:text-red-300 transition-all duration-200"
+              title="Cancel"
+            >
+              <FaTimes className="w-3 h-3" />
+            </button>
+          </div>
+        </div>
+      ) : (
+        <div className="flex items-center justify-between p-2 gap-2">
+          <span className="text-[#B8C7E0] text-sm break-words overflow-hidden flex-1 pr-1">{task.text}</span>
+          <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex-shrink-0">
+            <button
+              onClick={handleEdit}
+              className="flex items-center justify-center w-6 h-6 rounded bg-[#5983FC]/10 text-[#5983FC] hover:bg-[#5983FC]/20 hover:text-[#7AA1FF] transition-all duration-200"
+              title="Edit"
+            >
+              <FaEdit className="w-3 h-3" />
+            </button>
+            <button
+              onClick={() => onDelete(task.id)}
+              className="flex items-center justify-center w-6 h-6 rounded bg-red-500/10 text-red-400 hover:bg-red-500/20 hover:text-red-300 transition-all duration-200"
+              title="Delete"
+            >
+              <FaTrash className="w-3 h-3" />
+            </button>
+          </div>
+        </div>
+      )}
     </div>
-  </div>
-);
+  );
+};
 
 // Add these helper functions for the progress indicator
 const getProgressStyle = () => {
@@ -4322,3 +3451,60 @@ const ScenarioInput = ({ type, scenario, onUpdate, isCompleted }) => {
     </div>
   );
 };
+
+const handleAddTask = () => {
+  if (newTask.trim()) {
+    const task = {
+      id: Date.now(),
+      text: newTask.trim()
+    };
+    setTasks(prevTasks => [...prevTasks, task]);
+    setNewTask('');
+  }
+};
+
+const handleEditTask = (editedTask) => {
+  setTasks(prevTasks => 
+    prevTasks.map(task => 
+      task.id === editedTask.id ? editedTask : task
+    )
+  );
+};
+
+const handleDeleteTask = (taskId) => {
+  setTasks(prevTasks => prevTasks.filter(task => task.id !== taskId));
+};
+
+
+{/* Task Management Section */}
+<div className="space-y-4">
+  <div className="flex gap-2">
+    <input
+      type="text"
+      value={newTask}
+      onChange={(e) => setNewTask(e.target.value)}
+      onKeyDown={(e) => e.key === 'Enter' && handleAddTask()}
+      className="flex-1 bg-[#0F172A] border border-[#2A3547] rounded-lg px-3 py-2 text-[#B8C7E0] text-sm focus:outline-none focus:border-[#5983FC]"
+      placeholder="Add a new task..."
+    />
+    <button
+      onClick={handleAddTask}
+      className="px-4 py-2 bg-[#5983FC] text-white rounded-lg hover:bg-[#3E60C1] transition-colors"
+    >
+      Add
+    </button>
+  </div>
+  
+  <div className="space-y-2">
+    {tasks.map(task => (
+      <TaskItem
+        key={task.id}
+        task={task}
+        onDelete={() => handleDeleteTask(task.id)}
+        onEdit={handleEditTask}
+        color="blue"
+      />
+    ))}
+  </div>
+</div>
+// ... existing code ...
