@@ -92,23 +92,23 @@ const Home = () => {
         {/* Add margin-top to account for the navbar */}
         <div className="pt-20">
           {/* Hero Section */}
-          <div className="max-w-7xl mx-auto px-6 py-24">
-            <div className="flex flex-col lg:flex-row items-center gap-16">
-              <div className="lg:w-1/2 space-y-8">
-                <motion.h1 
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 py-16 md:py-24">
+            <div className="flex flex-col lg:flex-row items-center gap-12 md:gap-16">
+              <div className="lg:w-1/2 space-y-6 md:space-y-8 text-center lg:text-left">
+                <motion.h1
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="text-5xl font-bold text-white leading-tight"
+                  className="text-4xl md:text-5xl font-bold text-white leading-tight"
                 >
                   Transform Your Mental Health with
-                  <span className="block bg-gradient-to-r from-[#3E60C1] to-[#5983FC] bg-clip-text text-transparent mt-3">
+                  <span className="block bg-gradient-to-r from-[#3E60C1] to-[#5983FC] bg-clip-text text-transparent mt-2 md:mt-3">
                     AI-Powered Insights
                   </span>
                 </motion.h1>
-                <p className="text-lg text-[#B8C7E0] leading-relaxed">
+                <p className="text-md md:text-lg text-[#B8C7E0] leading-relaxed max-w-xl mx-auto lg:mx-0">
                   Track your emotions, analyse patterns, and find balance through intelligent journaling.
                 </p>
-                <div className="flex gap-4">
+                <div className="flex justify-center lg:justify-start gap-4">
                   <Link to="/register">
                     <motion.button
                       whileHover={{ scale: 1.02 }}
@@ -120,22 +120,23 @@ const Home = () => {
                   </Link>
                 </div>
               </div>
-              <div className="lg:w-1/2">
+              {/* Updated image container with responsive width and margin */}
+              <div className="w-full md:w-3/4 lg:w-1/2 mt-12 lg:mt-0 mx-auto">
                 <div className="relative bg-gradient-to-br from-[#3E60C1] to-[#5983FC] p-[1px] rounded-2xl shadow-2xl">
-                  <div className="bg-[#1A2335] rounded-2xl p-6 backdrop-blur-xl">
-                    {/* Static Representation of UI */}
-                    <div className="space-y-4">
-                      <div className="h-48 bg-gradient-to-br from-[#2A3547]/50 to-[#3E60C1]/30 rounded-lg flex items-center justify-center p-4">
-                        <FaChartLine className="text-6xl text-[#5983FC]/50 opacity-50" />
+                  <div className="bg-[#1A2335] rounded-2xl p-4 md:p-6 backdrop-blur-xl">
+                    {/* Static Representation of UI - adjusted sizes */}
+                    <div className="space-y-3 md:space-y-4">
+                      <div className="h-32 md:h-48 bg-gradient-to-br from-[#2A3547]/50 to-[#3E60C1]/30 rounded-lg flex items-center justify-center p-4">
+                        <FaChartLine className="text-4xl md:text-6xl text-[#5983FC]/50 opacity-50" />
                       </div>
-                      <div className="flex items-center gap-4">
-                        <div className="h-10 w-10 rounded-full bg-[#2A3547]/50"></div>
-                        <div className="space-y-2 flex-grow">
-                          <div className="h-3 bg-[#2A3547]/50 rounded-full w-3/4"></div>
-                          <div className="h-3 bg-[#2A3547]/50 rounded-full w-1/2"></div>
+                      <div className="flex items-center gap-3 md:gap-4">
+                        <div className="h-8 w-8 md:h-10 md:w-10 rounded-full bg-[#2A3547]/50"></div>
+                        <div className="space-y-1.5 md:space-y-2 flex-grow">
+                          <div className="h-2.5 md:h-3 bg-[#2A3547]/50 rounded-full w-3/4"></div>
+                          <div className="h-2.5 md:h-3 bg-[#2A3547]/50 rounded-full w-1/2"></div>
                         </div>
                       </div>
-                      <div className="h-6 bg-[#2A3547]/50 rounded-full w-full"></div>
+                      <div className="h-5 md:h-6 bg-[#2A3547]/50 rounded-full w-full"></div>
                     </div>
                   </div>
                 </div>
@@ -144,13 +145,13 @@ const Home = () => {
           </div>
 
           {/* Features Section */}
-          <div className="bg-[#1A2335] py-24">
-            <div className="max-w-7xl mx-auto px-6">
-              <div className="text-center mb-16">
-                <h2 className="text-3xl font-bold text-white mb-4">
+          <div className="bg-[#1A2335] py-16 md:py-24">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6">
+              <div className="text-center mb-12 md:mb-16">
+                <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
                   Features that Empower You
                 </h2>
-                <p className="text-[#B8C7E0] max-w-2xl mx-auto">
+                <p className="text-md md:text-lg text-[#B8C7E0] max-w-2xl mx-auto">
                   Experience a new way of understanding your mental health journey
                 </p>
               </div>
@@ -158,39 +159,39 @@ const Home = () => {
                 {/* Feature 1 */}
                 <motion.div
                   whileHover={{ y: -5 }}
-                  className="bg-[#0F172A] p-8 rounded-2xl border border-[#2A3547] hover:border-[#3E60C1] transition-all duration-300"
+                  className="bg-[#0F172A] p-6 md:p-8 rounded-2xl border border-[#2A3547] hover:border-[#3E60C1] transition-all duration-300"
                 >
-                  <div className="text-[#5983FC] text-4xl mb-4"><FaBook /></div>
-                  <h3 className="text-xl font-semibold text-white mb-3">
+                  <div className="text-[#5983FC] text-3xl md:text-4xl mb-4"><FaBook /></div>
+                  <h3 className="text-lg md:text-xl font-semibold text-white mb-3">
                     Intelligent Journaling
                   </h3>
-                  <p className="text-[#B8C7E0]">
+                  <p className="text-sm md:text-base text-[#B8C7E0]">
                     Record your thoughts and let our AI find connections.
                   </p>
                 </motion.div>
                 {/* Feature 2 */}
                 <motion.div
                   whileHover={{ y: -5 }}
-                  className="bg-[#0F172A] p-8 rounded-2xl border border-[#2A3547] hover:border-[#3E60C1] transition-all duration-300"
+                  className="bg-[#0F172A] p-6 md:p-8 rounded-2xl border border-[#2A3547] hover:border-[#3E60C1] transition-all duration-300"
                 >
-                  <div className="text-[#5983FC] text-4xl mb-4"><FaRegSmile /></div>
-                  <h3 className="text-xl font-semibold text-white mb-3">
+                  <div className="text-[#5983FC] text-3xl md:text-4xl mb-4"><FaRegSmile /></div>
+                  <h3 className="text-lg md:text-xl font-semibold text-white mb-3">
                     Mood Tracking & Analysis
                   </h3>
-                  <p className="text-[#B8C7E0]">
+                  <p className="text-sm md:text-base text-[#B8C7E0]">
                     Visualize your emotional patterns over time.
                   </p>
                 </motion.div>
                 {/* Feature 3 */}
                 <motion.div
                   whileHover={{ y: -5 }}
-                  className="bg-[#0F172A] p-8 rounded-2xl border border-[#2A3547] hover:border-[#3E60C1] transition-all duration-300"
+                  className="bg-[#0F172A] p-6 md:p-8 rounded-2xl border border-[#2A3547] hover:border-[#3E60C1] transition-all duration-300"
                 >
-                  <div className="text-[#5983FC] text-4xl mb-4"><FaChartLine /></div>
-                  <h3 className="text-xl font-semibold text-white mb-3">
+                  <div className="text-[#5983FC] text-3xl md:text-4xl mb-4"><FaChartLine /></div>
+                  <h3 className="text-lg md:text-xl font-semibold text-white mb-3">
                     AI-Powered Insights
                   </h3>
-                  <p className="text-[#B8C7E0]">
+                  <p className="text-sm md:text-base text-[#B8C7E0]">
                     Gain deeper understanding with personalized feedback.
                   </p>
                 </motion.div>
@@ -204,47 +205,47 @@ const Home = () => {
 
   // Authenticated Dashboard with animations
   return (
-    <div className="p-6">
+    <div className="p-4 md:p-6">
       <div className="max-w-7xl mx-auto">
         {/* Welcome Header with Stats */}
-        <div className="mb-10">
-          <motion.div 
+        <div className="mb-8 md:mb-10">
+          <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="flex flex-col md:flex-row justify-between items-start md:items-center"
+            className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 md:gap-0"
           >
             <div className="flex items-center">
               {avatar ? (
-                <div className="h-14 w-14 rounded-full border-2 border-[#2A3547] overflow-hidden mr-4 bg-[#1A2335] flex-shrink-0">
-                  <img 
-                    src={avatar} 
-                    alt="Profile" 
+                <div className="h-12 w-12 md:h-14 md:w-14 rounded-full border-2 border-[#2A3547] overflow-hidden mr-3 md:mr-4 bg-[#1A2335] flex-shrink-0">
+                  <img
+                    src={avatar}
+                    alt="Profile"
                     className="h-full w-full object-cover"
                     key={user?.id || 'default'}
                   />
                 </div>
               ) : (
-                <div className="h-14 w-14 rounded-full bg-[#3E60C1]/20 flex items-center justify-center mr-4 flex-shrink-0">
+                <div className="h-12 w-12 md:h-14 md:w-14 rounded-full bg-[#3E60C1]/20 flex items-center justify-center mr-3 md:mr-4 flex-shrink-0">
                   <FaUser className="text-[#5983FC]" />
                 </div>
               )}
               <div>
-                <h1 className="text-3xl font-bold text-white">
+                <h1 className="text-2xl md:text-3xl font-bold text-white">
                   {greeting}, {user?.username || 'there'}
                 </h1>
-                <p className="text-[#B8C7E0] mt-1">
-                  {new Date().toLocaleDateString('en-US', { 
-                    weekday: 'long', 
-                    year: 'numeric', 
-                    month: 'long', 
-                    day: 'numeric' 
+                <p className="text-sm md:text-base text-[#B8C7E0] mt-1">
+                  {new Date().toLocaleDateString('en-US', {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
                   })}
                 </p>
               </div>
             </div>
             
-            <div className="flex gap-4 mt-4 md:mt-0">
-              <div className="bg-[#1A2335] rounded-xl border border-[#2A3547] p-3 flex items-center">
+            <div className="flex flex-wrap gap-3 md:gap-4 mt-4 md:mt-0 w-full md:w-auto justify-end">
+              <div className="bg-[#1A2335] rounded-xl border border-[#2A3547] p-3 flex items-center flex-grow md:flex-grow-0">
                 <div className="bg-[#3E60C1]/20 p-2 rounded-lg mr-3">
                   <FaBook className="text-[#5983FC]" />
                 </div>
@@ -254,7 +255,7 @@ const Home = () => {
                 </div>
               </div>
               
-              <div className="bg-[#1A2335] rounded-xl border border-[#2A3547] p-3 flex items-center">
+              <div className="bg-[#1A2335] rounded-xl border border-[#2A3547] p-3 flex items-center flex-grow md:flex-grow-0">
                 <div className="bg-[#3E60C1]/20 p-2 rounded-lg mr-3">
                   <FaCalendarDay className="text-[#5983FC]" />
                 </div>
@@ -270,51 +271,51 @@ const Home = () => {
         </div>
         
         {/* Quick Actions */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10"
+          className="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-4 mb-8 md:mb-10"
         >
           <Link to="/journal" className="col-span-1">
-            <motion.div 
+            <motion.div
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              className={`h-full flex items-center justify-center gap-3 p-4 rounded-xl ${
-                todaysEntry 
-                  ? "bg-[#1A2335] border border-[#2A3547] text-[#B8C7E0]" 
+              className={`h-full flex items-center justify-center gap-2 md:gap-3 p-3 md:p-4 rounded-xl ${
+                todaysEntry
+                  ? "bg-[#1A2335] border border-[#2A3547] text-[#B8C7E0]"
                   : "bg-gradient-to-r from-[#3E60C1] to-[#5983FC] text-white"
               }`}
             >
               <FaBook size={18} />
-              <span className="font-medium">
+              <span className="font-medium text-sm md:text-base">
                 {todaysEntry ? "Edit Today's Journal" : "Write Today's Journal"}
               </span>
             </motion.div>
           </Link>
           
           <Link to="/mood" className="col-span-1">
-            <motion.div 
+            <motion.div
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              className="h-full flex items-center justify-center gap-3 p-4 rounded-xl bg-[#1A2335] border border-[#2A3547] text-[#B8C7E0]"
+              className="h-full flex items-center justify-center gap-2 md:gap-3 p-3 md:p-4 rounded-xl bg-[#1A2335] border border-[#2A3547] text-[#B8C7E0]"
             >
               <FaRegSmile size={18} />
-              <span className="font-medium">View your Mood Trends</span>
+              <span className="font-medium text-sm md:text-base">View your Mood Trends</span>
             </motion.div>
           </Link>
 
           <Link to="/profile" className="col-span-1">
-            <motion.div 
+            <motion.div
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              className="h-full flex items-center justify-center gap-3 p-4 rounded-xl bg-[#1A2335] border border-[#2A3547] text-[#B8C7E0]"
+              className="h-full flex items-center justify-center gap-2 md:gap-3 p-3 md:p-4 rounded-xl bg-[#1A2335] border border-[#2A3547] text-[#B8C7E0]"
             >
               {avatar ? (
-                <div className="h-6 w-6 rounded-full overflow-hidden">
-                  <img 
-                    src={avatar} 
-                    alt="Profile" 
+                <div className="h-5 w-5 md:h-6 md:w-6 rounded-full overflow-hidden">
+                  <img
+                    src={avatar}
+                    alt="Profile"
                     className="h-full w-full object-cover"
                     key={`small-${user?.id || 'default'}`}
                   />
@@ -322,32 +323,32 @@ const Home = () => {
               ) : (
                 <FaUser size={18} />
               )}
-              <span className="font-medium">Update Profile</span>
+              <span className="font-medium text-sm md:text-base">Update Profile</span>
             </motion.div>
           </Link>
         </motion.div>
         
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
           {/* Journal Section */}
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
             className="lg:col-span-2"
           >
-            <div className="bg-[#1A2335] rounded-2xl border border-[#2A3547] p-6 h-full">
-              <div className="flex justify-between items-center mb-6">
+            <div className="bg-[#1A2335] rounded-2xl border border-[#2A3547] p-4 md:p-6 h-full">
+              <div className="flex justify-between items-center mb-4 md:mb-6">
                 <div className="flex items-center gap-3">
                   <div className="bg-[#3E60C1]/20 p-2 rounded-lg">
                     <FaBook className="text-[#5983FC]" />
                   </div>
-                  <h2 className="text-xl font-semibold text-white">Journal</h2>
+                  <h2 className="text-lg md:text-xl font-semibold text-white">Journal</h2>
                 </div>
                 <Link to="/journal">
                   <motion.button
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
-                    className="px-4 py-2 rounded-lg bg-[#0F172A] text-[#B8C7E0] text-sm hover:bg-[#2A3547] transition-colors"
+                    className="px-3 py-1.5 md:px-4 md:py-2 rounded-lg bg-[#0F172A] text-[#B8C7E0] text-xs md:text-sm hover:bg-[#2A3547] transition-colors"
                   >
                     View All
                   </motion.button>
@@ -463,19 +464,19 @@ const Home = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
           >
-            <div className="bg-[#1A2335] rounded-2xl border border-[#2A3547] p-6 h-full">
+            <div className="bg-[#1A2335] rounded-2xl border border-[#2A3547] p-4 md:p-6 h-full">
               <div className="flex justify-between items-center mb-4">
                 <div className="flex items-center gap-3">
                   <div className="bg-[#3E60C1]/20 p-2 rounded-lg">
                     <FaRegSmile className="text-[#5983FC]" />
                   </div>
-                  <h2 className="text-xl font-semibold text-white">Mood Trends</h2>
+                  <h2 className="text-lg md:text-xl font-semibold text-white">Mood Trends</h2>
                 </div>
                 <Link to="/mood">
                   <motion.button
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
-                    className="px-4 py-2 rounded-lg bg-[#0F172A] text-[#B8C7E0] text-sm hover:bg-[#2A3547] transition-colors"
+                    className="px-3 py-1.5 md:px-4 md:py-2 rounded-lg bg-[#0F172A] text-[#B8C7E0] text-xs md:text-sm hover:bg-[#2A3547] transition-colors"
                   >
                     View All
                   </motion.button>
@@ -483,7 +484,7 @@ const Home = () => {
               </div>
               
               {/* Mood Chart Visualization */}
-              <div className="bg-[#0F172A] rounded-xl p-4 mb-4">
+              <div className="bg-[#0F172A] rounded-xl p-3 md:p-4 mb-4">
                 <h3 className="text-white text-sm font-medium mb-2 flex items-center">
                   <FaChartLine className="text-[#5983FC] mr-2" />
                   <span>Weekly Mood Trends</span>
@@ -492,23 +493,23 @@ const Home = () => {
               </div>
               
               {/* Mood Distribution Chart */}
-              <div className="mb-4 grid grid-cols-2 gap-4">
-                <div className="col-span-1 bg-[#0F172A] rounded-xl p-4">
+              <div className="mb-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="col-span-1 bg-[#0F172A] rounded-xl p-3 md:p-4">
                   <div className="flex items-center mb-2">
                     <FaChartPie className="text-[#5983FC] mr-2" />
-                    <h3 className="text-white text-sm font-medium">Mood Distribution</h3>
+                    <h3 className="text-white text-xs sm:text-sm font-medium">Mood Distribution</h3>
                   </div>
                   <HomeMoodDistributionChart />
                 </div>
                 
-                <div className="col-span-1 bg-[#0F172A] rounded-xl p-4">
+                <div className="col-span-1 bg-[#0F172A] rounded-xl p-3 md:p-4">
                   <div className="flex items-center mb-2">
                     <FaRegSmile className="text-[#5983FC] mr-2" />
-                    <h3 className="text-white text-sm font-medium">Mood Stats</h3>
+                    <h3 className="text-white text-xs sm:text-sm font-medium">Mood Stats</h3>
                   </div>
-                  <div className="grid grid-rows-2 gap-3 h-36">
-                    <div className="bg-[#1A2335] rounded-lg p-3 flex items-center">
-                      <div className="text-[#5983FC] mr-3">
+                  <div className="grid grid-rows-2 gap-2 md:gap-3 h-32 md:h-36">
+                    <div className="bg-[#1A2335] rounded-lg p-2 md:p-3 flex items-center">
+                      <div className="text-[#5983FC] mr-2 md:mr-3">
                         <FaRegSmile size={16} />
                       </div>
                       <div>
@@ -517,8 +518,8 @@ const Home = () => {
                       </div>
                     </div>
                     
-                    <div className="bg-[#1A2335] rounded-lg p-3 flex items-center">
-                      <div className="text-[#5983FC] mr-3">
+                    <div className="bg-[#1A2335] rounded-lg p-2 md:p-3 flex items-center">
+                      <div className="text-[#5983FC] mr-2 md:mr-3">
                         <FaRegSadTear size={16} />
                       </div>
                       <div>
