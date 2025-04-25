@@ -1584,6 +1584,20 @@ const MoodCausePrompt = ({ notification, onClose }) => {
     else if (recommendation.title === "Task Prioritization Method") {
       enhancedExercise.link = 'task-prioritization';
       enhancedExercise.type = 'task';
+      enhancedExercise.resources = [
+        {
+          type: "article",
+          title: "The Eisenhower Matrix: Time and Task Management",
+          description: "Learn how to prioritize tasks effectively using the proven Eisenhower Matrix method",
+          url: "https://www.indeed.com/career-advice/career-development/eisenhower-matrix"
+        },
+        {
+          type: "article",
+          title: "Time Management and Task Prioritization",
+          description: "Professional guide to managing tasks and time effectively",
+          url: "https://www.coursera.org/learn/work-smarter-not-harder"
+        }
+      ];
     }
     else if (recommendation.title === "Values Based Work Reflection") {
       enhancedExercise.link = 'work-values-reflection';
