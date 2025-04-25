@@ -1555,7 +1555,6 @@ const ExerciseModal = ({ exercise, onClose }) => {
                       key={task.id}
                       task={task}
                       onDelete={() => handleDeleteTask(task.id)}
-                      onEdit={handleEditTask}
                       color="blue"
                     />
                   ))}
@@ -3309,45 +3308,9 @@ const TaskItem = ({ task, onDelete, onEdit, color }) => {
 
   return (
     <div className={`group relative bg-[#1A2335] rounded-lg border border-${color}-500/20 transition-all duration-200 hover:border-${color}-500/40 min-h-[40px] overflow-visible`}>
-      {isEditing ? (
-        <div className="flex items-center gap-2 p-2">
-          <input
-            type="text"
-            value={editedText}
-            onChange={(e) => setEditedText(e.target.value)}
-            onKeyDown={handleKeyDown}
-            className="flex-1 min-w-0 bg-[#0F172A] border border-[#2A3547] rounded-lg px-2 py-1 text-[#B8C7E0] text-sm focus:outline-none focus:border-[#5983FC] focus:ring-1 focus:ring-[#5983FC] transition-all duration-200"
-            placeholder="Enter task..."
-            autoFocus
-          />
-          <div className="flex items-center gap-1 flex-shrink-0">
-            <button
-              onClick={handleSave}
-              className="flex items-center justify-center w-6 h-6 rounded bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 hover:text-emerald-300 transition-all duration-200"
-              title="Save"
-            >
-              <FaCheck className="w-3 h-3" />
-            </button>
-            <button
-              onClick={handleCancel}
-              className="flex items-center justify-center w-6 h-6 rounded bg-red-500/10 text-red-400 hover:bg-red-500/20 hover:text-red-300 transition-all duration-200"
-              title="Cancel"
-            >
-              <FaTimes className="w-3 h-3" />
-            </button>
-          </div>
-        </div>
-      ) : (
         <div className="flex items-center justify-between p-2 gap-2">
           <span className="text-[#B8C7E0] text-sm break-words overflow-hidden flex-1 pr-1">{task.text}</span>
           <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex-shrink-0">
-            <button
-              onClick={handleEdit}
-              className="flex items-center justify-center w-6 h-6 rounded bg-[#5983FC]/10 text-[#5983FC] hover:bg-[#5983FC]/20 hover:text-[#7AA1FF] transition-all duration-200"
-              title="Edit"
-            >
-              <FaEdit className="w-3 h-3" />
-            </button>
             <button
               onClick={() => onDelete(task.id)}
               className="flex items-center justify-center w-6 h-6 rounded bg-red-500/10 text-red-400 hover:bg-red-500/20 hover:text-red-300 transition-all duration-200"
@@ -3355,9 +3318,8 @@ const TaskItem = ({ task, onDelete, onEdit, color }) => {
             >
               <FaTrash className="w-3 h-3" />
             </button>
-          </div>
         </div>
-      )}
+      </div>
     </div>
   );
 };
@@ -3451,60 +3413,3 @@ const ScenarioInput = ({ type, scenario, onUpdate, isCompleted }) => {
     </div>
   );
 };
-
-const handleAddTask = () => {
-  if (newTask.trim()) {
-    const task = {
-      id: Date.now(),
-      text: newTask.trim()
-    };
-    setTasks(prevTasks => [...prevTasks, task]);
-    setNewTask('');
-  }
-};
-
-const handleEditTask = (editedTask) => {
-  setTasks(prevTasks => 
-    prevTasks.map(task => 
-      task.id === editedTask.id ? editedTask : task
-    )
-  );
-};
-
-const handleDeleteTask = (taskId) => {
-  setTasks(prevTasks => prevTasks.filter(task => task.id !== taskId));
-};
-
-
-{/* Task Management Section */}
-<div className="space-y-4">
-  <div className="flex gap-2">
-    <input
-      type="text"
-      value={newTask}
-      onChange={(e) => setNewTask(e.target.value)}
-      onKeyDown={(e) => e.key === 'Enter' && handleAddTask()}
-      className="flex-1 bg-[#0F172A] border border-[#2A3547] rounded-lg px-3 py-2 text-[#B8C7E0] text-sm focus:outline-none focus:border-[#5983FC]"
-      placeholder="Add a new task..."
-    />
-    <button
-      onClick={handleAddTask}
-      className="px-4 py-2 bg-[#5983FC] text-white rounded-lg hover:bg-[#3E60C1] transition-colors"
-    >
-      Add
-    </button>
-  </div>
-  
-  <div className="space-y-2">
-    {tasks.map(task => (
-      <TaskItem
-        key={task.id}
-        task={task}
-        onDelete={() => handleDeleteTask(task.id)}
-        onEdit={handleEditTask}
-        color="blue"
-      />
-    ))}
-  </div>
-</div>
-// ... existing code ...
