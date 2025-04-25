@@ -223,10 +223,8 @@ class MoodLogViewSet(viewsets.ModelViewSet):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_mood_trends(request):
-    thirty_days_ago = timezone.now().date() - timezone.timedelta(days=30)
     mood_logs = MoodLog.objects.filter(
-        user=request.user,
-        date__gte=thirty_days_ago
+        user=request.user
     ).order_by('date')
     
     serializer = MoodLogSerializer(mood_logs, many=True)
