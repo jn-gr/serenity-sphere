@@ -10,6 +10,7 @@ import { fetchJournalEntries } from '../journal/journalSlice';
 import HomeMoodChart from '../mood/HomeMoodChart';
 import HomeMoodDistributionChart from '../mood/HomeMoodDistributionChart';
 import { fetchMoodTrends } from '../mood/moodSlice';
+import Logo from '../../components/common/Logo';
 
 const Home = () => {
   const dispatch = useDispatch();
@@ -95,6 +96,12 @@ const Home = () => {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 py-16 md:py-24">
             <div className="flex flex-col lg:flex-row items-center gap-12 md:gap-16">
               <div className="lg:w-1/2 space-y-6 md:space-y-8 text-center lg:text-left">
+                <div className="flex items-center justify-center lg:justify-start mb-2">
+                  <Logo width={40} height={40} className="mr-3" />
+                  <span className="text-xl md:text-2xl font-bold bg-gradient-to-r from-[#5983FC] to-[#5983FC] bg-clip-text text-transparent">
+                    Serenity Sphere
+                  </span>
+                </div>
                 <motion.h1
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}

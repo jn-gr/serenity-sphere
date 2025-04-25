@@ -13,15 +13,19 @@ import {
   FaTimes
 } from 'react-icons/fa';
 import api from '../../services/api';
+import Logo from '../common/Logo';
 
 // Sidebar NavLink (for large screens)
 const SidebarNavLink = ({ to, icon: Icon, children }) => (
   <Link
     to={to}
-    className="w-full flex items-center justify-center relative rounded-xl text-[#B8C7E0] hover:bg-[#2A3547] hover:text-white transition-all duration-200 h-11 group-hover:justify-start group-hover:px-3"
+    className="w-full flex items-center justify-center rounded-xl text-[#B8C7E0] hover:bg-[#2A3547] hover:text-white transition-all duration-200 h-11 relative"
   >
-    <Icon size={20} className="flex-shrink-0 transition-all duration-200" />
-    <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap pl-3">
+    {/* Icon with different positioning for collapsed vs expanded states */}
+    <Icon size={20} className="absolute left-1/2 -translate-x-1/2 group-hover:left-3 group-hover:translate-x-0 transition-all duration-200" />
+    
+    {/* Text only shown when expanded */}
+    <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 pl-10">
       {children}
     </span>
   </Link>
@@ -59,8 +63,11 @@ const Navbar = () => {
     return (
       <nav className="fixed top-0 left-0 right-0 bg-[#1A2335]/80 backdrop-blur-md border-b border-[#2A3547] z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex justify-between items-center">
-          <Link to="/" className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-[#5983FC] to-[#3E60C1] bg-clip-text text-transparent">
-            Serenity Sphere
+          <Link to="/" className="flex items-center">
+            <Logo width={28} height={28} className="mr-2" />
+            <span className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-[#5983FC] to-[#3E60C1] bg-clip-text text-transparent">
+              Serenity Sphere
+            </span>
           </Link>
           <div className="flex items-center gap-2 sm:gap-4">
             <Link
@@ -92,9 +99,9 @@ const Navbar = () => {
       >
         {/* Logo */}
         <div className="mb-8 px-3 flex items-center h-[30px] overflow-hidden">
-          <span className="text-3xl font-bold text-[#5983FC]">S</span>
+          <Logo width={28} height={28} className="flex-shrink-0" />
           <span className="ml-2 text-xl font-bold bg-gradient-to-r from-[#5983FC] to-[#3E60C1] bg-clip-text text-transparent whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200 delay-100">
-             erenity Sphere
+            erenity Sphere
           </span>
         </div>
 
@@ -116,10 +123,13 @@ const Navbar = () => {
         <div className="pt-4 border-t border-[#2A3547] px-3">
           <button
             onClick={handleLogout}
-            className="w-full flex items-center justify-center relative rounded-xl text-[#B8C7E0] hover:bg-[#2A3547] hover:text-white transition-all duration-200 h-11 group-hover:justify-start group-hover:px-3"
+            className="w-full flex items-center justify-center rounded-xl text-[#B8C7E0] hover:bg-[#2A3547] hover:text-white transition-all duration-200 h-11 relative"
           >
-            <FaSignOutAlt size={20} className="flex-shrink-0 transition-all duration-200" />
-            <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap pl-3">
+            {/* Icon with different positioning for collapsed vs expanded states */}
+            <FaSignOutAlt size={20} className="absolute left-1/2 -translate-x-1/2 group-hover:left-3 group-hover:translate-x-0 transition-all duration-200" />
+            
+            {/* Text only shown when expanded */}
+            <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 pl-10">
               Log Out
             </span>
           </button>
