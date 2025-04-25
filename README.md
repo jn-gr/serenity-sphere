@@ -86,7 +86,6 @@
 - RoBERTa model by Facebook AI Research
 - Django REST Framework team
 - React and Redux communities
-- All contributors and supporters
 
 <div align="center">
   Made with ❤️ for better mental health
