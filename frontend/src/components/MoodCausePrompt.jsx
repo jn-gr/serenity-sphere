@@ -1744,16 +1744,16 @@ const MoodCausePrompt = ({ notification, onClose }) => {
       ];
     }
     
-    
+    // Ensure resources are available
     if (!enhancedExercise.resources || enhancedExercise.resources.length === 0) {
       if (recommendation.title === "Values Clarification") {
         enhancedExercise.resources = [
           {
-            type: "article",
-            title: "How Personal Values Shape Your Life",
-            description: "Psychology Today's research on values and relationships",
-            url: "https://www.psychologytoday.com/us/blog/click-here-happiness/202101/what-are-personal-values"
-          }
+            type: "video",
+            title: "How to Find Work That Matters",
+            description: "Inspiring talk about aligning work with personal values and meaning",
+            url: "https://www.youtube.com/watch?v=jpe-LKn-4gM"
+          },
         ];
       }
       else if (recommendation.title === "Appreciation Expression") {

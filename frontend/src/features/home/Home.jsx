@@ -123,12 +123,19 @@ const Home = () => {
               <div className="lg:w-1/2">
                 <div className="relative bg-gradient-to-br from-[#3E60C1] to-[#5983FC] p-[1px] rounded-2xl shadow-2xl">
                   <div className="bg-[#1A2335] rounded-2xl p-6 backdrop-blur-xl">
-                    <div className="space-y-6">
-                      <div className="h-64 bg-gradient-to-r from-[#3E60C1]/20 to-[#5983FC]/20 rounded-xl animate-pulse" />
-                      <div className="space-y-4">
-                        <div className="h-4 bg-[#3E60C1]/20 rounded-full w-3/4" />
-                        <div className="h-4 bg-[#3E60C1]/20 rounded-full w-1/2" />
+                    {/* Static Representation of UI */}
+                    <div className="space-y-4">
+                      <div className="h-48 bg-gradient-to-br from-[#2A3547]/50 to-[#3E60C1]/30 rounded-lg flex items-center justify-center p-4">
+                        <FaChartLine className="text-6xl text-[#5983FC]/50 opacity-50" />
                       </div>
+                      <div className="flex items-center gap-4">
+                        <div className="h-10 w-10 rounded-full bg-[#2A3547]/50"></div>
+                        <div className="space-y-2 flex-grow">
+                          <div className="h-3 bg-[#2A3547]/50 rounded-full w-3/4"></div>
+                          <div className="h-3 bg-[#2A3547]/50 rounded-full w-1/2"></div>
+                        </div>
+                      </div>
+                      <div className="h-6 bg-[#2A3547]/50 rounded-full w-full"></div>
                     </div>
                   </div>
                 </div>
@@ -148,19 +155,45 @@ const Home = () => {
                 </p>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <motion.div 
+                {/* Feature 1 */}
+                <motion.div
                   whileHover={{ y: -5 }}
                   className="bg-[#0F172A] p-8 rounded-2xl border border-[#2A3547] hover:border-[#3E60C1] transition-all duration-300"
                 >
-                  <div className="text-[#5983FC] text-4xl mb-4">🧠</div>
+                  <div className="text-[#5983FC] text-4xl mb-4"><FaBook /></div>
                   <h3 className="text-xl font-semibold text-white mb-3">
-                    Emotional AI Analysis
+                    Intelligent Journaling
                   </h3>
                   <p className="text-[#B8C7E0]">
-                    Deep learning models detect subtle emotional patterns
+                    Record your thoughts and let our AI find connections.
                   </p>
                 </motion.div>
-                {/* Add more feature cards here */}
+                {/* Feature 2 */}
+                <motion.div
+                  whileHover={{ y: -5 }}
+                  className="bg-[#0F172A] p-8 rounded-2xl border border-[#2A3547] hover:border-[#3E60C1] transition-all duration-300"
+                >
+                  <div className="text-[#5983FC] text-4xl mb-4"><FaRegSmile /></div>
+                  <h3 className="text-xl font-semibold text-white mb-3">
+                    Mood Tracking & Analysis
+                  </h3>
+                  <p className="text-[#B8C7E0]">
+                    Visualize your emotional patterns over time.
+                  </p>
+                </motion.div>
+                {/* Feature 3 */}
+                <motion.div
+                  whileHover={{ y: -5 }}
+                  className="bg-[#0F172A] p-8 rounded-2xl border border-[#2A3547] hover:border-[#3E60C1] transition-all duration-300"
+                >
+                  <div className="text-[#5983FC] text-4xl mb-4"><FaChartLine /></div>
+                  <h3 className="text-xl font-semibold text-white mb-3">
+                    AI-Powered Insights
+                  </h3>
+                  <p className="text-[#B8C7E0]">
+                    Gain deeper understanding with personalized feedback.
+                  </p>
+                </motion.div>
               </div>
             </div>
           </div>
