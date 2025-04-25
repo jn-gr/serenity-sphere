@@ -16,8 +16,8 @@ import {
   FaChartPie,
   FaChartArea
 } from 'react-icons/fa';
-// Import icons for recommendation and forecast components
-import { FaLightbulb, FaArrowTrendUp, FaArrowTrendDown, FaMinus, FaExclamation, FaCalendarDay } from 'react-icons/fa6';
+// Import icons for recommendation components
+import { FaLightbulb, FaArrowTrendUp, FaArrowTrendDown, FaMinus, FaExclamation } from 'react-icons/fa6';
 import { analyzeMoodTrends } from './moodAnalysisUtils';
 import MoodChart from './MoodChart';
 
@@ -25,8 +25,6 @@ import MoodChart from './MoodChart';
 import MoodRadarChart from './components/MoodRadarChart';
 import MoodCalendarHeatmap from './components/MoodCalendarHeatmap';
 import MoodDistributionChart from './components/MoodDistributionChart';
-// Import the new MoodForecast component
-import MoodForecast from './components/MoodForecast';
 
 // Import the NotificationCenter component
 import NotificationCenter from '../notifications/NotificationCenter';
@@ -503,15 +501,6 @@ const MoodLog = () => {
               >
                 <FaLightbulb className="inline mr-1" /> Analysis
               </button>
-              
-              <button
-                onClick={() => setSelectedView('forecast')}
-                className={`px-4 py-2 rounded-lg transition-colors flex items-center gap-2 ${selectedView === 'forecast'
-                  ? 'bg-[#3E60C1] text-white'
-                  : 'bg-[#0F172A] text-[#B8C7E0] hover:bg-[#2A3547]'}`}
-              >
-                <FaCalendarDay className="inline mr-1" /> Forecast
-              </button>
             </div>
 
             <div className="flex flex-wrap items-center gap-2">
@@ -751,15 +740,7 @@ const MoodLog = () => {
                 </div>
               </div>
             </>
-          ) : (
-            
-            <>
-              <h2 className="text-xl font-semibold text-white mb-4">Mood Forecast</h2>
-
-              {/* Show the MoodForecast component here */}
-              <MoodForecast logs={safetyLogs} selectedPeriod={selectedPeriod} />
-            </>
-          )}
+          ) : null}
         </div>
       </div>
       
