@@ -1600,37 +1600,51 @@ const ExerciseModal = ({ exercise, onClose }) => {
                     <label className="block text-[#B8C7E0] text-sm">
                       Alignment with current role (1-10):
                     </label>
-                    <input
-                      type="range"
-                      min="1"
-                      max="10"
-                      value={item.rating}
-                      onChange={(e) => {
-                        const newValues = [...workValues];
-                        newValues[index].rating = parseInt(e.target.value);
-                        setWorkValues(newValues);
-                      }}
-                      className="w-full"
-                    />
-                    <div className="text-[#B8C7E0] text-sm text-center">
-                      Rating: {item.rating}/10
+                    <div className="flex items-center gap-4">
+                      <input
+                        type="range"
+                        min="1"
+                        max="10"
+                        value={item.rating}
+                        onChange={(e) => {
+                          const newValues = [...workValues];
+                          newValues[index].rating = parseInt(e.target.value);
+                          setWorkValues(newValues);
+                        }}
+                        className="flex-1 h-2 bg-[#1E293B] rounded-lg appearance-none cursor-pointer accent-[#5983FC]
+                          [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 
+                          [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:bg-[#5983FC] 
+                          [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:cursor-pointer
+                          [&::-webkit-slider-thumb]:transition-all [&::-webkit-slider-thumb]:duration-150
+                          [&::-webkit-slider-thumb]:hover:bg-[#3E60C1] [&::-webkit-slider-thumb]:hover:scale-110
+                          [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:w-4 
+                          [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:bg-[#5983FC] 
+                          [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:rounded-full 
+                          [&::-moz-range-thumb]:cursor-pointer [&::-moz-range-thumb]:transition-all 
+                          [&::-moz-range-thumb]:duration-150 [&::-moz-range-thumb]:hover:bg-[#3E60C1]
+                          [&::-moz-range-thumb]:hover:scale-110"
+                      />
+                      <div className="bg-[#1E293B] px-3 py-1 rounded-lg border border-[#3E60C1]/30 min-w-[60px] text-center">
+                        <span className="text-[#5983FC] font-medium">{item.rating}</span>
+                        <span className="text-[#B8C7E0] text-sm">/10</span>
+                      </div>
                     </div>
-                  </div>
 
-                  <div>
-                    <label className="block text-[#B8C7E0] text-sm mb-1">
-                      How does your work currently honor this value?
-                    </label>
-                    <textarea
-                      value={item.alignment}
-                      onChange={(e) => {
-                        const newValues = [...workValues];
-                        newValues[index].alignment = e.target.value;
-                        setWorkValues(newValues);
-                      }}
-                      placeholder="Describe how your work aligns with this value..."
-                      className="w-full bg-[#1E293B] border border-[#3E60C1]/30 rounded-lg p-2 text-white focus:outline-none focus:border-[#5983FC] min-h-[60px]"
-                    />
+                    <div>
+                      <label className="block text-[#B8C7E0] text-sm mb-1">
+                        How does your work currently honor this value?
+                      </label>
+                      <textarea
+                        value={item.alignment}
+                        onChange={(e) => {
+                          const newValues = [...workValues];
+                          newValues[index].alignment = e.target.value;
+                          setWorkValues(newValues);
+                        }}
+                        placeholder="Describe how your work aligns with this value..."
+                        className="w-full bg-[#1E293B] border border-[#3E60C1]/30 rounded-lg p-2 text-white focus:outline-none focus:border-[#5983FC] min-h-[60px]"
+                      />
+                    </div>
                   </div>
                 </div>
               ))}
