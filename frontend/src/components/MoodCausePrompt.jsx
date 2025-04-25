@@ -1744,7 +1744,7 @@ const MoodCausePrompt = ({ notification, onClose }) => {
       ];
     }
     
-    // Ensure resources are available
+    
     if (!enhancedExercise.resources || enhancedExercise.resources.length === 0) {
       if (recommendation.title === "Values Clarification") {
         enhancedExercise.resources = [
