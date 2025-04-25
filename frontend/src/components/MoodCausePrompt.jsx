@@ -1602,6 +1602,20 @@ const MoodCausePrompt = ({ notification, onClose }) => {
     else if (recommendation.title === "Values Based Work Reflection") {
       enhancedExercise.link = 'work-values-reflection';
       enhancedExercise.type = 'work-values';
+      enhancedExercise.resources = [
+        {
+          type: "video",
+          title: "How to Find Work You Love",
+          description: "Scott Dinsmore's popular TEDx talk about aligning work with personal values",
+          url: "https://www.ted.com/talks/scott_dinsmore_how_to_find_work_you_love"
+        },
+        {
+          type: "article",
+          title: "Creating a Personal Mission Statement for Work",
+          description: "Step-by-step guide to developing a meaningful work mission statement",
+          url: "https://www.mindtools.com/pages/article/newHTE_93.htm"
+        }
+      ];
     }
     else if (recommendation.title === "Health Worry Examination") {
       enhancedExercise.link = 'health-worry-link';
