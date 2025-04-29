@@ -8,7 +8,6 @@ const api = axios.create({
   withCredentials: true,
 });
 
-// Get CSRF token from cookie
 function getCSRFToken() {
   const name = 'csrftoken=';
   const decodedCookie = decodeURIComponent(document.cookie);
