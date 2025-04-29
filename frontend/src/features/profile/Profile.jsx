@@ -432,7 +432,7 @@ const Profile = () => {
                 </div>
               )}
 
-              {/* Action buttons */}
+              
               <div className="flex justify-end gap-4 mt-8">
                 <motion.button
                   whileHover={{ scale: 1.02 }}
