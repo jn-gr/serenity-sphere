@@ -20,7 +20,7 @@ const NotificationCenter = () => {
 
   useEffect(() => {
     if (items && items.length > 0 && !activeNotification) {
-      // Always prioritize positive reinforcement notifications
+
       const positiveNotification = items.find(item => item.type === 'positive_reinforcement');
       
       if (positiveNotification) {
@@ -28,14 +28,14 @@ const NotificationCenter = () => {
         return;
       }
       
-      // Then check for mood shift notifications
+
       const moodShift = items.find(item => item.type === 'mood_shift' || 
                                          (item.isNegativeShift && item.type === 'mood_shift'));
       
       if (moodShift) {
         setActiveNotification(moodShift);
       } else {
-        // Otherwise show the first notification
+
         setActiveNotification(items[0]);
       }
     }
