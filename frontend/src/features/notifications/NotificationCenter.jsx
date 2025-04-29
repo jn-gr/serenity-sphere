@@ -4,7 +4,7 @@ import { fetchNotifications, dismissNotification } from './notificationSlice';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaTimesCircle, FaExclamationTriangle, FaInfoCircle, FaTimes, FaRegSmileBeam } from 'react-icons/fa';
 
-// A new component to handle the cause selection and recommendations
+
 import MoodCausePrompt from '../../components/MoodCausePrompt';
 import PositiveReinforcement from '../../components/PositiveReinforcement';
 
