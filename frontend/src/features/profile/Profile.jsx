@@ -126,7 +126,7 @@ const Profile = () => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
     
-    // Update avatar on username change
+
     if (name === 'username') {
       setAvatar(`https://ui-avatars.com/api/?name=${value}&background=5983FC&color=fff`);
     }
@@ -136,7 +136,7 @@ const Profile = () => {
     }
     setMessage(null);
     
-    // Password validation
+
     if (name === 'password' || name === 'confirmPassword') {
       const newFormData = {
         ...formData,
@@ -158,7 +158,7 @@ const Profile = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    // Validation checks
+
     let hasErrors = false;
     const errors = {};
     
@@ -185,22 +185,19 @@ const Profile = () => {
       return;
     }
     
-    // If passwords are not provided or empty, remove them from the update data
     const updateData = { ...formData };
     if (!updateData.password.trim()) {
       delete updateData.password;
       delete updateData.confirmPassword;
     } else {
-      delete updateData.confirmPassword; // Don't send confirmPassword to the API
+      delete updateData.confirmPassword;
       
-      // If changing password, include the old password
       if (activeTab === 'security' && oldPassword) {
         updateData.old_password = oldPassword;
       }
     }
     
     try {
-      // Dispatch the updateProfile action
       await dispatch(updateProfile(updateData));
       
       // Reset password fields
