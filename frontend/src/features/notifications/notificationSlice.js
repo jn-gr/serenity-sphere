@@ -82,7 +82,6 @@ const analyzeNotificationTrend = (notification) => {
     'angry': 1, 'grieving': 1, 'disgusted': 1, 'remorseful': 1
   };
 
-  // Consider all moods with value < 4 as negative (this matches your mood chart values)
   return (moodValues[notification.mood] || 5) < 4;
 };
 
@@ -106,11 +105,9 @@ const notificationSlice = createSlice({
       .addCase(fetchNotifications.fulfilled, (state, action) => {
         state.status = 'succeeded';
         state.items = action.payload.reduce((acc, notification) => {
-          // Filter out mood_shift notifications that don't actually indicate negative shift
           if (notification.type === 'mood_shift') {
             const isNegativeShift = analyzeNotificationTrend(notification);
             
-            // Only keep truly negative shift notifications
             if (!isNegativeShift) return acc;
             
             return [...acc, {
@@ -118,7 +115,6 @@ const notificationSlice = createSlice({
               isNegativeShift: true
             }];
           }
-          // Keep all other notification types
           return [...acc, notification];
         }, []);
       })
@@ -127,7 +123,6 @@ const notificationSlice = createSlice({
         state.error = action.error.message;
       })
       .addCase(addPositiveReinforcement.fulfilled, (state, action) => {
-        // Only add if the payload is valid (not null)
         if (action.payload) {
           state.items = [action.payload, ...state.items];
         }
