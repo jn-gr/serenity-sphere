@@ -22,7 +22,7 @@ function getCSRFToken() {
   return null;
 }
 
-// Add request interceptor to include CSRF token
+
 api.interceptors.request.use(
   (config) => {
     const csrfToken = getCSRFToken();
