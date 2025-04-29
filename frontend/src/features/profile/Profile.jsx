@@ -200,7 +200,6 @@ const Profile = () => {
     try {
       await dispatch(updateProfile(updateData));
       
-      // Reset password fields
       setFormData(prev => ({
         ...prev,
         password: '',
@@ -209,7 +208,6 @@ const Profile = () => {
       setOldPassword('');
       
     } catch (err) {
-      // If the error contains field-specific errors
       if (err.response?.data?.errors) {
         const backendErrors = err.response.data.errors;
         if (backendErrors.old_password) {
@@ -235,7 +233,6 @@ const Profile = () => {
         confirmPassword: ''
       });
       
-      // Reset avatar to the current user's username
       setAvatar(`https://ui-avatars.com/api/?name=${user.username}&background=5983FC&color=fff`);
     }
     setOldPassword('');
