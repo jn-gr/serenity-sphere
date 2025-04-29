@@ -250,7 +250,6 @@ const Profile = () => {
           transition={{ duration: 0.4 }}
           className="bg-[#1A2335] rounded-2xl border border-[#2A3547] overflow-hidden"
         >
-          {/* Header section with background */}
           <div className="relative h-40 bg-gradient-to-r from-[#3E60C1] to-[#5983FC]">
             <div className="absolute -bottom-16 left-8 flex items-end">
               <div className="relative">
@@ -273,7 +272,6 @@ const Profile = () => {
             </div>
           </div>
 
-          {/* Tabs navigation */}
           <div className="mt-20 px-8">
             <div className="flex border-b border-[#2A3547]">
               <button
@@ -298,7 +296,6 @@ const Profile = () => {
             </div>
           </div>
 
-          {/* Notification messages */}
           <div className="px-8 pt-6">
             <AnimatePresence>
               {message && (
@@ -325,7 +322,6 @@ const Profile = () => {
             </AnimatePresence>
           </div>
 
-          {/* Form contents */}
           <div className="p-8 pt-2">
             <form onSubmit={handleSubmit}>
               {activeTab === 'personal' && (
