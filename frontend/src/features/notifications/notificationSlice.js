@@ -16,11 +16,11 @@ export const fetchNotifications = createAsyncThunk(
   }
 );
 
-// Create a custom thunk for adding positive reinforcement
+
 export const addPositiveReinforcement = createAsyncThunk(
   'notifications/addPositiveReinforcement',
   async (payload, { dispatch }) => {
-    // Get the mood values from MoodChart
+
     const moodValues = {
       // Very positive moods (8-10)
       'happy': 9, 'excited': 9, 'loving': 9, 'optimistic': 8,
@@ -43,7 +43,7 @@ export const addPositiveReinforcement = createAsyncThunk(
     const mood = payload.mood || 'neutral';
     const moodValue = moodValues[mood] || 0;
     
-    // Create notification for any positive mood (>=6)
+
     if (moodValue >= 6) {
       return {
         id: payload.id || Date.now(),
@@ -62,7 +62,7 @@ export const addPositiveReinforcement = createAsyncThunk(
 const analyzeNotificationTrend = (notification) => {
   if (!notification || !notification.mood) return false;
   
-  // Get all the mood values from the MoodChart component
+
   const moodValues = {
     // Very positive moods (8-10)
     'happy': 9, 'excited': 9, 'loving': 9, 'optimistic': 8,
