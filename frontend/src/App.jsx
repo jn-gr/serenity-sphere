@@ -62,7 +62,6 @@ const AppContent = () => {
             <Route path="/journal" element={isAuthenticated ? <JournalList /> : <Navigate to="/login" />} />
             <Route path="/mood" element={isAuthenticated ? <MoodLog /> : <Navigate to="/login" />} />
             <Route path="/profile" element={isAuthenticated ? <Profile /> : <Navigate to="/login" />} />
-            {/* Add more routes as needed */}
           </Routes>
         </Layout>
       </ThemeProvider>
