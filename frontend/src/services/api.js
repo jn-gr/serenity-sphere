@@ -41,7 +41,6 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response && [401, 403].includes(error.response.status)) {
-      // Clear local storage and reload page if session is invalid
       localStorage.removeItem('user');
       window.location.reload();
     }
