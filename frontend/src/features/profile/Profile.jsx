@@ -54,11 +54,11 @@ const Profile = () => {
   const [showPasswordSection, setShowPasswordSection] = useState(false);
   const [successAnimation, setSuccessAnimation] = useState(false);
 
-  // Avatar state - using initials
+
   const [avatar, setAvatar] = useState(null);
   const [passwordError, setPasswordError] = useState('');
 
-  // Fetch the current profile if not in the redux store
+
   useEffect(() => {
     const fetchProfile = async () => {
       try {
@@ -71,7 +71,7 @@ const Profile = () => {
           confirmPassword: ''
         });
         
-        // Update avatar with username initials
+
         setAvatar(`https://ui-avatars.com/api/?name=${response.data.username}&background=5983FC&color=fff`);
       } catch (err) {
         console.error('Error fetching profile:', err);
@@ -90,7 +90,7 @@ const Profile = () => {
         confirmPassword: ''
       });
       
-      // Set avatar to username initials
+
       setAvatar(`https://ui-avatars.com/api/?name=${user.username}&background=5983FC&color=fff`);
     } else {
       fetchProfile();
@@ -104,7 +104,7 @@ const Profile = () => {
     }
     
     if (success) {
-      // Check what was updated
+
       const updatedFields = [];
       if (formData.username !== user?.username) updatedFields.push('username');
       if (formData.email !== user?.email) updatedFields.push('email');
