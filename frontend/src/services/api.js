@@ -36,7 +36,6 @@ api.interceptors.request.use(
   }
 );
 
-// Add response interceptor to handle 401/403 errors
 api.interceptors.response.use(
   (response) => response,
   (error) => {
