@@ -5,7 +5,6 @@ import { FiX } from 'react-icons/fi';
 const Modal = ({ isOpen, onClose, title, children }) => {
   const modalRef = useRef();
   
-  // Close modal when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (modalRef.current && !modalRef.current.contains(event.target)) {
@@ -15,7 +14,6 @@ const Modal = ({ isOpen, onClose, title, children }) => {
 
     if (isOpen) {
       document.addEventListener('mousedown', handleClickOutside);
-      // Prevent scrolling of background content
       document.body.style.overflow = 'hidden';
     }
     
@@ -25,7 +23,6 @@ const Modal = ({ isOpen, onClose, title, children }) => {
     };
   }, [isOpen, onClose]);
 
-  // Close on ESC key press
   useEffect(() => {
     const handleEsc = (event) => {
       if (event.keyCode === 27) onClose();
@@ -57,7 +54,6 @@ const Modal = ({ isOpen, onClose, title, children }) => {
             transition={{ type: 'spring', damping: 20, stiffness: 300 }}
             className="bg-[#1A2335] relative rounded-2xl border border-[#2A3547] shadow-xl w-full max-w-3xl max-h-[90vh] overflow-hidden flex flex-col"
           >
-            {/* Header */}
             <div className="flex items-center justify-between p-4 md:p-6 border-b border-[#2A3547] bg-[#0F172A]">
               <h2 className="text-xl md:text-2xl font-bold text-white">{title}</h2>
               <button
