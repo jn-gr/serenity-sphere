@@ -38,18 +38,14 @@ const SmartNotificationCenter = () => {
     );
     const recentLogs = sortedLogs.slice(0, 3);
     
-    // Define emotion categories
     const positiveEmotions = ['happy', 'excited', 'loving', 'optimistic', 'proud', 'grateful', 'relieved', 'amused', 'calm', 'caring'];
     const negativeEmotions = ['anxious', 'nervous', 'embarrassed', 'disappointed', 'annoyed', 'disapproving', 'sad', 'angry', 'grieving', 'disgusted', 'remorseful'];
     
-    // Check current emotional state
     const currentMood = recentLogs[0]?.mood;
     const previousMood = recentLogs[1]?.mood;
     
-    // Check if current mood is negative
     const isCurrentNegative = currentMood && negativeEmotions.includes(currentMood);
     
-    // For users experiencing negative emotions
     if (isCurrentNegative) {
       // Show mood shift UI when transitioning from positive to negative
       if (previousMood && positiveEmotions.includes(previousMood)) {
