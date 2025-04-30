@@ -14,9 +14,6 @@ const Layout = ({ children }) => {
       <Navbar />
       <motion.main
         className={`min-h-screen w-full ${mainPaddingClasses}`}
-        // Remove animation props related to old sidebar hover state
-        // animate={{}}
-        // transition={{}}
       >
         {children}
       </motion.main>
