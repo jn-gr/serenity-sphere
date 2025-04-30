@@ -65,12 +65,10 @@ const Modal = ({ isOpen, onClose, title, children }) => {
               </button>
             </div>
             
-            {/* Content */}
             <div className="p-4 md:p-6 overflow-y-auto">
               {children}
             </div>
             
-            {/* Footer */}
             <div className="p-4 md:p-6 border-t border-[#2A3547] bg-[#0F172A] flex justify-end">
               <button
                 onClick={onClose}
