@@ -5,10 +5,9 @@ import { motion } from 'framer-motion';
 const Layout = ({ children }) => {
   const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
 
-  // Define padding based on authentication status and screen size
   const mainPaddingClasses = isAuthenticated 
-    ? "pb-16 md:pb-0 md:pl-[4.5rem]" // Padding for bottom nav on small, sidebar on large
-    : "pt-16 md:pt-20"; // Padding for top nav (adjust pt values if your top nav height changed)
+    ? "pb-16 md:pb-0 md:pl-[4.5rem]" 
+    : "pt-16 md:pt-20";
 
   return (
     <div className="min-h-screen bg-[#0F172A]">
