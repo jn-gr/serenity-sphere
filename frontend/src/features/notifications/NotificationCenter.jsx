@@ -6,7 +6,6 @@ import { FaTimesCircle, FaExclamationTriangle, FaInfoCircle, FaTimes, FaRegSmile
 
 
 import MoodCausePrompt from '../../components/MoodCausePrompt';
-import PositiveReinforcement from '../../components/PositiveReinforcement';
 
 const NotificationCenter = () => {
   const dispatch = useDispatch();
