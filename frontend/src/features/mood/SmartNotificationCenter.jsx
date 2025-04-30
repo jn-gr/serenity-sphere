@@ -28,13 +28,11 @@ const SmartNotificationCenter = () => {
     }
   }, [logs, dispatch]);
 
-  // If there's no data yet, just render the regular NotificationCenter
   if (!notifications || !logs || logs.length === 0) {
     return <NotificationCenter />;
   }
 
   try {
-    // Get recent logs to determine current emotional state
     const sortedLogs = [...logs].sort((a, b) => 
       new Date(b.date || b.created_at || 0) - new Date(a.date || a.created_at || 0)
     );
