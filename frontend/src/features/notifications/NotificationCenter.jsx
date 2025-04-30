@@ -28,8 +28,7 @@ const NotificationCenter = () => {
       }
       
 
-      const moodShift = items.find(item => item.type === 'mood_shift' || 
-                                         (item.isNegativeShift && item.type === 'mood_shift'));
+      const moodShift = items.find(item => item.type === 'mood_shift' || (item.isNegativeShift && item.type === 'mood_shift'));
       
       if (moodShift) {
         setActiveNotification(moodShift);
