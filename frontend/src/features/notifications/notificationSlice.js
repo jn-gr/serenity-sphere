@@ -78,7 +78,7 @@ const analyzeNotificationTrend = (notification) => {
     'anxious': 3, 'nervous': 3, 'embarrassed': 3, 'disappointed': 3,
     'annoyed': 3, 'disapproving': 2, 'sad': 2,
     
-    // Very negative moods (0-1)
+
     'angry': 1, 'grieving': 1, 'disgusted': 1, 'remorseful': 1
   };
 
