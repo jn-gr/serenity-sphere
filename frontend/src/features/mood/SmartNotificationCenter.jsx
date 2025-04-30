@@ -16,8 +16,6 @@ const SmartNotificationCenter = () => {
         new Date(b.date || b.created_at || 0) - new Date(a.date || a.created_at || 0)
       );
       const latestMood = sortedLogs[0]?.mood;
-      
-      // Define positive emotions
       const positiveEmotions = ['happy', 'excited', 'loving', 'optimistic', 'proud', 'grateful', 'relieved', 'amused', 'calm', 'caring'];
       
       // If latest mood is positive, always dispatch positive reinforcement
