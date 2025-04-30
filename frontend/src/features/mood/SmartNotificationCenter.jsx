@@ -47,7 +47,6 @@ const SmartNotificationCenter = () => {
     const isCurrentNegative = currentMood && negativeEmotions.includes(currentMood);
     
     if (isCurrentNegative) {
-      // Show mood shift UI when transitioning from positive to negative
       if (previousMood && positiveEmotions.includes(previousMood)) {
         const moodShiftNotification = {
           id: 'mood-shift-' + Date.now(),
@@ -72,7 +71,6 @@ const SmartNotificationCenter = () => {
         );
       }
       
-      // Show emotional support UI for negative states
       const supportNotification = {
         id: 'emotional-support-' + Date.now(),
         type: 'emotional_support',
@@ -100,7 +98,6 @@ const SmartNotificationCenter = () => {
     console.error("Error in SmartNotificationCenter:", error);
   }
   
-  // Default behavior - show normal notifications
   return <NotificationCenter />;
 };
 
