@@ -17,10 +17,7 @@ const SmartNotificationCenter = () => {
       );
       const latestMood = sortedLogs[0]?.mood;
       const positiveEmotions = ['happy', 'excited', 'loving', 'optimistic', 'proud', 'grateful', 'relieved', 'amused', 'calm', 'caring'];
-      
-      // If latest mood is positive, always dispatch positive reinforcement
       if (latestMood && positiveEmotions.includes(latestMood)) {
-        // Create a unique ID for each visit
         const notificationId = `positive-${Date.now()}`;
         dispatch(addPositiveReinforcement({ 
           mood: latestMood,
