@@ -28,15 +28,9 @@ export const addPositiveReinforcement = createAsyncThunk(
       
       // Positive moods (6-7)
       'calm': 7, 'caring': 7, 'surprised': 6, 'curious': 6,
-      
-      // Neutral moods (4-5)
       'neutral': 5, 'confused': 4,
-      
-      // Negative moods (2-3)
       'anxious': 3, 'nervous': 3, 'embarrassed': 3, 'disappointed': 3,
       'annoyed': 3, 'disapproving': 2, 'sad': 2,
-      
-      // Very negative moods (0-1)
       'angry': 1, 'grieving': 1, 'disgusted': 1, 'remorseful': 1
     };
     
