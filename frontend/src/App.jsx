@@ -20,7 +20,6 @@ const AppContent = () => {
   const isAuthenticated = useSelector(state => state.auth.isAuthenticated)
   
   useEffect(() => {
-    // Fetch CSRF token when app loads
     const fetchCSRFToken = async () => {
       try {
         await api.get('/api/csrf/')
@@ -30,16 +29,13 @@ const AppContent = () => {
     }
     fetchCSRFToken()
 
-    // If user is authenticated (from localStorage), verify the session
     if (isAuthenticated) {
       const verifySession = async () => {
         try {
           const response = await api.get('/api/auth/user/')
-          // Update the user data in case it changed
           dispatch(setCredentials({ user: response.data }))
         } catch (error) {
           console.error('Session verification failed:', error)
-          // Only logout if the error is authentication-related (401 or 403)
           if (error.response && [401, 403].includes(error.response.status)) {
             dispatch(logout())
           }
