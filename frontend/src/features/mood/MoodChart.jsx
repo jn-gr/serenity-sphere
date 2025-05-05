@@ -265,7 +265,6 @@ const MoodChart = () => {
             else if (score >= 2) mood = 'Negative';
             else mood = 'Very Negative';
             
-            // Find the original moods for this date
             const date = dates[context.dataIndex];
             const moodsForDate = trends.filter(trend => trend.date === date);
             const moodsList = moodsForDate.map(m => m.mood).join(', ');
