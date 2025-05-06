@@ -675,11 +675,6 @@ const MoodLog = () => {
                             </div>
                           ))}
                       </div>
-                      {trendsByDate[date][0]?.notes && (
-                        <p className="mt-2 text-sm text-[#B8C7E0] italic">
-                          "{trendsByDate[date][0].notes}"
-                        </p>
-                      )}
                     </div>
                   ))
                 ) : (
