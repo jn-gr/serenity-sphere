@@ -467,7 +467,7 @@ const MoodLog = () => {
       <div className="max-w-7xl mx-auto">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-white mb-2">Mood Analytics</h1>
-          <p className="text-[#B8C7E0]">Track and visualize your emotional journey over time</p>
+          <p className="text-[#B8C7E0]">Track and visualise your emotional journey over time</p>
         </div>
 
         <NotificationCenter />
@@ -587,7 +587,7 @@ const MoodLog = () => {
           {selectedView === 'chart' ? (
             <>
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-semibold text-white">Mood Visualizations</h2>
+                <h2 className="text-xl font-semibold text-white">Mood Visualisations</h2>
                 <div className="flex items-center space-x-2">
                   <button
                     onClick={() => setSelectedChart('line')}
