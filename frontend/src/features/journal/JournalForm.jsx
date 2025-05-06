@@ -279,7 +279,7 @@ const JournalForm = () => {
 
     const handleSuccessClose = () => {
         setShowSuccess(false);
-        navigate('/journal');
+        navigate('/mood');
     };
 
     const dismissToast = () => {
