@@ -43,11 +43,11 @@ const MoodDistributionChart = ({ trends }) => {
 
     // Category colors - updated with more professional palette
     const categoryColors = {
-      'Very Positive': 'rgba(16, 185, 129, 0.9)', // Emerald with opacity
-      'Positive': 'rgba(59, 130, 246, 0.9)',      // Blue with opacity
-      'Neutral': 'rgba(99, 102, 241, 0.9)',       // Indigo with opacity
-      'Negative': 'rgba(249, 115, 22, 0.9)',      // Orange with opacity
-      'Very Negative': 'rgba(239, 68, 68, 0.9)'   // Red with opacity
+      'Very Positive': 'rgba(16, 185, 129, 0.9)',
+      'Positive': 'rgba(59, 130, 246, 0.9)',
+      'Neutral': 'rgba(99, 102, 241, 0.9)',
+      'Negative': 'rgba(249, 115, 22, 0.9)',
+      'Very Negative': 'rgba(239, 68, 68, 0.9)'
     };
     
     // Category hover colors - slightly brighter
@@ -83,10 +83,10 @@ const MoodDistributionChart = ({ trends }) => {
           data: Object.values(categoryOccurrences),
           backgroundColor: Object.keys(categoryOccurrences).map(category => categoryColors[category]),
           hoverBackgroundColor: Object.keys(categoryOccurrences).map(category => categoryHoverColors[category]),
-          borderColor: 'rgba(30, 41, 59, 0.8)', // Dark border for contrast
+          borderColor: 'rgba(30, 41, 59, 0.8)',
           borderWidth: 1,
           hoverOffset: 15,
-          borderRadius: 4, // Rounded segments
+          borderRadius: 4,
         },
       ],
     };
@@ -95,7 +95,7 @@ const MoodDistributionChart = ({ trends }) => {
     const options = {
       responsive: true,
       maintainAspectRatio: false,
-      cutout: '75%', // Slightly thinner donut
+      cutout: '75%',
       plugins: {
         legend: {
           position: 'bottom',

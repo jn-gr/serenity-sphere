@@ -12,13 +12,10 @@ const MoodCausePrompt = ({ notification, onClose }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [dominantEmotion, setDominantEmotion] = useState('');
   const [activeExercise, setActiveExercise] = useState(null);
-  
-  // Add these new states
   const [showIssuePrompt, setShowIssuePrompt] = useState(false);
   const [userIssue, setUserIssue] = useState('');
   const [issueType, setIssueType] = useState('');
   
-  // Enhanced emotion categorization based on your mood chart values
   const emotionCategories = {
     veryPositive: ['happy', 'excited', 'loving', 'optimistic', 'proud', 'grateful', 'relieved', 'amused'],
     positive: ['calm', 'caring', 'surprised', 'curious'],
@@ -689,12 +686,6 @@ const MoodCausePrompt = ({ notification, onClose }) => {
             title: "5-4-3-2-1 Grounding Technique",
             description: "Guided exercise by a licensed therapist",
             url: "https://www.youtube.com/watch?v=30VMIEmA114"
-          },
-          {
-            type: "article",
-            title: "Grounding Techniques for Anxiety",
-            description: "Psychology Today",
-            url: "https://www.psychologytoday.com/us/blog/mindful-anger/201708/grounding-techniques-managing-intense-emotions"
           }
         ]
       },
@@ -712,14 +703,8 @@ const MoodCausePrompt = ({ notification, onClose }) => {
         duration: "5 minutes",
         benefits: "Reduces physiological symptoms of anxiety, slows heart rate",
         type: "breathing",
-        audioUrl: "/exercises/breathing-guide.mp3", // You would need to add these audio files
+        audioUrl: "/exercises/breathing-guide.mp3",
         resources: [
-          {
-            type: "video",
-            title: "Diaphragmatic Breathing Technique",
-            description: "University of Michigan Health",
-            url: "https://www.youtube.com/watch?v=8VbOPUWpFZs"
-          },
           {
             type: "article",
             title: "Breathing Exercises for Anxiety",
@@ -944,19 +929,19 @@ const MoodCausePrompt = ({ notification, onClose }) => {
         benefits: "Reduces catastrophizing, promotes balanced perspective"
       },
       {
-        title: "Mindful Body Scan",
-        description: "Connect with your body through systematic awareness.",
+        title: "Body Scan Meditation",
+        description: "Systematically bring awareness to each part of your body.",
         steps: [
           "Lie down in a comfortable position",
-          "Bring attention to your breath for several cycles",
-          "Slowly move your awareness from toes to head",
-          "Notice sensations without judgment (tension, relaxation, etc.)",
-          "When your mind wanders, gently return focus to your body",
-          "Conclude with gratitude for your body's continuous work"
+          "Starting at your toes, bring awareness to each body part",
+          "Notice sensations without judgment (heaviness, tingling, etc.)",
+          "If you notice tension, breathe into that area and imagine it softening",
+          "Continue gradually moving upward through your entire body",
+          "End with awareness of your body as a whole"
         ],
         duration: "15-20 minutes",
-        benefits: "Increases body awareness, reduces physical tension"
-      }
+        benefits: "Reduces physical tension, improves body awareness"
+      },
     ],
     
     'loss': [
@@ -1064,7 +1049,21 @@ const MoodCausePrompt = ({ notification, onClose }) => {
         duration: "15 minutes",
         benefits: "Builds confidence in coping abilities, reduces fear of unknown",
         type: "future-possibilities",
-        link: 'future-possibilities'
+        link: 'future-possibilities',
+        resources: [
+          {
+            type: "article",
+            title: "How Visualization Can Benefit Your Well-Being",
+            description: "Discusses how visualization can influence thoughts, emotions, and behaviors.",
+            url: "https://www.psychologytoday.com/us/blog/click-here-for-happiness/202308/how-visualization-can-benefit-your-well-being"
+          },
+          {
+            type: "video",
+            title: "A Great Future Awaits for You! (Guided Meditation)",
+            description: "A guided meditation to help visualize and connect with a positive future.",
+            url: "https://www.youtube.com/watch?v=X-Ueg598Tt0"
+          }
+        ]
       },
       {
         title: "Uncertainty Tolerance Practice",
@@ -1092,7 +1091,17 @@ const MoodCausePrompt = ({ notification, onClose }) => {
           "Remind yourself: 'I can only live in this moment'"
         ],
         duration: "5-10 minutes",
-        benefits: "Shifts focus from future worries to present agency"
+        benefits: "Shifts focus from future worries to present agency",
+        type: "anchoring-in-the-present",
+        link: "anchoring-in-the-present",
+        resources: [
+          {
+            type: "article",
+            title: "Anchoring: A Strategy for Weathering Life",
+            description: "A mindfulness practice of focusing on a particular point to ground yourself.",
+            url: "https://www.psychologytoday.com/us/blog/beyond-mental-health/202405/anchoring-a-strategy-for-weathering-life"
+          }
+        ]
       }
     ],
     
@@ -1197,7 +1206,17 @@ const MoodCausePrompt = ({ notification, onClose }) => {
           "Conclude by noting how your attention feels now"
         ],
         duration: "5 minutes",
-        benefits: "Trains attention, cultivates present-moment awareness"
+        benefits: "Trains attention, cultivates present-moment awareness",
+        type: "mindful-observation",
+        link: "mindful-observation",
+        resources: [
+          {
+            type: "article",
+            title: "Work Day Stress Relief: 5 Senses in 5 Mindful Minutes",
+            description: "A quick mindfulness exercise engaging each of the five senses to ground oneself.",
+            url: "https://www.psychologytoday.com/us/blog/design-your-path/201106/work-day-stress-relief-5-senses-in-5-mindful-minutes"
+          }
+        ]
       },
       {
         title: "Body Scan Meditation",
@@ -1369,7 +1388,6 @@ const MoodCausePrompt = ({ notification, onClose }) => {
       });
     }
     
-    // If we have a custom user issue, craft a personalized exercise
     if (userIssue && userIssue.trim().length > 0) {
       const personalizedExercise = createPersonalizedExercise(
         userIssue, 
@@ -1451,8 +1469,8 @@ const MoodCausePrompt = ({ notification, onClose }) => {
         title: "Personal Reflection Exercise",
         description: `Explore your situation: "${issue.substring(0, 50)}${issue.length > 50 ? '...' : ''}"`,
         steps: [
-          "Write exactly what you're experiencing",
-          "Note how this situation affects your emotions and body",
+          "Think about what you're experiencing",
+          "Say out loud how this situation affects your emotions and body",
           "Consider what this experience might be teaching you",
           "Identify one small step toward self-care"
         ]
@@ -1554,6 +1572,10 @@ const MoodCausePrompt = ({ notification, onClose }) => {
       enhancedExercise.link = 'appreciation-expression';
       enhancedExercise.type = 'appreciation';
     }
+    else if (recommendation.title === "mindful body scan") {
+      enhancedExercise.link = 'mindful-body-scan';
+      enhancedExercise.type = 'mindful-body-scan';
+    }
     // Add this specific case for Body Appreciation Practice
     else if (recommendation.title === "Body Appreciation Practice") {
       enhancedExercise.link = 'body-appreciation-link';
@@ -1561,15 +1583,30 @@ const MoodCausePrompt = ({ notification, onClose }) => {
       enhancedExercise.resources = [
         {
           type: "article",
-          title: "The Power of Body Gratitude",
-          description: "Research on body appreciation and well-being",
-          url: "https://www.psychologytoday.com/us/blog/beauty-sick/201904/what-is-body-appreciation"
+          title: "How to Accept and Embrace Your Body Once and for All",
+          description: "Learn to challenge inner criticism and accept your body.",
+          url: "https://www.psychologytoday.com/intl/blog/compassion-matters/201201/how-accept-and-embrace-your-body-once-and-all"
         },
         {
           type: "video",
-          title: "Guided Body Appreciation Practice",
-          description: "Expert-led body gratitude meditation",
-          url: "https://www.youtube.com/watch?v=example"
+          title: "10-Minute Guided Meditation | Body Appreciation & Gratitude",
+          description: "A guided meditation to foster body appreciation and gratitude.",
+          url: "https://www.youtube.com/watch?v=HZ5q_qlV45Y"
+        }
+      ];
+    }else if (recommendation.title === "Personal Reflection Exercise") {
+      enhancedExercise.link = 'personal-reflection';
+      enhancedExercise.type = 'reflection';
+    }
+    else if (recommendation.title === "Strengths Inventory") {
+      enhancedExercise.link = 'strengths-inventory';
+      enhancedExercise.type = 'strengths-inventory';
+      enhancedExercise.resources = [
+        {
+          type: "article",
+          title: "Strengths-Based Self-Compassion",
+          description: "Research on self-compassion and well-being",
+          url: "https://www.psychologytoday.com/us/blog/click-here-for-happiness/202101/6-science-based-self-compassion-exercises"
         }
       ];
     }
@@ -1626,12 +1663,6 @@ const MoodCausePrompt = ({ notification, onClose }) => {
           title: "Understanding Health Anxiety",
           description: "Expert insights on managing health-related worries",
           url: "https://www.health.harvard.edu/staying-healthy/always-worried-about-your-health-you-may-be-dealing-with-health-anxiety-disorder"
-        },
-        {
-          type: "video",
-          title: "Managing Health Anxiety",
-          description: "Professional guidance on coping with health concerns",
-          url: "https://www.youtube.com/watch?v=example"
         }
       ];
     }
@@ -1641,15 +1672,39 @@ const MoodCausePrompt = ({ notification, onClose }) => {
       enhancedExercise.resources = [
         {
           type: "article",
-          title: "Cognitive Restructuring Techniques",
-          description: "Evidence-based approaches to challenging anxious thoughts",
-          url: "https://www.psychologytoday.com/us/blog/anxiety-files/201801/cognitive-restructuring-techniques"
+          title: "Cognitive Restructuring",
+          description: "Learn six ways to do cognitive restructuring, a core part of CBT for anxiety.",
+          url: "https://www.psychologytoday.com/us/blog/in-practice/201301/cognitive-restructuring"
         },
         {
           type: "video",
-          title: "How to Challenge Anxious Thoughts",
-          description: "Step-by-step guide to thought reframing",
-          url: "https://www.youtube.com/watch?v=example"
+          title: "Change Your Anxious Thinking: CBT for Anxiety & Cognitive Restructuring",
+          description: "A guide to understanding and applying CBT techniques to reframe anxious thoughts.",
+          url: "https://www.youtube.com/watch?v=ArS-SJi2sbM"
+        }
+      ];
+    }
+    else if (recommendation.title === "Anchoring in the Present") {
+      enhancedExercise.link = 'anchoring-in-the-present';
+      enhancedExercise.type = 'anchoring-in-the-present';
+      enhancedExercise.resources = [
+        {
+          type: "article",
+          title: "Anchoring: A Strategy for Weathering Life",
+          description: "A mindfulness practice of focusing on a particular point to ground yourself.",
+          url: "https://www.psychologytoday.com/us/blog/beyond-mental-health/202405/anchoring-a-strategy-for-weathering-life"
+        }
+      ];
+    }
+    else if (recommendation.title === "Mindful Observation Practice") {
+      enhancedExercise.link = 'mindful-observation';
+      enhancedExercise.type = 'mindful-observation';
+      enhancedExercise.resources = [
+        {
+          type: "article",
+          title: "Work Day Stress Relief: 5 Senses in 5 Mindful Minutes",
+          description: "A quick mindfulness exercise engaging each of the five senses to ground oneself.",
+          url: "https://www.psychologytoday.com/us/blog/design-your-path/201106/work-day-stress-relief-5-senses-in-5-mindful-minutes"
         }
       ];
     }
@@ -1662,12 +1717,6 @@ const MoodCausePrompt = ({ notification, onClose }) => {
           title: "Understanding Grief and Loss",
           description: "Expert insights on processing different types of loss",
           url: "https://www.psychologytoday.com/us/basics/grief"
-        },
-        {
-          type: "video",
-          title: "Coping with Loss",
-          description: "Professional guidance on navigating the journey of loss",
-          url: "https://www.youtube.com/watch?v=example"
         }
       ];
     }
@@ -1677,15 +1726,15 @@ const MoodCausePrompt = ({ notification, onClose }) => {
       enhancedExercise.resources = [
         {
           type: "article",
-          title: "Finding Meaning in Difficult Experiences",
-          description: "Research on post-traumatic growth and meaning-making",
-          url: "https://www.psychologytoday.com/us/blog/what-doesnt-kill-us/201901/finding-meaning-in-adversity"
+          title: "Finding Purpose in the Face of Tragedy and Adversity",
+          description: "Purposefully creating goodness from random suffering and senseless malevolence.",
+          url: "https://www.psychologytoday.com/us/blog/finding-purpose/201811/finding-purpose-in-the-face-of-tragedy-and-adversity"
         },
         {
           type: "video",
-          title: "The Power of Meaning",
-          description: "Expert insights on meaning-making and resilience",
-          url: "https://www.youtube.com/watch?v=example"
+          title: "There's more to life than being happy",
+          description: "Emily Esfahani Smith discusses the pillars of a meaningful life.",
+          url: "https://www.ted.com/talks/emily_esfahani_smith_there_s_more_to_life_than_being_happy"
         }
       ];
     }
@@ -1695,15 +1744,15 @@ const MoodCausePrompt = ({ notification, onClose }) => {
       enhancedExercise.resources = [
         {
           type: "article",
-          title: "Understanding Continuing Bonds",
-          description: "Research on maintaining healthy connections after loss",
-          url: "https://www.psychologytoday.com/us/blog/understanding-grief/201901/continuing-bonds-after-loss"
+          title: "Continuing Bonds, Not Chains of Pain", // Updated title
+          description: "Discusses how we never lose connection with loved ones and how to maintain a healthy continuing bond.", // Updated description
+          url: "https://www.psychologytoday.com/us/blog/good-mourning/202007/continuing-bonds-not-chains-of-pain" // Updated URL
         },
         {
           type: "video",
-          title: "Maintaining Connection After Loss",
-          description: "Expert guidance on healthy continuing bonds",
-          url: "https://www.youtube.com/watch?v=example"
+          title: "Continuing Bonds: The Model + How it Applies with Dr Edith Shiro", // Updated title
+          description: "Dr. Edith Shiro discusses the Continuing Bonds model and its application.", // Updated description
+          url: "https://www.youtube.com/watch?v=jmNhMAluYBc" // Updated URL
         }
       ];
     }
@@ -1713,15 +1762,15 @@ const MoodCausePrompt = ({ notification, onClose }) => {
       enhancedExercise.resources = [
         {
           type: "article",
-          title: "Understanding and Transforming Self-Criticism",
-          description: "Research on self-compassion and inner critic work",
-          url: "https://www.psychologytoday.com/us/blog/click-here-happiness/202101/how-transform-your-inner-critic"
+          title: "Is Your Inner Critic Controlling You? How to Heal From Within",
+          description: "Understand and heal your inner critic with compassionate self-awareness.",
+          url: "https://www.psychologytoday.com/us/blog/making-change/202503/is-your-inner-critic-controlling-you-how-to-heal-from-within"
         },
         {
           type: "video",
-          title: "Working with Your Inner Critic",
-          description: "Expert guidance on developing self-compassion",
-          url: "https://www.youtube.com/watch?v=example"
+          title: "How to FINALLY tame your inner critic 🤫",
+          description: "Practical advice for managing and softening your inner critic.",
+          url: "https://www.youtube.com/watch?v=HHnV0awivks"
         }
       ];
     }
@@ -1731,15 +1780,37 @@ const MoodCausePrompt = ({ notification, onClose }) => {
       enhancedExercise.resources = [
         {
           type: "article",
-          title: "Building Tolerance for Uncertainty",
-          description: "Research on managing uncertainty and anxiety",
-          url: "https://www.psychologytoday.com/us/blog/anxiety-files/201801/how-build-tolerance-uncertainty"
+          title: "How to Grow Your Tolerance for Uncertainty",
+          description: "Learn why we fear the unknown and strategies to practice and grow your tolerance for uncertainty.",
+          url: "https://www.psychologytoday.com/us/blog/unpacking-anxiety/202404/how-to-grow-your-tolerance-for-uncertainty"
         },
         {
           type: "video",
-          title: "Managing Uncertainty in Life",
-          description: "Expert guidance on developing uncertainty tolerance",
-          url: "https://www.youtube.com/watch?v=example"
+          title: "Coping With Uncertainty",
+          description: "Learn practical strategies to cope with uncertainty and reduce anxiety.",
+          url: "https://www.youtube.com/watch?v=S3CU2kOBt3s"
+        }
+      ];
+    }
+    else if (recommendation.title === "Body Scan Meditation") {
+      enhancedExercise.resources = [
+        {
+          type: "article",
+          title: "The Power of Body Gratitude",
+          description: "Research on body appreciation and well-being",
+          url: "https://www.psychologytoday.com/us/blog/beauty-sick/201904/what-is-body-appreciation"
+        }
+      ];
+    }
+    else if (recommendation.title === "Self-Compassion Break") {
+      enhancedExercise.link = 'self-compassion-break';
+      enhancedExercise.type = 'self-compassion-break';
+      enhancedExercise.resources = [
+        {
+          type: "article",
+          title: "6 Science-Based Self-Compassion Exercises",
+          description: "Learn about self-compassion and practices like the Self-Compassion Break.",
+          url: "https://www.psychologytoday.com/us/blog/click-here-for-happiness/202101/6-science-based-self-compassion-exercises"
         }
       ];
     }
@@ -1760,9 +1831,9 @@ const MoodCausePrompt = ({ notification, onClose }) => {
         enhancedExercise.resources = [
           {
             type: "article",
-            title: "The Science of Gratitude in Relationships",
-            description: "Research from Greater Good Science Center",
-            url: "https://greatergood.berkeley.edu/article/item/how_gratitude_strengthens_relationships"
+            title: "Giving Thanks: How Gratitude Strengthens Relationships",
+            description: "Research shows that gratitude improves connection and relationship satisfaction.",
+            url: "https://www.psychologytoday.com/us/blog/evidence-based-living/202311/giving-thanks-how-gratitude-strengthens-relationships"
           }
         ];
       }
@@ -1776,7 +1847,6 @@ const MoodCausePrompt = ({ notification, onClose }) => {
           }
         ];
       }
-      // Also add resources in the resources section
       else if (recommendation.title === "Work Boundaries Exercise") {
         enhancedExercise.resources = [
           {
@@ -1794,22 +1864,21 @@ const MoodCausePrompt = ({ notification, onClose }) => {
         ];
       }
     }
-    
     else if (recommendation.title === "Future Possibilities Visualization") {
       enhancedExercise.link = 'future-possibilities';
       enhancedExercise.type = 'future-possibilities';
       enhancedExercise.resources = [
         {
           type: "article",
-          title: "Managing Uncertainty Through Visualization",
-          description: "Research on visualization techniques for anxiety management",
-          url: "https://www.psychologytoday.com/us/blog/anxiety-files/202101/managing-uncertainty"
+          title: "How Visualization Can Benefit Your Well-Being",
+          description: "Discusses how visualization can influence thoughts, emotions, and behaviors.",
+          url: "https://www.psychologytoday.com/us/blog/click-here-for-happiness/202308/how-visualization-can-benefit-your-well-being"
         },
         {
           type: "video",
-          title: "Guided Future Visualization Practice",
-          description: "Expert-led visualization for uncertainty",
-          url: "https://www.youtube.com/watch?v=example"
+          title: "A Great Future Awaits for You! (Guided Meditation)",
+          description: "A guided meditation to help visualize and connect with a positive future.",
+          url: "https://www.youtube.com/watch?v=X-Ueg598Tt0"
         }
       ];
     }

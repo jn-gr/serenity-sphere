@@ -131,7 +131,7 @@ class Notification(models.Model):
 class MoodCause(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='mood_causes')
     notification = models.ForeignKey(Notification, on_delete=models.CASCADE, related_name='causes', null=True, blank=True)
-    cause_type = models.CharField(max_length=50)  # e.g., 'loss', 'stress', 'conflict'
+    cause_type = models.CharField(max_length=50) 
     notes = models.TextField(blank=True, null=True)  # Optional user notes
     created_at = models.DateTimeField(default=timezone.now)
     

@@ -157,22 +157,23 @@ const detectNegativeTrend = (logs) => {
   const recentLogs = logs.slice(-5);
   
   // Define the mood values directly from your MoodChart
+
   const moodValues = {
-    // Very positive moods (8-10)
+    // Very positive
     'happy': 9, 'excited': 9, 'loving': 9, 'optimistic': 8,
     'proud': 8, 'grateful': 8, 'relieved': 8, 'amused': 8,
     
-    // Positive moods (6-7)
+    // Positive
     'calm': 7, 'caring': 7, 'surprised': 6, 'curious': 6,
     
-    // Neutral moods (4-5)
+    // Neutral
     'neutral': 5, 'confused': 4,
     
-    // Negative moods (2-3)
+    // Negative
     'anxious': 3, 'nervous': 3, 'embarrassed': 3, 'disappointed': 3,
     'annoyed': 3, 'disapproving': 2, 'sad': 2,
     
-    // Very negative moods (0-1)
+    // Very negative
     'angry': 1, 'grieving': 1, 'disgusted': 1, 'remorseful': 1
   };
   

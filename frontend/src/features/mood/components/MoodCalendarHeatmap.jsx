@@ -14,7 +14,6 @@ const MoodCalendarHeatmap = ({ trends }) => {
     );
   }
 
-  // Process trends to map date -> average mood score
   const moodValues = {
     // Very positive moods (8-10)
     'happy': 9,

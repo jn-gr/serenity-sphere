@@ -3,6 +3,10 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { FaTimes, FaSave, FaRegLightbulb, FaCheck, FaArrowRight, FaArrowLeft, FaPlay, FaPause, FaExternalLinkAlt, FaVolumeMute, FaVolumeUp, FaStopwatch, FaLink, FaYoutube, FaFileAlt, FaBook, FaEdit, FaTrash, FaPlus, FaClock, FaChevronLeft, FaChevronRight, FaLightbulb, FaPencilAlt, FaSmile, FaMeh, FaFrown } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 
+// Assuming exerciseContents would be defined elsewhere and passed as a prop or imported
+// For now, to prevent ReferenceError, let's use a placeholder if it's not provided.
+const exerciseContents = {}; // Placeholder - ideally this comes from props or import
+
 const ExerciseModal = ({ exercise, onClose }) => {
   const [journalEntry, setJournalEntry] = useState('');
   const [saved, setSaved] = useState(false);
@@ -107,14 +111,61 @@ const ExerciseModal = ({ exercise, onClose }) => {
   const [controlAspects, setControlAspects] = useState('');
   const timerRef = useRef(null);
   const audioRef = useRef(null);
+
+  // State for Future Possibilities Visualization Exercise
+  const [futurePossibilitiesStep, setFuturePossibilitiesStep] = useState(0); // 0: situation, 1: positive, 2: neutral, 3: challenging, 4: reflection
   const [futurePossibilitiesData, setFuturePossibilitiesData] = useState({
     situation: '',
     scenarios: {
-      positive: { description: '', coping: '', resources: '' },
-      neutral: { description: '', coping: '', resources: '' },
-      challenging: { description: '', coping: '', resources: '' }
-    }
+      positive: { description: '', coping: '', resources: '', feelings: '' },
+      neutral: { description: '', coping: '', resources: '', feelings: '' },
+      challenging: { description: '', coping: '', resources: '', feelings: '' }
+    },
+    reflection: '',
+    actionStep: ''
   });
+
+  const bodyParts = [
+    { name: "Toes", prompt: "Bring your awareness to your toes. Notice any sensations: tingling, warmth, pressure, or nothing at all." },
+    { name: "Feet Soles & Heels", prompt: "Move your attention to the soles of your feet and your heels. Feel the contact with the surface beneath you." },
+    { name: "Ankles & Calves", prompt: "Become aware of your ankles and calves. Notice any tension or relaxation." },
+    { name: "Knees & Thighs", prompt: "Shift your focus to your knees and thighs. Feel their weight and any sensations present." },
+    { name: "Hips & Pelvis", prompt: "Bring your awareness to your hips and pelvis. Notice the support of this area." },
+    { name: "Abdomen", prompt: "Focus on your abdomen. Notice the gentle rise and fall with your breath." },
+    { name: "Chest", prompt: "Move your attention to your chest. Feel your heartbeat and the expansion of your lungs." },
+    { name: "Back", prompt: "Become aware of your entire back, from the lower back up to your shoulder blades. Notice any contact or sensations." },
+    { name: "Shoulders & Arms", prompt: "Shift your focus to your shoulders, arms, and hands. Let them be heavy and relaxed." },
+    { name: "Neck & Throat", prompt: "Bring your awareness to your neck and throat. Release any tension you might be holding." },
+    { name: "Face & Head", prompt: "Focus on your face – jaw, mouth, eyes, forehead – and the entire scalp. Allow all facial muscles to soften." },
+    { name: "Whole Body", prompt: "Finally, expand your awareness to your entire body, feeling it as a whole, breathing." }
+  ];
+
+  const [strengths, setStrengths] = useState(['', '', '', '', '', '', '']); // For 7 strengths
+  const [strengthExamples, setStrengthExamples] = useState(['', '', '', '', '', '', '']);
+  const [strengthReflections, setStrengthReflections] = useState({
+    howHelped: ['', '', '', '', '', '', ''],
+    keyStrengths: [false, false, false, false, false, false, false], // To select 3 key strengths
+    usagePlan: '',
+    mantra: ''
+  });
+
+  // State for Anchoring in the Present
+  const [anchoringSee, setAnchoringSee] = useState('');
+  const [anchoringHear, setAnchoringHear] = useState('');
+  const [anchoringFeel, setAnchoringFeel] = useState('');
+  const [anchoringReflection, setAnchoringReflection] = useState('');
+
+  // State for Mindful Observation
+  const [observedObject, setObservedObject] = useState('');
+  const [observationDetails, setObservationDetails] = useState({
+    color: '',
+    texture: '',
+    shape: '',
+    uniqueFeatures: '',
+    newDetails: '',
+    concludingFeeling: ''
+  });
+
   const getDurationInSeconds = () => {
     if (!exercise.duration) return 300;
 
@@ -224,7 +275,13 @@ const ExerciseModal = ({ exercise, onClose }) => {
       exerciseContent.type === 'continuing-bonds' ||
       exerciseContent.type === 'inner-critic' ||
       exerciseContent.type === 'uncertainty-tolerance' ||
-      exerciseContent.type === 'future-possibilities';
+      exerciseContent.type === 'future-possibilities' ||
+      exerciseContent.type === 'grounding' ||
+      exerciseContent.type === 'self-compassion-break' ||
+      exerciseContent.type === 'strengths-inventory' ||
+      exerciseContent.type === 'anchoring-in-the-present' ||
+      exerciseContent.type === 'mindful-observation' ||
+      exerciseContent.type === 'personal-reflection';
   };
 
   const renderInteractiveComponent = () => {
@@ -2737,89 +2794,571 @@ const ExerciseModal = ({ exercise, onClose }) => {
         );
 
       case 'future-possibilities':
-        const updateScenario = (type, newData) => {
-          setFuturePossibilitiesData(prev => ({
-            ...prev,
-            scenarios: {
-              ...prev.scenarios,
-              [type]: newData
+        const handleFutureDataChange = (field, value, scenarioType = null) => {
+          setFuturePossibilitiesData(prev => {
+            if (scenarioType) {
+              return {
+                ...prev,
+                scenarios: {
+                  ...prev.scenarios,
+                  [scenarioType]: {
+                    ...prev.scenarios[scenarioType],
+                    [field]: value
+                  }
+                }
+              };
+            } else {
+              return { ...prev, [field]: value };
             }
-          }));
-        };
-
-        const isScenarioComplete = (scenario) => {
-          return scenario.description && scenario.coping && scenario.resources;
-        };
-
-        const allScenariosComplete = () => {
-          return isScenarioComplete(futurePossibilitiesData.scenarios.positive) &&
-            isScenarioComplete(futurePossibilitiesData.scenarios.neutral) &&
-            isScenarioComplete(futurePossibilitiesData.scenarios.challenging);
-        };
-
-        const handleSave = () => {
-          const exerciseData = {
-            situation: futurePossibilitiesData.situation,
-            scenarios: futurePossibilitiesData.scenarios,
-            completedAt: new Date().toISOString()
-          };
-
-          console.log('Saving exercise data:', exerciseData);
-
-          toast.success('Your visualization exercise has been saved!', {
-            position: 'bottom-right',
-            theme: 'dark'
           });
+        };
 
-          setCompleted(true);
+        const nextFutureStep = () => setFuturePossibilitiesStep(prev => Math.min(prev + 1, 4));
+        const prevFutureStep = () => setFuturePossibilitiesStep(prev => Math.max(0, prev - 1));
+
+        const renderFutureStep = () => {
+          switch (futurePossibilitiesStep) {
+            case 0: // Define Situation
+              return (
+                <div className="space-y-4">
+                  <h4 className="text-white font-medium mb-2">Step 1: What situation are you uncertain about?</h4>
+                  <textarea
+                    value={futurePossibilitiesData.situation}
+                    onChange={(e) => handleFutureDataChange('situation', e.target.value)}
+                    placeholder="Describe the situation you'd like to explore..."
+                    className="w-full bg-[#0F172A] border border-[#2A3547] rounded-lg p-3 text-[#B8C7E0] focus:outline-none focus:border-[#5983FC] min-h-[120px] placeholder-[#4B5563]"
+                  />
+                  <div className="flex justify-end">
+                    <button
+                      onClick={nextFutureStep}
+                      disabled={!futurePossibilitiesData.situation.trim()}
+                      className="px-4 py-2 bg-[#5983FC] text-white rounded-lg hover:bg-[#3E60C1] transition-colors disabled:bg-slate-600 disabled:cursor-not-allowed"
+                    >
+                      Next <FaArrowRight className="ml-2" />
+                    </button>
+                  </div>
+                </div>
+              );
+            case 1: // Positive Outcome
+            case 2: // Neutral Outcome
+            case 3: // Challenging Outcome
+              const scenarioKey = futurePossibilitiesStep === 1 ? 'positive' : futurePossibilitiesStep === 2 ? 'neutral' : 'challenging';
+              const scenarioTitle = scenarioKey.charAt(0).toUpperCase() + scenarioKey.slice(1);
+              const currentScenario = futurePossibilitiesData.scenarios[scenarioKey];
+              return (
+                <div className="space-y-4">
+                  <h4 className="text-white font-medium mb-2">Step {futurePossibilitiesStep + 1}: Exploring a {scenarioTitle} Outcome</h4>
+                  <div>
+                    <label className="text-[#B8C7E0] text-sm block mb-1">Describe this {scenarioTitle.toLowerCase()} outcome:</label>
+                    <textarea
+                      value={currentScenario.description}
+                      onChange={(e) => handleFutureDataChange('description', e.target.value, scenarioKey)}
+                      placeholder={`What would a ${scenarioTitle.toLowerCase()} outcome look like?`}
+                      className="w-full bg-[#0F172A] border border-[#2A3547] rounded-lg p-3 text-[#B8C7E0] focus:outline-none focus:border-[#5983FC] min-h-[80px] placeholder-[#4B5563]"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[#B8C7E0] text-sm block mb-1">How would you cope or respond?</label>
+                    <textarea
+                      value={currentScenario.coping}
+                      onChange={(e) => handleFutureDataChange('coping', e.target.value, scenarioKey)}
+                      placeholder="What strategies would you use?"
+                      className="w-full bg-[#0F172A] border border-[#2A3547] rounded-lg p-3 text-[#B8C7E0] focus:outline-none focus:border-[#5983FC] min-h-[80px] placeholder-[#4B5563]"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[#B8C7E0] text-sm block mb-1">What resources or strengths would help?</label>
+                    <textarea
+                      value={currentScenario.resources}
+                      onChange={(e) => handleFutureDataChange('resources', e.target.value, scenarioKey)}
+                      placeholder="Internal strengths, external support, etc."
+                      className="w-full bg-[#0F172A] border border-[#2A3547] rounded-lg p-3 text-[#B8C7E0] focus:outline-none focus:border-[#5983FC] min-h-[80px] placeholder-[#4B5563]"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[#B8C7E0] text-sm block mb-1">How would this outcome make you feel?</label>
+                    <textarea
+                      value={currentScenario.feelings}
+                      onChange={(e) => handleFutureDataChange('feelings', e.target.value, scenarioKey)}
+                      placeholder="Describe your anticipated emotions..."
+                      className="w-full bg-[#0F172A] border border-[#2A3547] rounded-lg p-3 text-[#B8C7E0] focus:outline-none focus:border-[#5983FC] min-h-[80px] placeholder-[#4B5563]"
+                    />
+                  </div>
+                  <div className="flex justify-between">
+                    <button
+                      onClick={prevFutureStep}
+                      className="px-4 py-2 bg-slate-500 text-white rounded-lg hover:bg-slate-600 transition-colors flex items-center"
+                    >
+                      <FaArrowLeft className="mr-2" /> Previous
+                    </button>
+                    <button
+                      onClick={nextFutureStep}
+                      disabled={!currentScenario.description.trim() || !currentScenario.coping.trim() || !currentScenario.resources.trim() || !currentScenario.feelings.trim()}
+                      className="px-4 py-2 bg-[#5983FC] text-white rounded-lg hover:bg-[#3E60C1] transition-colors flex items-center disabled:bg-slate-600 disabled:cursor-not-allowed"
+                    >
+                      Next <FaArrowRight className="ml-2" />
+                    </button>
+                  </div>
+                </div>
+              );
+            case 4: // Reflection
+              return (
+                <div className="space-y-4">
+                  <h4 className="text-white font-medium mb-2">Step 5: Reflection & Action</h4>
+                  <div>
+                    <label className="text-[#B8C7E0] text-sm block mb-1">What are your key takeaways from exploring these possibilities?</label>
+                    <textarea
+                      value={futurePossibilitiesData.reflection}
+                      onChange={(e) => handleFutureDataChange('reflection', e.target.value)}
+                      placeholder="Summarize your insights..."
+                      className="w-full bg-[#0F172A] border border-[#2A3547] rounded-lg p-3 text-[#B8C7E0] focus:outline-none focus:border-[#5983FC] min-h-[100px] placeholder-[#4B5563]"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[#B8C7E0] text-sm block mb-1">What is one small, manageable action step you can take related to this situation?</label>
+                    <textarea
+                      value={futurePossibilitiesData.actionStep}
+                      onChange={(e) => handleFutureDataChange('actionStep', e.target.value)}
+                      placeholder="e.g., Gather more information, talk to someone..."
+                      className="w-full bg-[#0F172A] border border-[#2A3547] rounded-lg p-3 text-[#B8C7E0] focus:outline-none focus:border-[#5983FC] min-h-[80px] placeholder-[#4B5563]"
+                    />
+                  </div>
+                  <div className="flex justify-between">
+                    <button
+                      onClick={prevFutureStep}
+                      className="px-4 py-2 bg-slate-500 text-white rounded-lg hover:bg-slate-600 transition-colors flex items-center"
+                    >
+                      <FaArrowLeft className="mr-2" /> Previous
+                    </button>
+                    <button
+                      onClick={() => {
+                        // Consolidate save and complete logic here
+                        const exerciseDataToSave = {
+                          type: 'future-possibilities',
+                          data: futurePossibilitiesData,
+                          completedAt: new Date().toISOString()
+                        };
+                        console.log('Saving Future Possibilities exercise data:', exerciseDataToSave);
+                        toast.success('Your Future Possibilities exercise has been saved!', {
+                          position: 'bottom-right',
+                          theme: 'dark'
+                        });
+                        handleComplete(); // Call existing modal complete function
+                      }}
+                      disabled={!futurePossibilitiesData.reflection.trim()}
+                      className="px-4 py-2 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition-colors flex items-center disabled:bg-slate-600 disabled:cursor-not-allowed"
+                    >
+                      Save & Complete <FaSave className="ml-2" />
+                    </button>
+                  </div>
+                </div>
+              );
+            default:
+              return <p className="text-white">Loading step...</p>; 
+          }
         };
 
         return (
           <div className="space-y-6">
-            <div className="mb-6">
-              <h4 className="text-white font-medium mb-2">What situation are you uncertain about?</h4>
+            {renderFutureStep()}
+          </div>
+        );
+
+      case 'grounding':
+        const groundingSensePrompts = [
+          { name: 'See', prompt: 'List 5 things you can SEE around you. What do you notice about them?' },
+          { name: 'Touch', prompt: 'List 4 things you can TOUCH or FEEL. Describe their textures or temperatures.' },
+          { name: 'Hear', prompt: 'List 3 things you can HEAR right now. What sounds are nearby or far away?' },
+          { name: 'Smell', prompt: 'List 2 things you can SMELL. What scents are in the air?' },
+          { name: 'Taste', prompt: 'List 1 thing you can TASTE. What is the current taste in your mouth, or what was the last thing you tasted?' },
+          { name: 'Reflect', prompt: 'Take a deep breath. How do you feel now after grounding yourself?' }
+        ];
+
+        const currentGroundingSense = groundingSensePrompts[groundingStep];
+
+        const handleSimpleGroundingInputChange = (value) => {
+          const senseKey = currentGroundingSense.name.toLowerCase();
+          setGroundingInputs(prevInputs => ({
+            ...prevInputs,
+            [senseKey]: value
+          }));
+        };
+
+        const goToNextGroundingStep = () => {
+          if (groundingStep < groundingSensePrompts.length - 1) {
+            setGroundingStep(groundingStep + 1);
+          }
+        };
+
+        const goToPrevGroundingStep = () => {
+          if (groundingStep > 0) {
+            setGroundingStep(groundingStep - 1);
+          }
+        };
+
+        if (!currentGroundingSense) return null;
+
+        return (
+          <div className="mt-4 space-y-4">
+            <div className="bg-[#0F172A] p-4 rounded-lg border border-[#2A3547]">
+              <h4 className="text-white text-lg font-medium mb-1">{currentGroundingSense.name}</h4>
+              <p className="text-[#B8C7E0] text-sm mb-3">{currentGroundingSense.prompt}</p>
+              
               <textarea
-                value={futurePossibilitiesData.situation}
-                onChange={(e) => setFuturePossibilitiesData(prev => ({ ...prev, situation: e.target.value }))}
-                placeholder="Describe the situation you'd like to explore..."
-                className="w-full bg-[#0F172A] border border-[#2A3547] rounded-lg p-3 text-[#B8C7E0] focus:outline-none focus:border-[#5983FC] min-h-[100px] placeholder-[#4B5563]"
+                value={groundingInputs[currentGroundingSense.name.toLowerCase()] || ''}
+                onChange={(e) => handleSimpleGroundingInputChange(e.target.value)}
+                className="w-full h-28 bg-[#1A2335] border border-[#2A3547] rounded-lg p-3 text-[#B8C7E0] text-sm focus:outline-none focus:border-[#5983FC]"
+                placeholder={`Enter what you ${currentGroundingSense.name.toLowerCase()}...`}
               />
             </div>
 
-            {futurePossibilitiesData.situation && (
-              <>
-                <ScenarioInput
-                  type="positive"
-                  scenario={futurePossibilitiesData.scenarios.positive}
-                  onUpdate={(newData) => updateScenario('positive', newData)}
-                  isCompleted={isScenarioComplete(futurePossibilitiesData.scenarios.positive)}
-                />
+            <div className="flex justify-between mt-4">
+              <button
+                onClick={goToPrevGroundingStep}
+                disabled={groundingStep === 0}
+                className={`px-4 py-2 rounded-lg text-white transition-colors flex items-center ${groundingStep === 0 ? 'bg-slate-600 cursor-not-allowed' : 'bg-[#3E60C1] hover:bg-[#5983FC]'}`}
+              >
+                <FaArrowLeft className="mr-2" /> Previous
+              </button>
+              {groundingStep < groundingSensePrompts.length - 1 ? (
+                <button
+                  onClick={goToNextGroundingStep}
+                  className="px-4 py-2 rounded-lg text-white bg-[#3E60C1] hover:bg-[#5983FC] transition-colors flex items-center"
+                >
+                  Next <FaArrowRight className="ml-2" />
+                </button>
+              ) : (
+                <button
+                  onClick={handleComplete} // Assuming handleComplete exists and is appropriate
+                  className="px-4 py-2 rounded-lg text-white bg-emerald-500 hover:bg-emerald-600 transition-colors flex items-center"
+                >
+                  Complete <FaCheck className="ml-2" />
+                </button>
+              )}
+            </div>
+          </div>
+        );
 
-                <ScenarioInput
-                  type="neutral"
-                  scenario={futurePossibilitiesData.scenarios.neutral}
-                  onUpdate={(newData) => updateScenario('neutral', newData)}
-                  isCompleted={isScenarioComplete(futurePossibilitiesData.scenarios.neutral)}
-                />
+      case 'self-compassion-break':
+        const selfCompassionPhases = [
+          {
+            title: "Acknowledge Your Feeling",
+            prompt: "Notice and acknowledge that you're going through a difficult time. Silently say to yourself:",
+            affirmation: "This is a moment of suffering."
+          },
+          {
+            title: "Common Humanity",
+            prompt: "Remind yourself that suffering is a part of life, and you're not alone. Silently say to yourself:",
+            affirmation: "Suffering is a part of being human. Other people feel this way too."
+          },
+          {
+            title: "Offer Self-Kindness",
+            prompt: "Now, offer yourself some compassion. You can place a hand on your heart or another comforting gesture. Silently say to yourself:",
+            affirmation: "May I be kind to myself in this moment. May I give myself the compassion I need."
+          },
+          {
+            title: "Reflection",
+            prompt: "Take a gentle breath. Notice how you feel after this brief pause for self-compassion.",
+            affirmation: null // No affirmation for reflection, user can just reflect
+          }
+        ];
 
-                <ScenarioInput
-                  type="challenging"
-                  scenario={futurePossibilitiesData.scenarios.challenging}
-                  onUpdate={(newData) => updateScenario('challenging', newData)}
-                  isCompleted={isScenarioComplete(futurePossibilitiesData.scenarios.challenging)}
-                />
+        const currentPhase = selfCompassionPhases[selfCompassionStep];
 
-                {allScenariosComplete() && (
-                  <div className="flex justify-end">
-                    <button
-                      onClick={handleSave}
-                      className="px-4 py-2 bg-[#5983FC] text-white rounded-lg hover:bg-[#3E60C1] transition-colors flex items-center"
-                    >
-                      <FaSave className="mr-2" /> Save Visualization
-                    </button>
+        return (
+          <div className="mt-4 space-y-4">
+            <div className="bg-[#0F172A] p-4 rounded-lg border border-[#2A3547]">
+              <h4 className="text-white text-lg font-medium mb-2">{currentPhase.title}</h4>
+              <p className="text-[#B8C7E0] text-sm mb-3">{currentPhase.prompt}</p>
+              {currentPhase.affirmation && (
+                <div className="bg-[#1A2335] p-3 rounded-lg border border-[#3E60C1]/30">
+                  <p className="text-white italic text-center">{currentPhase.affirmation}</p>
+                </div>
+              )}
+              {currentPhase.title === "Reflection" && (
+                 <textarea
+                    className="w-full h-20 bg-[#1A2335] border border-[#2A3547] rounded-lg p-3 mt-3 text-[#B8C7E0] text-sm focus:outline-none focus:border-[#5983FC]"
+                    placeholder="Your reflections (optional)..."
+                  />
+              )}
+            </div>
+
+            <div className="flex justify-between mt-4">
+              <button
+                onClick={() => setSelfCompassionStep(prev => Math.max(0, prev - 1))}
+                disabled={selfCompassionStep === 0}
+                className={`px-4 py-2 rounded-lg text-white transition-colors flex items-center ${selfCompassionStep === 0 ? 'bg-slate-600 cursor-not-allowed' : 'bg-[#3E60C1] hover:bg-[#5983FC]'}`}
+              >
+                <FaArrowLeft className="mr-2" /> Previous
+              </button>
+              {selfCompassionStep < selfCompassionPhases.length - 1 ? (
+                <button
+                  onClick={() => setSelfCompassionStep(prev => prev + 1)}
+                  className="px-4 py-2 rounded-lg text-white bg-[#3E60C1] hover:bg-[#5983FC] transition-colors flex items-center"
+                >
+                  Next <FaArrowRight className="ml-2" />
+                </button>
+              ) : (
+                <button
+                  onClick={handleComplete} 
+                  className="px-4 py-2 rounded-lg text-white bg-emerald-500 hover:bg-emerald-600 transition-colors flex items-center"
+                >
+                  Complete <FaCheck className="ml-2" />
+                </button>
+              )}
+            </div>
+          </div>
+        );
+
+      case 'strengths-inventory':
+        const handleStrengthChange = (index, value) => {
+          const newStrengths = [...strengths];
+          newStrengths[index] = value;
+          setStrengths(newStrengths);
+        };
+
+        const handleExampleChange = (index, value) => {
+          const newExamples = [...strengthExamples];
+          newExamples[index] = value;
+          setStrengthExamples(newExamples);
+        };
+
+        const handleHowHelpedChange = (index, value) => {
+          const newReflections = { ...strengthReflections };
+          newReflections.howHelped[index] = value;
+          setStrengthReflections(newReflections);
+        };
+
+        const toggleKeyStrength = (index) => {
+          const newReflections = { ...strengthReflections };
+          const currentSelectionCount = newReflections.keyStrengths.filter(Boolean).length;
+          if (!newReflections.keyStrengths[index] && currentSelectionCount >= 3) {
+            toast.info("You can select up to 3 key strengths.", { theme: 'dark' });
+            return;
+          }
+          newReflections.keyStrengths[index] = !newReflections.keyStrengths[index];
+          setStrengthReflections(newReflections);
+        };
+        
+        const selectedKeyStrengthsCount = strengthReflections.keyStrengths.filter(Boolean).length;
+
+        return (
+          <div className="space-y-6">
+            <div className="bg-[#0F172A]/70 p-5 rounded-xl border border-[#2A3547]">
+              <h4 className="text-white font-medium mb-3">Your Strengths & Qualities</h4>
+              <p className="text-[#B8C7E0] text-sm mb-4">
+                List at least 7 strengths or positive qualities you possess. For each, provide a specific example of when you've used it and how it has helped.
+              </p>
+              <div className="space-y-4">
+                {strengths.map((strength, index) => (
+                  <div key={index} className="bg-[#1A2335] p-4 rounded-lg border border-[#2A3547]">
+                    <div className="flex items-center mb-2">
+                       <span className="text-[#5983FC] font-medium mr-2">{index + 1}.</span>
+                       <input
+                        type="text"
+                        value={strength}
+                        onChange={(e) => handleStrengthChange(index, e.target.value)}
+                        placeholder={`Strength / Quality #${index + 1}`}
+                        className="flex-1 bg-[#0F172A] border border-[#2A3547] rounded-lg p-2 text-[#B8C7E0] focus:outline-none focus:border-[#5983FC]"
+                      />
+                    </div>
+                    <textarea
+                      value={strengthExamples[index]}
+                      onChange={(e) => handleExampleChange(index, e.target.value)}
+                      placeholder="Specific example of when you used this strength..."
+                      className="w-full bg-[#0F172A] border border-[#2A3547] rounded-lg p-2 text-[#B8C7E0] focus:outline-none focus:border-[#5983FC] min-h-[60px] mt-2"
+                    />
+                    <textarea
+                      value={strengthReflections.howHelped[index]}
+                      onChange={(e) => handleHowHelpedChange(index, e.target.value)}
+                      placeholder="How has this strength helped you or others?"
+                      className="w-full bg-[#0F172A] border border-[#2A3547] rounded-lg p-2 text-[#B8C7E0] focus:outline-none focus:border-[#5983FC] min-h-[60px] mt-2"
+                    />
                   </div>
-                )}
-              </>
+                ))}
+              </div>
+            </div>
+
+            <div className="bg-[#0F172A]/70 p-5 rounded-xl border border-[#2A3547]">
+              <h4 className="text-white font-medium mb-3">Identify Your Key Strengths</h4>
+              <p className="text-[#B8C7E0] text-sm mb-4">
+                Choose up to 3 strengths from your list that feel most authentic and impactful to you. ({selectedKeyStrengthsCount}/3 selected)
+              </p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {strengths.map((strength, index) => (
+                  strength && (
+                    <button
+                      key={index}
+                      onClick={() => toggleKeyStrength(index)}
+                      className={`p-3 rounded-lg border text-left transition-colors ${
+                        strengthReflections.keyStrengths[index]
+                          ? 'bg-[#3E60C1]/20 border-[#5983FC] text-white'
+                          : 'bg-[#1A2335] border-[#2A3547] text-[#B8C7E0] hover:border-[#5983FC]/70'
+                      }`}
+                    >
+                      <div className="flex items-center">
+                        <div className={`w-5 h-5 rounded-full mr-3 flex-shrink-0 flex items-center justify-center border-2 ${
+                          strengthReflections.keyStrengths[index] ? 'border-[#5983FC] bg-[#5983FC]' : 'border-[#3E60C1]'
+                        }`}>
+                          {strengthReflections.keyStrengths[index] && <FaCheck className="text-white w-3 h-3"/>}
+                        </div>
+                        <span className="font-medium">{strength}</span>
+                      </div>
+                    </button>
+                  )
+                ))}
+              </div>
+            </div>
+            
+            <div className="bg-[#0F172A]/70 p-5 rounded-xl border border-[#2A3547]">
+              <h4 className="text-white font-medium mb-3">Leverage Your Strengths</h4>
+              <div className="space-y-4">
+                <div>
+                  <label className="text-[#B8C7E0] text-sm block mb-1">How will you intentionally use one of your key strengths tomorrow?</label>
+                  <textarea
+                    value={strengthReflections.usagePlan}
+                    onChange={(e) => setStrengthReflections({...strengthReflections, usagePlan: e.target.value})}
+                    placeholder="e.g., 'I will use my creativity to approach the team project.'"
+                    className="w-full bg-[#0F172A] border border-[#2A3547] rounded-lg p-3 text-[#B8C7E0] focus:outline-none focus:border-[#5983FC] min-h-[80px]"
+                  />
+                </div>
+                <div>
+                  <label className="text-[#B8C7E0] text-sm block mb-1">Create a 'Strengths Mantra'</label>
+                  <textarea
+                    value={strengthReflections.mantra}
+                    onChange={(e) => setStrengthReflections({...strengthReflections, mantra: e.target.value})}
+                    placeholder="A short phrase to remind you of your qualities, e.g., 'I am resilient and resourceful.'"
+                    className="w-full bg-[#0F172A] border border-[#2A3547] rounded-lg p-3 text-[#B8C7E0] focus:outline-none focus:border-[#5983FC] min-h-[80px]"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {strengths.some(s => s) && strengthReflections.keyStrengths.some(k => k) && strengthReflections.usagePlan && strengthReflections.mantra && (
+                <div className="bg-emerald-500/10 border border-emerald-500/30 p-4 rounded-xl mt-4">
+                    <p className="text-emerald-400 text-sm">
+                        Well done! You've thoughtfully reflected on your strengths. Remember to draw on these qualities regularly.
+                    </p>
+                </div>
+            )}
+          </div>
+        );
+
+      case 'anchoring-in-the-present':
+        return (
+          <div className="space-y-6">
+            <div className="bg-[#0F172A]/70 p-5 rounded-xl border border-[#2A3547]">
+              <h4 className="text-white font-medium mb-3">Anchoring in the Present Moment</h4>
+              <p className="text-[#B8C7E0] text-sm">
+                This exercise helps you connect with your current environment using your senses.
+              </p>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <label className="text-[#5983FC] text-sm block mb-1">What are 3 things you can SEE right now?</label>
+                <textarea
+                  value={anchoringSee}
+                  onChange={(e) => setAnchoringSee(e.target.value)}
+                  placeholder="Describe what you see around you..."
+                  className="w-full bg-[#0F172A] border border-[#2A3547] rounded-lg p-3 text-[#B8C7E0] focus:outline-none focus:border-[#5983FC] min-h-[80px]"
+                />
+              </div>
+
+              <div>
+                <label className="text-[#5983FC] text-sm block mb-1">What are 2 things you can HEAR right now?</label>
+                <textarea
+                  value={anchoringHear}
+                  onChange={(e) => setAnchoringHear(e.target.value)}
+                  placeholder="Listen and describe the sounds..."
+                  className="w-full bg-[#0F172A] border border-[#2A3547] rounded-lg p-3 text-[#B8C7E0] focus:outline-none focus:border-[#5983FC] min-h-[80px]"
+                />
+              </div>
+
+              <div>
+                <label className="text-[#5983FC] text-sm block mb-1">What is 1 thing you can FEEL (touch) right now?</label>
+                <textarea
+                  value={anchoringFeel}
+                  onChange={(e) => setAnchoringFeel(e.target.value)}
+                  placeholder="Notice a physical sensation, like the texture of your clothes or the chair beneath you..."
+                  className="w-full bg-[#0F172A] border border-[#2A3547] rounded-lg p-3 text-[#B8C7E0] focus:outline-none focus:border-[#5983FC] min-h-[80px]"
+                />
+              </div>
+            </div>
+
+            <div className="bg-[#0F172A]/70 p-5 rounded-xl border border-[#2A3547]">
+              <h4 className="text-white font-medium mb-2">Reflection</h4>
+              <p className="text-[#B8C7E0] text-sm mb-2">
+                After noticing these things, take a deep breath. How do you feel in this present moment?
+              </p>
+              <textarea
+                value={anchoringReflection}
+                onChange={(e) => setAnchoringReflection(e.target.value)}
+                placeholder="Briefly describe how you feel now..."
+                className="w-full bg-[#0F172A] border border-[#2A3547] rounded-lg p-3 text-[#B8C7E0] focus:outline-none focus:border-[#5983FC] min-h-[80px]"
+              />
+            </div>
+             {(anchoringSee || anchoringHear || anchoringFeel) && (
+                <div className="bg-emerald-500/10 border border-emerald-500/30 p-4 rounded-xl mt-4">
+                    <p className="text-emerald-400 text-sm">
+                        {anchoringReflection ? "Well done focusing on the present moment!" : "Continue to notice your surroundings and reflect on how you feel."}
+                    </p>
+                </div>
+            )}
+          </div>
+        );
+
+      case 'mindful-observation':
+        const handleObservationChange = (field, value) => {
+          setObservationDetails(prev => ({ ...prev, [field]: value }));
+        };
+        return (
+          <div className="space-y-6">
+            <div className="bg-[#0F172A]/70 p-5 rounded-xl border border-[#2A3547]">
+              <h4 className="text-white font-medium mb-3">Mindful Observation Practice</h4>
+              <p className="text-[#B8C7E0] text-sm">
+                Choose any natural object around you. Focus all your attention on it. Describe the object and then note down your observations based on the prompts below.
+              </p>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <label className="text-[#B8C7E0] text-sm block mb-1">Object you are observing:</label>
+                <input
+                  type="text"
+                  value={observedObject}
+                  onChange={(e) => setObservedObject(e.target.value)}
+                  placeholder="e.g., a leaf, a stone, a flower"
+                  className="w-full bg-[#0F172A] border border-[#2A3547] rounded-lg p-3 text-[#B8C7E0] focus:outline-none focus:border-[#5983FC] placeholder-[#4B5563]"
+                />
+              </div>
+
+              {[ 
+                {field: 'color', prompt: 'Observe its color(s):'},
+                {field: 'texture', prompt: 'Observe its texture(s):'},
+                {field: 'shape', prompt: 'Observe its shape(s):'},
+                {field: 'uniqueFeatures', prompt: 'Note any unique features:'},
+                {field: 'newDetails', prompt: 'What details did you notice that you hadn\'t seen at first?'},
+                {field: 'concludingFeeling', prompt: 'How does your attention feel now after this observation?'}
+              ].map(item => (
+                <div key={item.field}>
+                  <label className="text-[#B8C7E0] text-sm block mb-1">{item.prompt}</label>
+                  <textarea
+                    value={observationDetails[item.field]}
+                    onChange={(e) => handleObservationChange(item.field, e.target.value)}
+                    placeholder="Describe your observation..."
+                    className="w-full bg-[#0F172A] border border-[#2A3547] rounded-lg p-3 text-[#B8C7E0] focus:outline-none focus:border-[#5983FC] min-h-[80px] placeholder-[#4B5563]"
+                  />
+                </div>
+              ))}
+            </div>
+
+            {observedObject && Object.values(observationDetails).every(val => val.trim() !== '') && (
+                 <div className="bg-emerald-500/10 border border-emerald-500/30 p-4 rounded-xl mt-4">
+                    <p className="text-emerald-400 text-sm">
+                        Excellent focus! You've mindfully observed your chosen object.
+                    </p>
+                </div>
             )}
           </div>
         );
@@ -2832,15 +3371,18 @@ const ExerciseModal = ({ exercise, onClose }) => {
   useEffect(() => {
     const loadExerciseContent = async () => {
       setIsLoading(true);
-
       try {
         const exerciseKey = determineExerciseKey();
+        // Safely access exerciseContents or default to createDefaultExercise
+        const specificExerciseData = (typeof exerciseContents !== 'undefined' && exerciseContents[exerciseKey])
+          ? exerciseContents[exerciseKey]
+          : null; 
 
-        setExerciseContent(exerciseContents[exerciseKey] || createDefaultExercise());
+        setExerciseContent(specificExerciseData || createDefaultExercise());
 
-        if (exerciseContents[exerciseKey]?.checkItems) {
+        if (specificExerciseData?.checkItems) { // Check specificExerciseData for checkItems
           const initialChecklist = {};
-          exerciseContents[exerciseKey].checkItems.forEach((_, index) => {
+          specificExerciseData.checkItems.forEach((_, index) => {
             initialChecklist[index] = false;
           });
           setChecklist(initialChecklist);
@@ -2860,6 +3402,10 @@ const ExerciseModal = ({ exercise, onClose }) => {
     if (!exercise) return 'default';
 
     if (exercise.link && typeof exercise.link === 'string') {
+
+      if (exercise.link === 'mindful-body-scan' || exercise.type === 'mindful-body-scan') {
+        return 'body-scan';
+      }
 
       if (exercise.link === 'task-prioritization' ||
         (exercise.type === 'task') ||
@@ -2883,6 +3429,9 @@ const ExerciseModal = ({ exercise, onClose }) => {
       }
       if (exercise.link === 'work-boundaries') {
         return 'work-boundaries';
+      }
+      if (exercise.link === 'mindful-body-scan') {
+        return 'body-scan';
       }
       if (exerciseContents[exercise.link]) {
         return exercise.link;
@@ -2943,13 +3492,15 @@ const ExerciseModal = ({ exercise, onClose }) => {
     if (titleLower.includes('health') || titleLower.includes('body')) {
       if (titleLower.includes('appreciation')) return 'body-appreciation';
       if (titleLower.includes('worry')) return 'health-worry';
-      return 'mindful-body-scan';
+      return 'body-scan';
     }
+    if (titleLower.includes('Mindful Body Scan')) return 'body-scan';
     if (exercise.type === 'journaling' || exercise.type === 'journal') return 'journaling';
     if (exercise.type === 'meditation') return 'mindfulness';
     if (exercise.type === 'breathing') return 'breathing';
     if (exercise.type === 'grounding') return 'grounding';
     if (exercise.type === 'reflection') return 'reflection';
+    if (exercise.type === 'body-scan') return 'body-scan';
 
     return 'default';
   };
